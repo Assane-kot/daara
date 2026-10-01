@@ -50,7 +50,7 @@ export class AbsencesService {
 - Signals pour l'état : `items`, `loading`, `error`, `total`.
 - Afficher : squelette de chargement, message d'erreur en français avec bouton « Réessayer », état vide.
 - Composants visuels repris du thème (skill composant-vristo).
-- Textes via les fichiers de traduction (fr, ar).
+- Textes via les fichiers de traduction (fr, en).
 
 ## Fin de feature
 - Tests unitaires du service (mock du client Supabase) et du composant principal.

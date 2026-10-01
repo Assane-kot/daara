@@ -1,6 +1,6 @@
 ---
 name: composant-vristo
-description: Retrouve un composant ou une page dans le thème Vristo de référence et l'adapte à DAARA (charte, signals, i18n, RTL). À utiliser pour tout élément d'interface (tableau, formulaire, modale, carte, graphique, dashboard).
+description: Retrouve un composant ou une page dans le thème Vristo de référence et l'adapte à DAARA (charte, signals, i18n, mode sombre). À utiliser pour tout élément d'interface (tableau, formulaire, modale, carte, graphique, dashboard).
 ---
 # Réutiliser le thème Vristo
 
@@ -12,7 +12,7 @@ description: Retrouve un composant ou une page dans le thème Vristo de référe
    - garder le markup et les classes Tailwind du thème ;
    - remplacer les données de démo par des `input()` typés ;
    - remplacer les couleurs en dur par les couleurs du thème DAARA ;
-   - textes via i18n, vérifier le rendu en RTL et en mode sombre.
+   - textes via i18n (fr, en), vérifier le rendu en mode sombre et en 375 px ; garder les classes `ltr:` / `rtl:`.
 4. Ne copier que les éléments nécessaires, au cas par cas. Ne jamais importer directement depuis
    `C:/projets/vristo-reference/` (hors dépôt) et ne jamais le modifier.
 5. Composants partagés à construire en priorité : data-table (pagination serveur), form-field, modal,

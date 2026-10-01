@@ -17,7 +17,8 @@ src/app/
 │   ├── supabase/        supabase.service.ts, database.types.ts
 │   ├── auth/            auth.service.ts, auth.guard.ts, role.guard.ts
 │   ├── daara/           current-daara.service.ts, daara.resolver.ts
-│   ├── i18n/            fr.json, ar.json, direction (RTL)
+│   ├── i18n/            language.service.ts (fr, en) — traductions dans public/i18n/{fr,en}.json
+│   ├── theme/           theme.service.ts (clair / sombre / système)
 │   ├── notifications/   notification-center.service.ts, push.service.ts
 │   └── errors/          error-handler, messages utilisateur
 ├── shared/ui/           data-table, form-field, modal, confirm-dialog, stat-card, badge, empty-state, page-header
@@ -65,8 +66,11 @@ src/app/
 | `CurrentDaaraService` | Signals `daara`, `roles`, `id` ; `hasRole(...)` ; mémorise le dernier slug utilisé |
 | `NotificationCenterService` | Abonnement Realtime à `notifications` de l'utilisateur, compteur non lus |
 | `PushService` | Inscription Web Push (sprint 8) |
+| `ThemeService` | Signal `mode` (clair / sombre / système), classe `dark` sur `<body>`, mémorisé dans `localStorage` |
+| `LanguageService` | Signal `langue` (`fr` par défaut, `en`), `lang` sur `<html>`, bascule sans rechargement, mémorisé |
 
-État : signals dans les services de feature ; pas de store global (NgRx) en V1.
+État : signals dans les services de feature ; pas de store global (NgRx) en V1. Application zoneless,
+composants standalone OnPush, primitives @angular/cdk (Dialog, Menu, Overlay) : voir ADR-004.
 
 ## 3. Modèle de données
 
@@ -264,7 +268,7 @@ sequenceDiagram
 | Niveau | Outil | Périmètre |
 |---|---|---|
 | Base | pgTAP (`supabase test db`) | RLS, fonctions, triggers, calculs de moyennes |
-| Unitaire | Outil de test du starter | Services, composants |
+| Unitaire | Vitest (`@angular/build:unit-test`) | Services, composants |
 | E2E | Playwright | Parcours critiques (connexion, absence → parent, notes → bulletin) |
 | Sécurité | Agents auditeur-securite / auditeur-rls, scan secrets en CI | À chaque feature |
 
@@ -274,5 +278,5 @@ sequenceDiagram
 3. `supabase start` + `supabase db reset` + `supabase test db`
 4. Build production
 5. Scan de secrets + `npm audit --audit-level=high`
-6. Déploiement Cloudflare Pages : preview par branche, production sur `main` ; migrations appliquées manuellement
+6. Déploiement Cloudflare Pages : preview sur `develop`, production sur `main` ; migrations appliquées manuellement
 7. Tâches planifiées : sauvegarde quotidienne → R2, requête anti-pause

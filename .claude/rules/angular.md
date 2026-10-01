@@ -15,5 +15,6 @@ paths:
 - Abonnements Realtime : créés dans le service, libérés via `DestroyRef` / `removeChannel`. Un canal par écran.
 - Toute requête gère les 3 états : chargement, erreur (message utilisateur en français), vide.
 - Formulaires : Reactive Forms typés, validation côté client ET contraintes en base.
-- i18n : français + arabe, layout compatible RTL (`dir="rtl"`), pas de texte en dur hors fichiers de traduction.
+- i18n : français + anglais (ADR-005), pas de texte en dur hors fichiers de traduction. Conserver les variantes
+  `ltr:` / `rtl:` du markup Vristo (arabe prévu plus tard).
 - Guards : `authGuard` + `roleGuard(['admin', ...])`. Le guard est du confort UI ; la vraie sécurité est la RLS.

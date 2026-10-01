@@ -70,17 +70,14 @@ git push -u origin develop
 - **Le développeur fait toutes les commandes git.** Claude Code n'exécute jamais `git` ni `gh`, même en
   lecture (bloqué par `deny` dans `.claude/settings.json`). En fin de tâche, il fournit la liste des
   fichiers modifiés, les commandes git à lancer et le message de commit.
-- `main` = production : ne reçoit que des releases (fusion de `develop`) ; déployé automatiquement en
-  production par Cloudflare Pages.
-- `develop` = branche d'intégration.
-- Cloudflare Pages : production sur `main`, preview sur `develop` et sur chaque branche de story.
-- Une branche par story, créée depuis `develop` : `s1/memberships`, `s5/absences-temps-reel`…
-- Pull request de la story vers `develop` (déclenche CI + preview Cloudflare de la branche),
-  fusion en *squash*, branche supprimée.
-- Release : pull request `develop` → `main`, puis tag sur `main` : `git tag r0 && git push --tags`.
+- Travail directement sur `develop` : pas de branche par story ni par sprint, **un commit par story**.
+  Chaque push sur `develop` déclenche la CI et la preview Cloudflare Pages.
+- `main` = production : mise à jour uniquement à chaque release, par pull request `develop` → `main`,
+  puis tag sur `main` : `git tag r0 && git push --tags`. Déployé automatiquement par Cloudflare Pages.
+- Cloudflare Pages : production sur `main`, preview sur `develop`.
 - Commits en Conventional Commits : `feat:`, `fix:`, `docs:`, `chore:`, `test:`, `refactor:`.
-- GitHub gratuit ne protège pas les branches sur un dépôt privé : la discipline (jamais de push direct sur
-  `main` ni `develop`) repose sur le développeur, seul à exécuter les commandes git.
+- GitHub gratuit ne protège pas les branches sur un dépôt privé : la discipline (jamais de commit direct
+  sur `main`) repose sur le développeur, seul à exécuter les commandes git.
 
 ---
 
@@ -112,7 +109,6 @@ npm start          # le starter doit s'afficher
 ```powershell
 cd C:\dev\daara
 git checkout develop
-git checkout -b s0/analyse-starter
 claude
 ```
 `/memory` pour vérifier que CLAUDE.md est chargé, puis :
@@ -125,10 +121,10 @@ claude
 ---
 
 ## Étape 5 — Sprint 0 (voir docs/SPRINTS.md)
-Une branche et une session par story, dans cet ordre :
+Une session et un commit sur `develop` par story, dans cet ordre :
 1. Mise à niveau / nettoyage du starter, charte DAARA
 2. Supabase local (`supabase init`, `supabase start`) + `SupabaseService` + environnements
-3. i18n fr/ar + RTL
+3. i18n fr/en (ADR-005)
 4. Composants `shared/ui` de base
 5. CI GitHub Actions + Cloudflare Pages
 6. Workflows planifiés (sauvegarde → R2, anti-pause) + Sentry
@@ -140,7 +136,7 @@ Fin de sprint : tag `r0-s0`, application vide en ligne.
 | Moment | Action | Avec Claude Code |
 |---|---|---|
 | Jour 1 | Planification : choisir les stories, compléter le LLD du sprint | « Détaille dans le LLD les stories du sprint N, sans coder » |
-| Chaque story | Branche → spec → migration/RLS/tests → Angular → audit → PROGRESS → PR | Une session par story, `/clear` entre deux |
+| Chaque story | Spec → migration/RLS/tests → Angular → audit → PROGRESS → commit sur `develop` (par le développeur) | Une session par story, `/clear` entre deux |
 | Fin de sprint | Démo, mise à jour SPRINTS.md, rétrospective dans PROGRESS.md, tag | « Fais le bilan du sprint N dans PROGRESS.md » |
 Économiser l'usage Claude Pro : demandes précises (« story X selon LLD §Y »), tâches mécaniques faites à la
 main (install, tests, reset), agents d'audit en fin de story seulement.

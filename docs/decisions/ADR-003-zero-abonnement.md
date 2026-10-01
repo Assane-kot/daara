@@ -9,7 +9,7 @@ Aucune dépense récurrente souhaitée avant que les daaras paient. Claude Code 
 | Besoin | Service gratuit |
 |---|---|
 | Backend | Supabase Free : 2 projets (`daara-dev`, `daara-prod`), région Europe de l'Ouest |
-| Front | Cloudflare Pages (preview par branche, production sur `main`) |
+| Front | Cloudflare Pages (preview sur `develop`, production sur `main`) |
 | Fichiers lourds (audios) | Cloudflare R2 (10 Go gratuits), URLs signées via Edge Function |
 | Sauvegardes | `pg_dump` quotidien par GitHub Actions → R2 |
 | Anti-pause | Requête planifiée GitHub Actions (vacances scolaires) |

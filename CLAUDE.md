@@ -25,11 +25,10 @@ Langue de travail : français. Réponses concises.
 - RÈGLE ABSOLUE : Claude n'exécute JAMAIS de commande `git` ni `gh`, même en lecture (status, diff, log
   compris). Le développeur fait toutes les commandes git. Quand un travail est prêt, Claude donne : la liste
   des fichiers modifiés, les commandes git à lancer et un message de commit (Conventional Commits, en français).
-- `main` = production : releases uniquement (fusion de `develop`), taguées (`r0`, `r1`…).
-- `develop` = branche d'intégration.
-- Une branche par story `sN/nom-story`, créée depuis `develop`, fusionnée dans `develop` par pull request.
-- Jamais de commit ni de push direct sur `main` ni sur `develop`.
-- Cloudflare Pages : production sur `main`, preview sur `develop` et sur chaque branche de story.
+- On travaille directement sur `develop` : pas de branche par story ni par sprint, un commit par story.
+- `main` = production : mise à jour uniquement à chaque release (pull request `develop` → `main` + tag
+  `r0`, `r1`…). Jamais de commit direct sur `main`.
+- Cloudflare Pages : production sur `main`, preview sur `develop`.
 
 ## Workflow par feature
 1. Mode plan → vérifier/compléter la section du LLD, spec dans `docs/features/<nom>.md` (modèle : `_TEMPLATE.md`) → validation du développeur.

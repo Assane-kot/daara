@@ -10,7 +10,7 @@ Objectifs :
 - Centraliser la gestion scolaire : classes, matières, apprenants, absences, notes, bulletins.
 - Suivre l'apprentissage du Coran : cahier numérique, récitations, moteur nafar.
 - Donner aux parents une visibilité en temps réel.
-- Être exploitable dans le contexte local : mobile, connexion instable, français/arabe, paiement mobile.
+- Être exploitable dans le contexte local : mobile, connexion instable, français/anglais (arabe plus tard), paiement mobile.
 
 Hors périmètre V1 : application mobile native (V2 Flutter), visioconférence, IA de correction du Tajwid.
 
@@ -78,7 +78,7 @@ traitements lourds si les Edge Functions deviennent insuffisantes.
 |---|---|---|
 | Backend | Supabase (BaaS Postgres) | ADR-001 |
 | Multi-tenant | Base partagée, `daara_id` partout, RLS, memberships | ADR-002 |
-| Front | Angular standalone + signals, PWA, thème Vristo | — |
+| Front | Angular 22 standalone + signals, zoneless, PWA, thème Vristo | ADR-004 |
 | Logique métier | SQL (vues, fonctions, triggers) pour les données ; Edge Functions pour l'externe | — |
 | Temps réel | Supabase Realtime filtré par daara | — |
 | URL | Daara active dans l'URL : `/d/:slug/...` | LLD §2 |
@@ -107,7 +107,7 @@ Montée en charge : migration progressive vers le mode Broadcast déclenché par
 | Environnement | Base | Front | Accès Claude Code |
 |---|---|---|---|
 | Local | `supabase start` (Docker) | `npm start` | Total |
-| Dev / recette | Projet Supabase Free `daara-dev` | Preview Cloudflare Pages (par branche) | Lecture seule (MCP) |
+| Dev / recette | Projet Supabase Free `daara-dev` | Preview Cloudflare Pages (`develop`) | Lecture seule (MCP) |
 | Production | Projet Supabase Free `daara-prod` (Pro plus tard) | Cloudflare Pages (`main`) | Aucun |
 Fonctionnement sans abonnement jusqu'aux premiers revenus : voir ADR-003.
 Pipeline : lint → tests unitaires → tests RLS (pgTAP) → build → scan secrets → déploiement preview.
@@ -121,7 +121,7 @@ Les migrations vers dev/prod sont appliquées manuellement par le développeur.
 | Disponibilité | Celle de Supabase Pro / hébergeur statique |
 | Volumétrie V1 | 100 daaras × 500 apprenants |
 | Mobile | Écrans parents utilisables dès 375 px |
-| Langues | Français, arabe (RTL) ; wolof plus tard |
+| Langues | Interface en français (défaut) et anglais ; arabe (RTL) et wolof plus tard (ADR-005) |
 | Sauvegardes | Sauvegardes quotidiennes Supabase + export mensuel |
 | Accessibilité | Contrastes, taille de police, navigation clavier sur les formulaires |
 

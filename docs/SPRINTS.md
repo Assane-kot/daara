@@ -17,7 +17,7 @@ Règle : une story n'entre dans un sprint que si sa section du LLD est détaill�
 - [ ] Section LLD à jour
 - [ ] Migration avec RLS + tests pgTAP verts (accès autorisés et refusés inter-daara)
 - [ ] Types régénérés, aucun `any`
-- [ ] Écrans : chargement / erreur / vide, français + arabe, RTL, mode sombre, mobile 375 px
+- [ ] Écrans : chargement / erreur / vide, français + anglais, mode sombre, mobile 375 px
 - [ ] Tests unitaires du service et du composant principal
 - [ ] Rapport `auditeur-securite` sans critique ni important ouvert
 - [ ] PROGRESS.md mis à jour, commit Conventional Commits
@@ -29,10 +29,10 @@ Objectif : un projet propre qui tourne, avec l'outillage en place.
 - [ ] Analyser le starter Vristo (versions, structure), mettre à niveau si nécessaire (ADR-003)
 - [ ] Nettoyer le starter, renommer en DAARA, appliquer la charte vert/or
 - [ ] `SupabaseService`, environnements, `supabase init` / `start`
-- [ ] i18n fr/ar + bascule RTL
+- [ ] i18n fr/en (ADR-005)
 - [ ] Composants `shared/ui` de base : page-header, empty-state, badge, confirm-dialog
 - [ ] CI GitHub Actions (lint, tests, build, pgTAP, scan secrets)
-- [ ] Cloudflare Pages branché sur le dépôt (preview par branche)
+- [ ] Cloudflare Pages branché sur le dépôt (production `main`, preview `develop`)
 - [ ] Projets Supabase Free `daara-dev` et `daara-prod`, SMTP Brevo/Resend
 - [ ] Workflows planifiés : sauvegarde `pg_dump` → R2, anti-pause
 - [ ] Sentry branché sur Angular
