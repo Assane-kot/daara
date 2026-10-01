@@ -33,7 +33,7 @@ Langue de travail : français. Réponses concises.
 ## Workflow par feature
 1. Mode plan → vérifier/compléter la section du LLD, spec dans `docs/features/<nom>.md` (modèle : `_TEMPLATE.md`) → validation du développeur.
 2. Migration + RLS + tests pgTAP → `supabase db reset` + `supabase test db`.
-3. `supabase gen types typescript --local > src/app/core/supabase/database.types.ts`
+3. `npm run db:types` (génère et formate `src/app/core/supabase/database.types.ts`)
 4. Code Angular (skill feature-angular, composants via skill composant-vristo).
 5. Agent `auditeur-securite` (+ `auditeur-rls` si nouvelles tables) → corriger.
 6. Mettre à jour `docs/PROGRESS.md`, cocher la story dans `docs/SPRINTS.md`, puis donner au développeur
@@ -53,4 +53,5 @@ PROGRESS.md, un ADR ou ce fichier — sinon elle sera perdue à la prochaine ses
 
 ## Commandes utiles
 - `npm start` · `npm test` · `npm run build`
-- `supabase start` · `supabase db reset` · `supabase test db` · `supabase migration new <nom>`
+- `npm run db:start` · `npm run db:reset` · `npm run db:test` · `npm run db:types` · `npx supabase migration new <nom>`
+  (CLI Supabase en devDependency : `npx supabase …` ; Docker Desktop doit être lancé)

@@ -1,0 +1,2 @@
+-- Données de démonstration chargées par `supabase db reset` (local uniquement, jamais en production).
+-- À compléter à partir du sprint 1 (daaras, membres, rôles) puis au sprint 5 (données de démo du pilote).

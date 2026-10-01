@@ -5,7 +5,7 @@
 
 ## État actuel
 - Sprint en cours : 0 — Installation (voir docs/SPRINTS.md)
-- Dernière tâche terminée : S0.4 — composants `shared/ui` (39 tests verts)
+- Dernière tâche terminée : S0.5 — Supabase local, `SupabaseService`, environnements (43 tests + pgTAP verts)
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -18,8 +18,8 @@
     affiche des dates (pipe localisé basé sur `LanguageService`).
 
 ## Prochaine étape
-S0.5 — Supabase local (`supabase init` / `start`, Docker Desktop requis), `SupabaseService`,
-environnements (`scripts/set-env.mjs`), test pgTAP minimal. Puis S0.6 → S0.10 (plan ci-dessous).
+S0.6 — ESLint (angular-eslint), Prettier 3 + plugin Tailwind, CI GitHub Actions (lint, tests, pgTAP via
+`supabase start`, build, gitleaks, `npm audit`). Puis S0.7 → S0.10 (plan ci-dessous).
 
 ### Plan du sprint 0 (validé le 2026-10-01)
 | Story | Contenu |
@@ -38,6 +38,24 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-01 — S0.5 Supabase local et environnements
+- `@supabase/supabase-js` 2.117 (dépendance) et CLI `supabase` 2.119 (devDependency, binaire fourni sans
+  script d'installation) ; scripts `npm run db:start|db:stop|db:reset|db:test|db:types`. Pas de script
+  `db:push` : les migrations distantes restent manuelles (règle 7).
+- `supabase init` : Postgres 17 ; Auth local aligné sur la prod (site `localhost:4200`, confirmation
+  d'e-mail, mot de passe ≥ 8 avec lettres et chiffres, changement de mot de passe sécurisé) ; analytics et
+  vector désactivés pour alléger la pile locale ; e-mails locaux dans Mailpit (http://127.0.0.1:54324).
+- Test pgTAP `000_garde_fous` : toute table de `public` a la RLS activée et au moins une politique
+  (vérifié : une table sans RLS est bien détectée).
+- `SupabaseService` (client unique typé `Database`, `verifierConnexion()`), diagnostic non bloquant au
+  démarrage en développement ; `database.types.ts` généré et formaté.
+- Environnements : `environment.ts` (local, clé publishable locale) et `environment.prod.ts` généré par
+  `scripts/set-env.mjs` (prebuild). Testé : refus des clés service_role / sb_secret_, des URL http distantes
+  et des variables manquantes sur Cloudflare.
+- Bundle initial : 136 kB transférés (+49 kB, supabase-js requis dès le démarrage pour l'auth) ; seuil
+  d'avertissement du budget porté de 500 à 650 kB bruts (erreur toujours à 1 Mo).
+- Vérifié dans le navigateur : `auth/v1/health` → 200 depuis l'app, sans erreur CORS.
+
 ### 2026-10-01 — S0.4 Composants shared/ui
 - `@angular/cdk` 22 ajouté (prévu par ADR-004) ; `overlay-prebuilt.css` dans les styles du build.
 - `app-page-header` (fil d'Ariane Vristo, titre h1, actions projetées), `app-empty-state`, `app-badge`

@@ -5,10 +5,16 @@
     "scripts": {
         "ng": "ng",
         "start": "ng serve --open",
+        "prebuild": "node scripts/set-env.mjs",
         "build": "ng build",
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
-        "test:ci": "ng test --no-watch"
+        "test:ci": "ng test --no-watch",
+        "db:start": "supabase start",
+        "db:stop": "supabase stop",
+        "db:reset": "supabase db reset",
+        "db:test": "supabase test db",
+        "db:types": "supabase gen types typescript --local > src/app/core/supabase/database.types.ts && prettier --write src/app/core/supabase/database.types.ts"
     },
     "engines": {
         "node": "^22.22.3 || ^24.15.0"
@@ -23,6 +29,7 @@
         "@angular/router": "^22.2.0",
         "@ngx-translate/core": "^18.0.0",
         "@ngx-translate/http-loader": "^18.0.0",
+        "@supabase/supabase-js": "^2.117.2",
         "rxjs": "~7.8.0",
         "tslib": "^2.3.0"
     },
@@ -36,6 +43,7 @@
         "jsdom": "^30.0.0",
         "postcss": "^8.4.35",
         "prettier": "^3.8.1",
+        "supabase": "^2.119.0",
         "tailwindcss": "^3.4.19",
         "typescript": "~6.0.2",
         "vitest": "^5.0.0"

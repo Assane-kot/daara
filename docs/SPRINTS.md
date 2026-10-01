@@ -28,7 +28,7 @@ Règle : une story n'entre dans un sprint que si sa section du LLD est détaill�
 Objectif : un projet propre qui tourne, avec l'outillage en place.
 - [x] Analyser le starter Vristo (versions, structure), mettre à niveau si nécessaire (ADR-004)
 - [x] Nettoyer le starter, renommer en DAARA, appliquer la charte vert/or
-- [ ] `SupabaseService`, environnements, `supabase init` / `start`
+- [x] `SupabaseService`, environnements, `supabase init` / `start`
 - [x] i18n fr/en (ADR-005)
 - [x] Composants `shared/ui` de base : page-header, empty-state, badge, confirm-dialog
 - [ ] CI GitHub Actions (lint, tests, build, pgTAP, scan secrets)

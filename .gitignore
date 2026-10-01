@@ -41,3 +41,6 @@ yarn-error.log
 testem.log
 /typings
 /test.json
+
+# Environnement de production généré au build (scripts/set-env.mjs)
+src/environments/environment.prod.ts

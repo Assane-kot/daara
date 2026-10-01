@@ -58,6 +58,16 @@ src/app/
 /plateforme/...                    super-admin
 ```
 
+### Environnements
+| Fichier | Rôle |
+|---|---|
+| `src/environments/environment.ts` | Développement : Supabase local (`http://127.0.0.1:54321`, clé publishable locale) |
+| `src/environments/environment.prod.ts` | Généré par `scripts/set-env.mjs` (prebuild), non versionné, remplace le précédent en production |
+
+`set-env.mjs` lit `SUPABASE_URL` et `SUPABASE_ANON_KEY` (variables Cloudflare Pages : production → `daara-prod`,
+preview → `daara-dev`). Il échoue sur Cloudflare si elles manquent, refuse toute clé secrète (`service_role`,
+`sb_secret_`) et toute URL non https. Sans variables hors Cloudflare (poste, CI) : build branché sur le local.
+
 ### Services transverses
 | Service | Responsabilité |
 |---|---|
