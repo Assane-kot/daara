@@ -220,7 +220,7 @@ URLs signées à durée courte pour les fichiers privés.
   signée R2 (upload ou lecture, 15 min).
 
 **Sauvegardes** : GitHub Actions quotidien (`sauvegarde.yml`), `supabase db dump` de `daara-prod` (rôles, schéma, données
-`public` + `auth`) chiffré avec la clé publique `age` → R2 `daara-sauvegardes/daara-prod/`, rétention 30 jours.
+`public` + `auth`, sans jetons ni sessions) chiffré avec la clé publique `age` → R2 `daara-sauvegardes/daara-prod/`, rétention 30 jours.
 Fichiers du Storage non couverts (à traiter au sprint 4). Restauration : `scripts/restaurer-sauvegarde-locale.ps1`.
 Anti-pause : `anti-pause.yml`, rôle `keepalive` sans droits, tous les deux jours.
 

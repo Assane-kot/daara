@@ -44,3 +44,13 @@ testem.log
 
 # Environnement de production généré au build (scripts/set-env.mjs)
 src/environments/environment.prod.ts
+
+# Sauvegardes et clés (audit sprint 0) : à manipuler HORS du dépôt (docs/deploiement.md §4)
+*.age
+daara-sauvegarde*.txt
+*-cle-privee*.txt
+dump/
+dump-*/
+/roles.sql
+/schema.sql
+/data.sql

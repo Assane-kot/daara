@@ -12,3 +12,18 @@ id = "supabase-secret-key"
 description = "Clé secrète Supabase (sb_secret_…) : uniquement dans les secrets des Edge Functions / GitHub"
 regex = '''sb_secret_[A-Za-z0-9_-]{20,}'''
 keywords = ["sb_secret_"]
+
+# Chaîne de connexion Postgres avec mot de passe (secrets SUPABASE_*_DB_URL / *_KEEPALIVE_URL).
+# Les exemples de la documentation (`<ref>`, `<mot-de-passe>`) ne sont pas concernés.
+[[rules]]
+id = "postgres-uri-with-password"
+description = "URL Postgres contenant un mot de passe"
+regex = '''postgres(?:ql)?://[^:\s<>/]+:[^@\s<>]+@'''
+keywords = ["postgres://", "postgresql://"]
+
+# Clé SMTP Brevo (SMTP de Supabase Auth).
+[[rules]]
+id = "brevo-smtp-key"
+description = "Clé SMTP Brevo"
+regex = '''xsmtpsib-[a-f0-9]{64}-[A-Za-z0-9]{16}'''
+keywords = ["xsmtpsib-"]

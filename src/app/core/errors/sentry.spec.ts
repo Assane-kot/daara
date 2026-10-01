@@ -40,6 +40,26 @@ describe('Nettoyage des données personnelles avant envoi à Sentry', () => {
         expect(breadcrumb.data?.['method']).toBe('GET');
     });
 
+    it('retire les attributs des éléments cliqués ou saisis (aria-label, title, alt, name)', () => {
+        const clic = nettoyerBreadcrumb({
+            category: 'ui.click',
+            message: 'div.panel > button.btn.btn-primary[aria-label="Voir la fiche de Awa Ndiaye"] > img[alt="Photo de Awa Ndiaye"]',
+        });
+        const saisie = nettoyerBreadcrumb({ category: 'ui.input', message: 'input.form-input[name="nom_mere"][title="Fatou Sow"]' });
+
+        expect(clic.message).toBe('div.panel > button.btn.btn-primary > img');
+        expect(saisie.message).toBe('input.form-input');
+    });
+
+    it('retire un attribut dont la valeur contient des crochets', () => {
+        const clic = nettoyerBreadcrumb({
+            category: 'ui.click',
+            message: 'a.lien[aria-label="Notes [CE2] de Awa Ndiaye"][title="Bulletin [T1]"] > span.badge',
+        });
+
+        expect(clic.message).toBe('a.lien > span.badge');
+    });
+
     it('supprime les arguments bruts des journaux console', () => {
         const breadcrumb = nettoyerBreadcrumb({
             category: 'console',

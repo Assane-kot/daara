@@ -27,13 +27,22 @@
   - Fichiers du Storage (photos d'apprenants, PDF) non couverts par la sauvegarde → à traiter au sprint 4.
   - Sentry : organisation en région UE, projet `daara-front`, `SENTRY_DSN` dans Cloudflare
     (`docs/deploiement.md` §5) ; source maps non envoyées (traces minifiées), à voir au sprint 12.
+  - Sécurité, reporté au sprint 1 (audit sprint 0, à traiter dans la PREMIÈRE migration) :
+    - garde-fous pgTAP étendus : vues de `public` sans `security_invoker = true`, vues matérialisées,
+      fonctions `security definer` sans `search_path`, tables sans `daara_id not null` + index (liste blanche :
+      `daaras`, `profiles`, `platform_admins`) ;
+    - `revoke execute on all functions in schema public from public, anon` + privilèges par défaut + test ;
+    - client Supabase en flux PKCE (`flowType: 'pkce'`), à consigner au LLD §2 ;
+    - ADR authentification : double authentification (TOTP) obligatoire pour les admins, réinitialisation du
+      mot de passe (proposition en attente de validation). Mot de passe : 8 caractères, lettres + chiffres
+      (décision du développeur, 2026-10-01).
 
 ## Prochaine étape
 Clôture du sprint 0 :
 1. Développeur : configurations manuelles dans l'ordre §2 (Supabase + Brevo) → §1 (Cloudflare) → §5 (Sentry)
    → §4 (sauvegardes) de `docs/deploiement.md`, puis vérifier le premier run de la CI sur GitHub.
 2. Validation de la charte sur `/dev/charte` → retrait de la page.
-3. Audit de sécurité du sprint (agent `auditeur-securite`, Definition of Done) puis bilan du sprint 0 et tag.
+3. Audit de sécurité clos (contre-vérification : 0 critique, 0 important ouvert) → bilan du sprint 0 et tag.
 Ensuite : sprint 1 (socle multi-tenant), en commençant par détailler le LLD §3.2 / §4.
 
 ### Plan du sprint 0 (validé le 2026-10-01)
@@ -53,6 +62,23 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-01 — Audit de sécurité du sprint 0 (agent `auditeur-securite`)
+- Résultat : 0 critique, 4 importants, 9 mineurs, 3 informations ; `npm audit` : 0 vulnérabilité.
+- Importants corrigés :
+  1. clé age, archives et dumps pouvaient finir dans le dépôt → `.gitignore` complété, doc et script de
+     restauration travaillent hors du dépôt (le script refuse un fichier situé dans le dépôt) ;
+  2. environnement GitHub `production` ouvert à `develop` → limité à `main` ;
+  3. clés R2 exposées à `npm ci` dans le job de sauvegarde → plus de `npm ci` (CLI Supabase seule), chaque
+     secret limité à son étape ;
+  4. attributs `aria-label` / `alt` / `title` / `name` envoyés à Sentry dans les clics → retirés (testé).
+- Mineurs corrigés : jetons et sessions exclus des sauvegardes ; remise à zéro de la base locale après
+  restauration ; règles gitleaks Postgres et Brevo ; actions épinglées par SHA, `persist-credentials: false`,
+  Dependabot ; `interest-cohort` retiré ; `daara-dev` sans données réelles ; `keepalive` limité à 1 connexion.
+- Mineurs reportés au sprint 1 : voir « Problèmes ouverts ».
+- Contre-vérification : les 10 points clos ; 2 défauts introduits corrigés (attribut Sentry contenant « ] »,
+  échec de remise à zéro non signalé dans le script). À surveiller au premier run anti-pause : si « too many
+  connections for role keepalive » (Session pooler), passer `connection limit` à 2.
+
 ### 2026-10-01 — S0.10 Sentry
 - `@sentry/angular` 11.2 (prévu par ADR-003). Sentry v11 remplace `sendDefaultPii` par `dataCollection`,
   dont les valeurs par défaut collectent utilisateur, cookies, en-têtes, paramètres d'URL, corps de requêtes

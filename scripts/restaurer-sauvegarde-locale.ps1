@@ -5,33 +5,60 @@
 .DESCRIPTION
     Déchiffre l'archive (age), remet la base locale à zéro, restaure rôles, schéma et données, puis affiche
     un contrôle. Ne touche JAMAIS à un projet distant. Les fichiers déchiffrés (données personnelles de
-    mineurs) sont supprimés à la fin, même en cas d'erreur.
+    mineurs) sont supprimés à la fin, même en cas d'erreur, et la base locale est remise à zéro après le
+    contrôle (sauf -ConserverDonnees). Archive, clé et dumps doivent être HORS du dépôt : refusés sinon.
     Prérequis : Docker Desktop, `npm run db:start`, age (`winget install FiloSottile.age`).
-    Procédure complète : docs/deploiement.md §4.6.
+    Procédure complète : docs/deploiement.md §4.8.
 
 .EXAMPLE
-    .\scripts\restaurer-sauvegarde-locale.ps1 -Archive .\daara-prod-20261001-023000.tar.gz.age -CleAge D:\cles\daara-sauvegarde.txt
+    .\scripts\restaurer-sauvegarde-locale.ps1 -Archive "$env:USERPROFILE\daara-cles\daara-prod-20261001-023000.tar.gz.age" -CleAge E:\daara-sauvegarde.txt
 
 .EXAMPLE
-    .\scripts\restaurer-sauvegarde-locale.ps1 -Dossier .\dump-dechiffre   # fichiers roles.sql, schema.sql, data.sql déjà déchiffrés
+    .\scripts\restaurer-sauvegarde-locale.ps1 -Dossier "$env:USERPROFILE\daara-cles\dump-dechiffre"   # roles.sql, schema.sql, data.sql déjà déchiffrés
 #>
 [CmdletBinding(DefaultParameterSetName = 'Archive')]
 param(
     [Parameter(Mandatory, ParameterSetName = 'Archive')] [string] $Archive,
     [Parameter(Mandatory, ParameterSetName = 'Archive')] [string] $CleAge,
     [Parameter(Mandatory, ParameterSetName = 'Dossier')] [string] $Dossier,
-    [switch] $SansConfirmation
+    [switch] $SansConfirmation,
+    # Laisse les données restaurées dans la base locale (déconseillé : données réelles de mineurs sur le poste).
+    [switch] $ConserverDonnees
 )
 
 $ErrorActionPreference = 'Stop'
 $conteneur = 'supabase_db_daara'
+$depot = Split-Path $PSScriptRoot -Parent
 $travail = Join-Path ([IO.Path]::GetTempPath()) ("daara-restauration-" + [guid]::NewGuid())
 
 function Invoke-Psql([string[]] $arguments) {
     & docker exec $conteneur psql -U postgres -d postgres @arguments
 }
 
+# Un fichier sensible dans le dépôt risque d'être commité (git add -A) : on refuse.
+function Assert-HorsDepot([string] $chemin) {
+    $complet = (Resolve-Path $chemin).Path
+    if ($complet.StartsWith($depot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Fichier sensible dans le dépôt ($complet) : déplacez-le hors du dépôt (ex. $env:USERPROFILE\daara-cles)."
+    }
+}
+
+function Remove-DonneesLocales {
+    & npx supabase db reset | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning 'Échec de la remise à zéro : des données réelles restent dans la base locale. Relancez npm run db:reset.'
+    } else {
+        Write-Host '   base locale remise à zéro'
+    }
+}
+
 try {
+    if ($PSCmdlet.ParameterSetName -eq 'Archive') {
+        Assert-HorsDepot $Archive
+        Assert-HorsDepot $CleAge
+    } else {
+        Assert-HorsDepot $Dossier
+    }
     if ((& docker inspect -f '{{.State.Running}}' $conteneur 2>$null) -ne 'true') {
         throw "Supabase local arrêté : lancez 'npm run db:start' (Docker Desktop requis)."
     }
@@ -77,7 +104,15 @@ try {
     Write-Host '4. Contrôle'
     Invoke-Psql @('-tAc', "select '   comptes : ' || count(*) from auth.users")
     Invoke-Psql @('-tAc', "select '   tables publiques : ' || count(*) || ', dont sans RLS : ' || count(*) filter (where not rowsecurity) from pg_tables where schemaname = 'public'")
-    Write-Host 'Restauration réussie. Après vérification : npm run db:reset pour revenir à une base de développement.'
+    Write-Host 'Restauration réussie.'
+
+    if ($ConserverDonnees) {
+        Write-Warning 'Données réelles conservées dans la base locale : npm run db:reset dès que possible.'
+    } elseif ($SansConfirmation -or (Read-Host '5. Effacer maintenant les données restaurées de la base locale (recommandé) ? (O/n)') -notmatch '^[nN]') {
+        Remove-DonneesLocales
+    } else {
+        Write-Warning 'Données réelles conservées dans la base locale : npm run db:reset dès que possible.'
+    }
 }
 finally {
     & docker exec $conteneur rm -f /tmp/roles.sql /tmp/schema.sql /tmp/data.sql 2>$null | Out-Null

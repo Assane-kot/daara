@@ -36,7 +36,14 @@ export function nettoyerBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb {
         // Arguments bruts des console.warn / console.error.
         delete data['arguments'];
     }
-    return { ...breadcrumb, message: breadcrumb.message ? nettoyerTexte(breadcrumb.message) : breadcrumb.message, data };
+    let message = breadcrumb.message;
+    if (message && breadcrumb.category?.startsWith('ui.')) {
+        // Clics et saisies : Sentry décrit l'élément avec ses attributs (aria-label, title, alt, name…), qui
+        // peuvent contenir un nom (« Photo de … »). On ne garde que la balise et les classes CSS.
+        // Attribut entier, même si sa valeur contient « ] » (ex. « Notes [CE2] de … »).
+        message = message.replace(/\[[\w-]+="[\s\S]*?"\](?=\[[\w-]+="|\s>\s|$)/g, '');
+    }
+    return { ...breadcrumb, message: message ? nettoyerTexte(message) : message, data };
 }
 
 export function nettoyerEvenement(event: ErrorEvent): ErrorEvent {

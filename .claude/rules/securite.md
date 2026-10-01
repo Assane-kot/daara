@@ -12,3 +12,5 @@
 - Toute faille découverte est notée dans PROGRESS.md (section « Problèmes ouverts ») si non corrigée immédiatement.
 - Suivi des erreurs (Sentry) : jamais de `setUser`, de `setContext` ni de données métier dans les erreurs ; tout envoi
   passe par `nettoyerEvenement` (`src/app/core/errors/sentry.ts`). Région UE uniquement.
+- Les identifiants (`id`) et classes CSS restent visibles dans le fil d'actions Sentry : jamais de donnée personnelle
+  dedans (ex. pas de `id="fiche-awa-ndiaye"`) ; les attributs (`aria-label`, `alt`, `title`…) sont retirés.

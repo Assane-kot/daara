@@ -99,6 +99,9 @@ celui de la production.
 | Connexions anonymes | désactivées | désactivées |
 | Téléphone (SMS) | désactivé (ADR-003, décision OTP au sprint 2) | désactivé |
 
+**`daara-dev` ne contient jamais de données réelles**, même pour une démonstration à une daara pilote : ses
+redirections acceptent `localhost` et toutes les previews. Les démos se font avec des données fictives.
+
 La production n'accepte **aucune** redirection vers `localhost` ni vers les previews : un lien de
 connexion ne peut pas renvoyer un utilisateur réel vers une autre application.
 (La détection des mots de passe compromis n'existe qu'en offre Pro : à activer au passage à Pro, ADR-003.)
@@ -188,6 +191,7 @@ Toute modification de la CSP est testée en servant `dist/daara/browser` avec ce
 | Élément | Choix |
 |---|---|
 | Quoi | `daara-prod` : rôles, schéma complet, données des schémas `public` (métier) et `auth` (comptes) |
+| Exclu | Jetons et sessions (`refresh_tokens`, `sessions`, `one_time_tokens`…) et journal d'audit Auth (adresses IP) : une archive déchiffrée ne permet pas de reprendre une session ; après restauration, chacun se reconnecte |
 | Quand | Chaque nuit à 02:30 (heure de Dakar), workflow `.github/workflows/sauvegarde.yml` ; perte maximale : 24 h |
 | Où | Cloudflare R2, bucket `daara-sauvegardes`, préfixe `daara-prod/` |
 | Protection | Archive chiffrée avec la clé **publique** `age` : GitHub et Cloudflare ne peuvent pas la lire |
@@ -201,8 +205,11 @@ sur ses tables internes, et les buckets sont recréés par les migrations.
 ### 4.2 Clé de chiffrement (une fois, sur votre poste)
 ```powershell
 winget install FiloSottile.age
-age-keygen -o daara-sauvegarde.txt
+New-Item -ItemType Directory "$env:USERPROFILE\daara-cles" -Force   # HORS du dépôt
+age-keygen -o "$env:USERPROFILE\daara-cles\daara-sauvegarde.txt"
 ```
+Ne jamais générer ni copier la clé, une archive ou un dump dans le dossier du projet (risque de commit ;
+`.gitignore` exclut `*.age`, `daara-sauvegarde*.txt` et les dumps par sécurité).
 - Le fichier contient la **clé privée** : la ranger dans le gestionnaire de mots de passe **et** sur un
   support hors ligne (clé USB rangée), puis supprimer le fichier du disque. **Perdre cette clé rend toutes
   les sauvegardes illisibles** ; la divulguer rend toutes les sauvegardes lisibles.
@@ -225,14 +232,17 @@ Si le mot de passe contient des caractères spéciaux, les encoder (`@` → `%40
 ### 4.5 Rôle `keepalive` (anti-pause, dans chaque projet)
 **SQL Editor** de `daara-dev` puis de `daara-prod`, avec un mot de passe généré différent pour chacun :
 ```sql
-create role keepalive login password '<mot-de-passe-généré>';
+create role keepalive login connection limit 1 password '<mot-de-passe-généré>';
 ```
 Aucun `grant` : ce rôle peut seulement se connecter et exécuter `select 1` (vérifié en local : lecture des
 comptes, des tables et création de table refusées). Chaîne de connexion (Session pooler) :
 `postgresql://keepalive.<ref>:<mot-de-passe>@aws-0-eu-west-3.pooler.supabase.com:5432/postgres?sslmode=require`
 
 ### 4.6 Configuration GitHub
-1. **Settings → Environments → New environment** `production` ; **Deployment branches** : `main` et `develop`.
+1. **Settings → Environments → New environment** `production` ; **Deployment branches** : `main` **uniquement**.
+   Pour le tout premier test manuel (§4.7), ajouter temporairement `develop`, puis le **retirer aussitôt** : on
+   pousse directement sur `develop`, et tout workflow de cette branche pourrait sinon lire le mot de passe
+   `postgres` de la production et les clés R2 (audit sprint 0).
 2. Dans l'environnement `production` :
 
    | Type | Nom | Valeur |
@@ -252,6 +262,7 @@ comptes, des tables et création de table refusées). Chaîne de connexion (Sess
   automatiques à la première release (R0). Avant, `daara-prod` ne contient pas de données réelles.
 - Premier test : **Actions → Sauvegarde daara-prod → Run workflow** (branche `develop`), puis vérifier dans
   R2 qu'un fichier `daara-prod/daara-prod-AAAAMMJJ-HHMMSS.tar.gz.age` est apparu. Idem pour **Anti-pause Supabase**.
+  **Retirer ensuite `develop` des branches autorisées de l'environnement `production`** (§4.6).
 - En cas d'échec d'un workflow planifié, GitHub envoie un e-mail. Consulter l'onglet Actions une fois par mois.
 
 ### 4.8 Restauration
@@ -259,10 +270,12 @@ comptes, des tables et création de table refusées). Chaîne de connexion (Sess
 (tableau de bord → bucket → fichier → Download), puis sur le Supabase **local** :
 ```powershell
 npm run db:start
-.\scripts\restaurer-sauvegarde-locale.ps1 -Archive .\daara-prod-AAAAMMJJ-HHMMSS.tar.gz.age -CleAge <chemin de la clé privée>
-npm run db:reset   # revenir à une base de développement
+.\scripts\restaurer-sauvegarde-locale.ps1 -Archive "$env:USERPROFILE\daara-cles\daara-prod-AAAAMMJJ-HHMMSS.tar.gz.age" -CleAge <chemin de la clé privée>
 ```
-Le script supprime les fichiers déchiffrés à la fin. Supprimer aussi l'archive téléchargée.
+Télécharger l'archive dans `%USERPROFILE%\daara-cles\` : le script **refuse** toute archive, clé ou dump
+situé dans le dépôt. Il supprime les fichiers déchiffrés, puis propose d'effacer les données restaurées de la
+base locale (réponse par défaut : oui ; `-ConserverDonnees` pour les garder, déconseillé). Supprimer
+ensuite l'archive téléchargée.
 
 **Incident en production** (fait par le développeur, jamais par Claude) : créer un nouveau projet Supabase,
 appliquer les migrations, puis restaurer les trois fichiers avec la chaîne de connexion du nouveau projet :

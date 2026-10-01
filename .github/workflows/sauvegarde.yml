@@ -2,7 +2,9 @@
 # Chiffrement avec la clé PUBLIQUE age : GitHub ne peut pas relire les sauvegardes, seule la clé privée
 # (détenue hors ligne par le développeur) les déchiffre. Rétention de 30 jours : règle de cycle de vie R2.
 # Les workflows planifiés ne s'exécutent que depuis la branche par défaut (main) ; avant la première release,
-# lancement manuel possible (Actions → Run workflow, branche develop).
+# lancement manuel possible (Actions → Run workflow).
+# Sécurité (audit sprint 0) : aucune dépendance npm installée ; chaque secret n'est visible que de l'étape qui
+# l'utilise ; actions épinglées par empreinte (mises à jour proposées par Dependabot).
 name: Sauvegarde daara-prod
 
 on:
@@ -23,51 +25,44 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 30
         environment: production
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: auto
-            # R2 ne gère pas toutes les sommes de contrôle ajoutées par défaut par les versions récentes de l'AWS CLI.
-            AWS_REQUEST_CHECKSUM_CALCULATION: when_required
-            AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
-            R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
-            R2_BUCKET: ${{ vars.R2_BUCKET_SAUVEGARDES }}
-            AGE_RECIPIENT: ${{ vars.SAUVEGARDE_AGE_RECIPIENT }}
         steps:
-            - uses: actions/checkout@v7
-
-            - uses: actions/setup-node@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
-                  node-version: '24'
-                  cache: npm
+                  persist-credentials: false
 
-            - name: Installation (CLI Supabase, age)
-              run: |
-                  npm ci
-                  sudo apt-get update -qq && sudo apt-get install -y -qq age
+            - uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
+              with:
+                  version: 2.119.0
 
-            - name: Vérification de la configuration
+            - name: Installation de age
+              run: sudo apt-get update -qq && sudo apt-get install -y -qq age
+
+            - name: Vérification de la clé publique
+              env:
+                  AGE_RECIPIENT: ${{ vars.SAUVEGARDE_AGE_RECIPIENT }}
               run: |
-                  for v in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY R2_BUCKET AGE_RECIPIENT; do
-                      [ -n "${!v}" ] || { echo "::error::Configuration manquante : $v (voir docs/deploiement.md §4)"; exit 1; }
-                  done
                   [[ "$AGE_RECIPIENT" == age1* ]] || { echo "::error::SAUVEGARDE_AGE_RECIPIENT doit être une clé publique age (age1…)"; exit 1; }
 
             # Rôles (réglages internes Supabase), schéma complet, données des schémas public (métier) et auth (comptes).
-            # Les fichiers du Storage ne sont pas dans la base : ils ne sont pas couverts par cette sauvegarde.
+            # Exclus : jetons et sessions (une archive déchiffrée ne doit pas permettre de reprendre une session),
+            # journal d'audit Auth (adresses IP) et états transitoires. Les fichiers du Storage ne sont pas couverts.
             - name: Dump de la base
               env:
                   DB_URL: ${{ secrets.SUPABASE_PROD_DB_URL }}
               run: |
                   [ -n "$DB_URL" ] || { echo "::error::Secret SUPABASE_PROD_DB_URL manquant"; exit 1; }
                   mkdir -p dump
-                  npx supabase db dump --db-url "$DB_URL" --role-only -f dump/roles.sql
-                  npx supabase db dump --db-url "$DB_URL" -f dump/schema.sql
-                  npx supabase db dump --db-url "$DB_URL" --data-only --use-copy --schema public,auth -f dump/data.sql
+                  supabase db dump --db-url "$DB_URL" --role-only -f dump/roles.sql
+                  supabase db dump --db-url "$DB_URL" -f dump/schema.sql
+                  supabase db dump --db-url "$DB_URL" --data-only --use-copy --schema public,auth \
+                      --exclude auth.refresh_tokens,auth.sessions,auth.one_time_tokens,auth.flow_state,auth.mfa_challenges,auth.mfa_amr_claims,auth.audit_log_entries,auth.webauthn_challenges,auth.oauth_client_states,auth.saml_relay_states \
+                      -f dump/data.sql
                   [ -s dump/schema.sql ] && [ -s dump/data.sql ] || { echo "::error::Dump vide"; exit 1; }
                   ls -l dump
 
             - name: Archive chiffrée
+              env:
+                  AGE_RECIPIENT: ${{ vars.SAUVEGARDE_AGE_RECIPIENT }}
               run: |
                   NOM="daara-prod-$(date -u +%Y%m%d-%H%M%S).tar.gz.age"
                   tar -czf - -C dump . | age -r "$AGE_RECIPIENT" -o "$NOM"
@@ -76,6 +71,18 @@ jobs:
                   ls -l "$NOM"
 
             - name: Envoi vers R2
+              env:
+                  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+                  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+                  AWS_DEFAULT_REGION: auto
+                  # R2 ne gère pas toutes les sommes de contrôle ajoutées par défaut par les versions récentes de l'AWS CLI.
+                  AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+                  AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+                  R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+                  R2_BUCKET: ${{ vars.R2_BUCKET_SAUVEGARDES }}
               run: |
+                  for v in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY R2_BUCKET; do
+                      [ -n "${!v}" ] || { echo "::error::Configuration manquante : $v (voir docs/deploiement.md §4)"; exit 1; }
+                  done
                   aws s3 cp "$NOM" "s3://$R2_BUCKET/daara-prod/$NOM" --endpoint-url "$R2_ENDPOINT" --no-progress
                   aws s3 ls "s3://$R2_BUCKET/daara-prod/$NOM" --endpoint-url "$R2_ENDPOINT"
