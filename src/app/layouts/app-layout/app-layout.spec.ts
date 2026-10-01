@@ -29,7 +29,7 @@ describe('AppLayout', () => {
         expect(element.querySelector('footer')?.textContent).toContain('DAARA');
     });
 
-    it('reflète l\'état de la sidebar sur le conteneur principal', async () => {
+    it("reflète l'état de la sidebar sur le conteneur principal", async () => {
         const section = element.querySelector('.main-section');
         expect(section?.classList.contains('toggle-sidebar')).toBe(false);
 

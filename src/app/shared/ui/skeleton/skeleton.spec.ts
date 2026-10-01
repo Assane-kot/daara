@@ -7,7 +7,7 @@ describe('Skeleton', () => {
         TestBed.configureTestingModule({ providers: [provideTranslateTesting()] });
     });
 
-    it('annonce le chargement aux lecteurs d\'écran', async () => {
+    it("annonce le chargement aux lecteurs d'écran", async () => {
         const fixture = TestBed.createComponent(Skeleton);
         await fixture.whenStable();
         const statut = (fixture.nativeElement as HTMLElement).querySelector('[role="status"]');

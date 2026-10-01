@@ -1,15 +1,15 @@
 <div class="relative flex w-full items-center bg-white px-5 py-2.5 dark:bg-night">
-    <div class="horizontal-logo flex items-center justify-between ltr:mr-2 rtl:ml-2 lg:hidden">
+    <div class="horizontal-logo flex items-center justify-between lg:hidden ltr:mr-2 rtl:ml-2">
         <a routerLink="/" class="main-logo flex shrink-0 items-center">
             <img class="inline w-8 ltr:-ml-1 rtl:-mr-1" src="/images/logo.svg" alt="" />
-            <span class="hidden align-middle text-2xl font-semibold transition-all duration-300 ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light md:inline">
+            <span class="hidden align-middle text-2xl font-semibold transition-all duration-300 dark:text-white-light md:inline ltr:ml-1.5 rtl:mr-1.5">
                 DAARA
             </span>
         </a>
 
         <button
             type="button"
-            class="icon-btn collapse-icon flex-none ltr:ml-2 rtl:mr-2 dark:text-white-light lg:hidden"
+            class="icon-btn collapse-icon flex-none dark:text-white-light lg:hidden ltr:ml-2 rtl:mr-2"
             [attr.aria-label]="'layout.afficher_menu' | translate"
             (click)="layout.toggleSidebar()"
         >
@@ -17,7 +17,7 @@
         </button>
     </div>
 
-    <div class="flex items-center space-x-1.5 ltr:ml-auto rtl:mr-auto rtl:space-x-reverse dark:text-white-light lg:space-x-2">
+    <div class="flex items-center space-x-1.5 dark:text-white-light lg:space-x-2 ltr:ml-auto rtl:mr-auto rtl:space-x-reverse">
         <!-- Libellé écrit dans la langue proposée (attribut lang), pratique d'accessibilité courante. -->
         <button
             type="button"

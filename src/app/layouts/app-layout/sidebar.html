@@ -7,11 +7,11 @@
         <div class="flex items-center justify-between px-4 py-3">
             <a routerLink="/" class="main-logo flex shrink-0 items-center">
                 <img class="ml-[5px] w-8 flex-none" src="/images/logo.svg" alt="" />
-                <span class="align-middle text-2xl font-semibold ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light lg:inline">DAARA</span>
+                <span class="align-middle text-2xl font-semibold dark:text-white-light lg:inline ltr:ml-1.5 rtl:mr-1.5">DAARA</span>
             </a>
             <button
                 type="button"
-                class="collapse-icon flex h-8 w-8 items-center rounded-full transition duration-300 hover:bg-gray-500/10 hover:text-primary rtl:rotate-180 dark:text-white-light dark:hover:bg-dark-light/10"
+                class="collapse-icon flex h-8 w-8 items-center rounded-full transition duration-300 hover:bg-gray-500/10 hover:text-primary dark:text-white-light dark:hover:bg-dark-light/10 rtl:rotate-180"
                 [attr.aria-label]="'layout.replier_menu' | translate"
                 (click)="layout.toggleSidebar()"
             >
@@ -31,7 +31,9 @@
                     >
                         <div class="flex items-center">
                             <icon-menu-dashboard class="shrink-0 group-hover:!text-primary" />
-                            <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-night-muted dark:group-hover:text-white-dark">{{ 'menu.tableau_de_bord' | translate }}</span>
+                            <span class="text-black dark:text-night-muted dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{{
+                                'menu.tableau_de_bord' | translate
+                            }}</span>
                         </div>
                     </a>
                 </li>

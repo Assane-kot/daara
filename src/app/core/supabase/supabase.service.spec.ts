@@ -19,7 +19,7 @@ describe('SupabaseService', () => {
         expect(TestBed.inject(SupabaseService).client).toBe(service.client);
     });
 
-    it('n\'embarque qu\'une clé publique', () => {
+    it("n'embarque qu'une clé publique", () => {
         expect(environment.supabaseAnonKey.startsWith('sb_publishable_')).toBe(true);
     });
 
@@ -30,7 +30,7 @@ describe('SupabaseService', () => {
         expect(fetchMock).toHaveBeenCalledWith(`${environment.supabaseUrl}/auth/v1/health`, expect.anything());
     });
 
-    it('signale une API injoignable sans lever d\'erreur', async () => {
+    it("signale une API injoignable sans lever d'erreur", async () => {
         vi.spyOn(globalThis, 'fetch').mockRejectedValue(new TypeError('Failed to fetch'));
 
         expect(await service.verifierConnexion()).toBe(false);

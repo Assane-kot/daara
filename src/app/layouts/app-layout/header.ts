@@ -11,6 +11,7 @@ import { LayoutService } from '../layout.service';
 
 @Component({
     // Sélecteur sur l'élément <header> : le CSS Vristo `.navbar-sticky header` le rend collant.
+    // eslint-disable-next-line @angular-eslint/component-selector
     selector: 'header[appHeader]',
     imports: [RouterLink, TranslatePipe, IconMenu, IconSun, IconMoon, IconLaptop],
     templateUrl: './header.html',

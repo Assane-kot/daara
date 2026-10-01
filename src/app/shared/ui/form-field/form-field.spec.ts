@@ -42,13 +42,13 @@ describe('FormField', () => {
         expect(input.getAttribute('aria-required')).toBe('true');
     });
 
-    it('affiche l\'aide sans erreur tant que le champ n\'est pas touché', () => {
+    it("affiche l'aide sans erreur tant que le champ n'est pas touché", () => {
         expect(element.textContent).toContain("Tel qu'il figure sur l'acte de naissance.");
         expect(input.getAttribute('aria-invalid')).toBeNull();
         expect(input.getAttribute('aria-describedby')).toBe(`${input.id}-aide`);
     });
 
-    it('affiche l\'erreur traduite après soumission et la relie au champ', async () => {
+    it("affiche l'erreur traduite après soumission et la relie au champ", async () => {
         fixture.componentInstance.form.markAllAsTouched();
         await fixture.whenStable();
 
@@ -68,7 +68,7 @@ describe('FormField', () => {
         expect(element.querySelector(`#${input.id}-erreur`)?.textContent?.trim()).toBe('Au moins 3 caractères.');
     });
 
-    it('donne la priorité à l\'erreur serveur', async () => {
+    it("donne la priorité à l'erreur serveur", async () => {
         fixture.componentInstance.form.controls.nom.setValue('Moussa');
         fixture.componentInstance.erreurServeur.set('Ce matricule existe déjà dans la daara.');
         await fixture.whenStable();

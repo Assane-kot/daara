@@ -1,0 +1,14 @@
+# Configuration gitleaks (CI) : règles par défaut + exceptions justifiées, au cas par cas.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Clé publishable par défaut de tout Supabase local (publique par conception, environment.ts)"
+regexes = ['''sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH''']
+
+# Clés secrètes Supabase (nouveau format, contourne la RLS) : absentes des règles par défaut de gitleaks.
+[[rules]]
+id = "supabase-secret-key"
+description = "Clé secrète Supabase (sb_secret_…) : uniquement dans les secrets des Edge Functions / GitHub"
+regex = '''sb_secret_[A-Za-z0-9_-]{20,}'''
+keywords = ["sb_secret_"]

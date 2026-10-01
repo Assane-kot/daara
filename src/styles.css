@@ -48,12 +48,12 @@
 
     .sidebar .nav-item > button,
     .sidebar .nav-item > a {
-        @apply relative mb-1 flex w-full items-center justify-between overflow-hidden whitespace-nowrap rounded-md p-2.5 text-muted hover:bg-black/[0.06] hover:text-black max-lg:py-3 dark:text-night-muted dark:hover:bg-night-hover dark:hover:text-white-dark;
+        @apply relative mb-1 flex w-full items-center justify-between overflow-hidden whitespace-nowrap rounded-md p-2.5 text-muted hover:bg-black/[0.06] hover:text-black dark:text-night-muted dark:hover:bg-night-hover dark:hover:text-white-dark max-lg:py-3;
     }
     /* Élément actif DAARA : fond vert clair et barre or sur le bord intérieur. */
     .sidebar .nav-item > button.active,
     .sidebar .nav-item > a.active {
-        @apply bg-primary-light text-primary before:absolute before:inset-y-2 before:w-1 before:rounded-full before:bg-secondary ltr:before:left-0 rtl:before:right-0 dark:bg-primary-dark-light;
+        @apply bg-primary-light text-primary before:absolute before:inset-y-2 before:w-1 before:rounded-full before:bg-secondary dark:bg-primary-dark-light ltr:before:left-0 rtl:before:right-0;
     }
 
     .sidebar .nav-item > button.active > div > span,
@@ -64,8 +64,7 @@
 
     .sidebar ul.sub-menu li button,
     .sidebar ul.sub-menu li a {
-        @apply flex w-full items-center px-9 py-2.5 before:h-0.5 before:w-2 before:rounded before:bg-gray-300 hover:bg-gray-100
-hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark:before:bg-gray-500 dark:hover:bg-gray-900 dark:hover:text-primary;
+        @apply flex w-full items-center px-9 py-2.5 before:h-0.5 before:w-2 before:rounded before:bg-gray-300 hover:bg-gray-100 hover:text-primary hover:before:!bg-primary dark:before:bg-gray-500 dark:hover:bg-gray-900 dark:hover:text-primary ltr:before:mr-2 rtl:before:ml-2;
     }
     .sidebar ul.sub-menu li button.active,
     .sidebar ul.sub-menu li a.active {
@@ -90,12 +89,11 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
         @apply ltr:ml-0 rtl:mr-0;
     }
     .vertical .sidebar {
-        @apply ltr:-left-[260px] rtl:-right-[260px] lg:ltr:left-0 lg:rtl:right-0;
+        @apply ltr:-left-[260px] lg:ltr:left-0 rtl:-right-[260px] lg:rtl:right-0;
     }
     .vertical.toggle-sidebar .sidebar {
-        @apply ltr:left-0 rtl:right-0 lg:ltr:-left-[260px] lg:rtl:-right-[260px];
+        @apply ltr:left-0 lg:ltr:-left-[260px] rtl:right-0 lg:rtl:-right-[260px];
     }
-
 
     /* Buttons */
     .btn {
@@ -103,7 +101,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     }
     /* Bouton rond à icône (header) : zone tactile de 44 px en mobile. */
     .icon-btn {
-        @apply flex items-center justify-center rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary max-sm:h-11 max-sm:w-11 dark:bg-dark/40 dark:hover:bg-dark/60;
+        @apply flex items-center justify-center rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary dark:bg-dark/40 dark:hover:bg-dark/60 max-sm:h-11 max-sm:w-11;
     }
     .btn-lg {
         @apply px-7 py-2.5 text-base;
@@ -197,7 +195,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     .form-textarea,
     .form-select,
     .form-multiselect {
-        @apply w-full rounded-md border border-white-light bg-white px-4 py-2 text-base font-semibold text-black max-sm:min-h-11 sm:text-body !outline-none focus:border-primary focus:ring-transparent dark:border-night-border dark:bg-night-input dark:text-white-dark dark:focus:border-primary;
+        @apply w-full rounded-md border border-white-light bg-white px-4 py-2 text-base font-semibold text-black !outline-none focus:border-primary focus:ring-transparent dark:border-night-border dark:bg-night-input dark:text-white-dark dark:focus:border-primary max-sm:min-h-11 sm:text-body;
     }
 
     .form-input-lg,
@@ -263,8 +261,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     /* checkbox & radio */
     .form-radio,
     .form-checkbox {
-        @apply h-5 w-5 cursor-pointer rounded border-2 border-white-light bg-transparent text-primary !shadow-none !outline-none !ring-0 !ring-offset-0 checked:bg-[length:90%_90%] disabled:cursor-not-allowed disabled:bg-gray-100 ltr:mr-1.5 rtl:ml-1.5
-      dark:border-night-border-strong dark:checked:border-transparent dark:disabled:bg-night-raised;
+        @apply h-5 w-5 cursor-pointer rounded border-2 border-white-light bg-transparent text-primary !shadow-none !outline-none !ring-0 !ring-offset-0 checked:bg-[length:90%_90%] disabled:cursor-not-allowed disabled:bg-gray-100 dark:border-night-border-strong dark:checked:border-transparent dark:disabled:bg-night-raised ltr:mr-1.5 rtl:ml-1.5;
     }
 
     .form-checkbox.outline-primary:checked {
@@ -355,7 +352,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     table thead tr th,
     table tfoot tr th,
     table tbody tr td {
-        @apply py-3 px-4 ltr:text-left rtl:text-right;
+        @apply px-4 py-3 ltr:text-left rtl:text-right;
     }
     table thead tr th,
     table tfoot tr th {
@@ -373,7 +370,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
 
     table.dataTable-table tbody tr th,
     table.dataTable-table tbody tr td {
-        @apply border-b border-gray-200 py-3 px-4 ltr:text-left rtl:text-right dark:border-night-border;
+        @apply border-b border-gray-200 px-4 py-3 dark:border-night-border ltr:text-left rtl:text-right;
     }
     table.dataTable-table tbody tr:last-child td {
         @apply border-b-0;
@@ -395,11 +392,11 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
 /* Barre de défilement native de la sidebar (remplace ngx-scrollbar) */
 .sidebar-scroll {
     scrollbar-width: thin;
-    scrollbar-color: theme("colors.gray.300") transparent;
+    scrollbar-color: theme('colors.gray.300') transparent;
 }
 
 .dark .sidebar-scroll {
-    scrollbar-color: theme("colors.night.border-strong") transparent;
+    scrollbar-color: theme('colors.night.border-strong') transparent;
 }
 
 /* Focus clavier visible (accessibilité) : placé hors des couches pour primer sur `outline-none` de Vristo. */

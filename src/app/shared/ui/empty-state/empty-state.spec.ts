@@ -14,7 +14,7 @@ import { EmptyState } from './empty-state';
 class HoteTest {}
 
 describe('EmptyState', () => {
-    it('affiche le titre, le message et l\'action projetée', async () => {
+    it("affiche le titre, le message et l'action projetée", async () => {
         const fixture = TestBed.createComponent(HoteTest);
         await fixture.whenStable();
         const texte = (fixture.nativeElement as HTMLElement).textContent ?? '';

@@ -32,7 +32,7 @@ function verifierCle(cle) {
         echec('SUPABASE_ANON_KEY contient une clé SECRÈTE (service_role). Utiliser la clé anon / publishable.');
     }
     if (!cle.startsWith('sb_publishable_') && roleJwt(cle) !== 'anon') {
-        echec('SUPABASE_ANON_KEY n\'est ni une clé publishable (sb_publishable_…) ni une clé JWT de rôle anon.');
+        echec("SUPABASE_ANON_KEY n'est ni une clé publishable (sb_publishable_…) ni une clé JWT de rôle anon.");
     }
 }
 
@@ -41,7 +41,7 @@ function verifierUrl(valeur) {
     try {
         url = new URL(valeur);
     } catch {
-        echec('SUPABASE_URL n\'est pas une URL valide.');
+        echec("SUPABASE_URL n'est pas une URL valide.");
     }
     const locale = ['localhost', '127.0.0.1'].includes(url.hostname);
     if (url.protocol !== 'https:' && !locale) {

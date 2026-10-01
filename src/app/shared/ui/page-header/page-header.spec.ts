@@ -29,7 +29,7 @@ describe('PageHeader', () => {
         expect(element.querySelector('h1')?.textContent?.trim()).toBe('Absences');
     });
 
-    it('affiche le fil d\'Ariane : liens puis page courante', () => {
+    it("affiche le fil d'Ariane : liens puis page courante", () => {
         const nav = element.querySelector('nav');
         expect(nav?.getAttribute('aria-label')).toBe('Fil d’Ariane');
         expect(nav?.querySelector('a')?.textContent?.trim()).toBe('Accueil');

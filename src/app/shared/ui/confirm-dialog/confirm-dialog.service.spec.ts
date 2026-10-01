@@ -29,7 +29,7 @@ describe('ConfirmDialogService', () => {
         TestBed.inject(Dialog).closeAll();
     });
 
-    it('résout true quand l\'utilisateur confirme', async () => {
+    it("résout true quand l'utilisateur confirme", async () => {
         const resultat = service.confirmer({ titre: 'Supprimer ?', message: 'Action définitive.' });
         await stabiliser();
 
@@ -38,7 +38,7 @@ describe('ConfirmDialogService', () => {
         expect(await resultat).toBe(true);
     });
 
-    it('résout false quand l\'utilisateur annule', async () => {
+    it("résout false quand l'utilisateur annule", async () => {
         const resultat = service.confirmer({ titre: 'Supprimer ?', message: 'Action définitive.' });
         await stabiliser();
 

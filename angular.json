@@ -3,7 +3,8 @@
     "version": 1,
     "cli": {
         "packageManager": "npm",
-        "analytics": false
+        "analytics": false,
+        "schematicCollections": ["angular-eslint"]
     },
     "newProjectRoot": "projects",
     "projects": {
@@ -29,11 +30,7 @@
                                 "input": "public"
                             }
                         ],
-                        "styles": [
-                            "node_modules/@fontsource-variable/nunito/index.css",
-                            "node_modules/@angular/cdk/overlay-prebuilt.css",
-                            "src/styles.css"
-                        ]
+                        "styles": ["node_modules/@fontsource-variable/nunito/index.css", "node_modules/@angular/cdk/overlay-prebuilt.css", "src/styles.css"]
                     },
                     "configurations": {
                         "production": {
@@ -79,6 +76,12 @@
                 },
                 "test": {
                     "builder": "@angular/build:unit-test"
+                },
+                "lint": {
+                    "builder": "@angular-eslint/builder:lint",
+                    "options": {
+                        "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+                    }
                 }
             }
         }

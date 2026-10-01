@@ -52,6 +52,6 @@ Toute information importante apprise en session (décision, contrainte, piège) 
 PROGRESS.md, un ADR ou ce fichier — sinon elle sera perdue à la prochaine session.
 
 ## Commandes utiles
-- `npm start` · `npm test` · `npm run build`
+- `npm start` · `npm test` · `npm run build` · `npm run lint` · `npm run format` (Prettier, tri des classes Tailwind)
 - `npm run db:start` · `npm run db:reset` · `npm run db:test` · `npm run db:types` · `npx supabase migration new <nom>`
   (CLI Supabase en devDependency : `npx supabase …` ; Docker Desktop doit être lancé)

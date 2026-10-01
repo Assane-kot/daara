@@ -20,9 +20,18 @@ apprenants).
 | `npm start` | Serveur de développement (http://localhost:4200) |
 | `npm test` | Tests unitaires Vitest (mode watch) |
 | `npm run test:ci` | Tests unitaires, exécution unique |
-| `npm run build` | Build de production dans `dist/daara` |
+| `npm run build` | Build de production dans `dist/daara` (génère l'environnement via `scripts/set-env.mjs`) |
+| `npm run lint` | ESLint (règles Angular, accessibilité des templates) |
+| `npm run format` / `format:check` | Prettier (tri des classes Tailwind) |
+| `npm run db:start` / `db:stop` | Supabase local (Docker Desktop requis) |
+| `npm run db:reset` / `db:test` | Réapplique migrations et seed / tests pgTAP |
+| `npm run db:types` | Régénère `database.types.ts` |
 
 En développement, la page `/dev/charte` présente la charte graphique (couleurs, boutons, formulaires).
+
+## Intégration continue
+GitHub Actions (`.github/workflows/ci.yml`) à chaque push sur `develop` / `main` et chaque pull request :
+format, lint, tests unitaires, build, `npm audit`, tests pgTAP sur Postgres local, scan de secrets (gitleaks).
 
 ## Documentation
 - Conception : `docs/HLD.md` (vue d'ensemble), `docs/LLD.md` (tables, RLS, routes, flux)

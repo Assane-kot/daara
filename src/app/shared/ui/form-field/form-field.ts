@@ -1,15 +1,4 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    DestroyRef,
-    Directive,
-    afterNextRender,
-    computed,
-    contentChild,
-    inject,
-    input,
-    signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Directive, afterNextRender, computed, contentChild, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgControl, ValidationErrors, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';

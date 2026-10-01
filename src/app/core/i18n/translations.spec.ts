@@ -10,7 +10,7 @@ function cles(objet: unknown, prefixe = ''): string[] {
 }
 
 describe('Fichiers de traduction', () => {
-    it('existent pour chaque langue de l\'interface', () => {
+    it("existent pour chaque langue de l'interface", () => {
         for (const langue of LANGUES) {
             expect(TRADUCTIONS[langue]).toBeDefined();
         }
@@ -20,7 +20,7 @@ describe('Fichiers de traduction', () => {
         expect(cles(TRADUCTIONS['en']).sort()).toEqual(cles(TRADUCTIONS['fr']).sort());
     });
 
-    it('n\'ont aucune valeur vide', () => {
+    it("n'ont aucune valeur vide", () => {
         for (const langue of LANGUES) {
             const vides = cles(TRADUCTIONS[langue]).filter((cle) => {
                 const valeur = cle.split('.').reduce<unknown>((noeud, partie) => (noeud as Record<string, unknown>)[partie], TRADUCTIONS[langue]);

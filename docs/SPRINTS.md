@@ -19,6 +19,7 @@ Règle : une story n'entre dans un sprint que si sa section du LLD est détaill�
 - [ ] Types régénérés, aucun `any`
 - [ ] Écrans : chargement / erreur / vide, français + anglais, mode sombre, mobile 375 px
 - [ ] Tests unitaires du service et du composant principal
+- [ ] `npm run lint` et `npm run format:check` verts, CI verte sur `develop`
 - [ ] Rapport `auditeur-securite` sans critique ni important ouvert
 - [ ] PROGRESS.md mis à jour, commit Conventional Commits
 
@@ -31,7 +32,7 @@ Objectif : un projet propre qui tourne, avec l'outillage en place.
 - [x] `SupabaseService`, environnements, `supabase init` / `start`
 - [x] i18n fr/en (ADR-005)
 - [x] Composants `shared/ui` de base : page-header, empty-state, badge, confirm-dialog
-- [ ] CI GitHub Actions (lint, tests, build, pgTAP, scan secrets)
+- [x] CI GitHub Actions (lint, tests, build, pgTAP, scan secrets)
 - [ ] Cloudflare Pages branché sur le dépôt (production `main`, preview `develop`)
 - [ ] Projets Supabase Free `daara-dev` et `daara-prod`, SMTP Brevo/Resend
 - [ ] Workflows planifiés : sauvegarde `pg_dump` → R2, anti-pause

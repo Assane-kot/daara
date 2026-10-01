@@ -5,7 +5,7 @@
 
 ## État actuel
 - Sprint en cours : 0 — Installation (voir docs/SPRINTS.md)
-- Dernière tâche terminée : S0.5 — Supabase local, `SupabaseService`, environnements (43 tests + pgTAP verts)
+- Dernière tâche terminée : S0.6 — ESLint, Prettier, CI GitHub Actions (job front rejoué localement : vert)
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -16,10 +16,12 @@
     dans `_headers`, sinon des navigateurs garderont d'anciennes traductions après un déploiement.
   - Formats de date et de nombre (fr / en, fuseau `Africa/Dakar`) : à traiter avec le premier écran qui
     affiche des dates (pipe localisé basé sur `LanguageService`).
+  - CI : jobs `base` (pgTAP) et `secrets` (gitleaks en mode git) jamais exécutés sur GitHub → vérifier le
+    premier run après le push ; le job `front` a été rejoué localement à l'identique.
 
 ## Prochaine étape
-S0.6 — ESLint (angular-eslint), Prettier 3 + plugin Tailwind, CI GitHub Actions (lint, tests, pgTAP via
-`supabase start`, build, gitleaks, `npm audit`). Puis S0.7 → S0.10 (plan ci-dessous).
+S0.7 — Cloudflare Pages : `public/_redirects` (fallback SPA), `public/_headers` (CSP, HSTS, no-cache sur
+`/i18n/*`), `docs/deploiement.md` ; branchement du dépôt par le développeur. Puis S0.8 → S0.10.
 
 ### Plan du sprint 0 (validé le 2026-10-01)
 | Story | Contenu |
@@ -38,6 +40,21 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-01 — S0.6 Qualité et CI
+- ESLint 10 via `ng add angular-eslint` (22.5) : règles recommandées TS + templates + accessibilité ;
+  ajoutées : OnPush obligatoire, `no-explicit-any`, control flow obligatoire, `no-console` (sauf warn/error).
+  Préfixe `icon-` autorisé (icônes Vristo) ; `header[appHeader]` / `footer[appFooter]` justifiés en commentaire ;
+  `database.types.ts` exclu.
+- Prettier 3 + `prettier-plugin-tailwindcss` 0.8 (tri des classes, compatible Tailwind 3 vérifié) ; Markdown,
+  `.claude/` et fichiers générés exclus ; 16 fichiers reformatés sans changement fonctionnel.
+- gitleaks 8.30 : `.gitleaks.toml` = règles par défaut + règle `supabase-secret-key` (sb_secret_, absente des
+  règles par défaut) + exception limitée à la clé publishable locale. Contrôle : un fichier piégé est détecté.
+  Constat : `supabase/.temp/` contient les vraies clés locales (dont service_role) → l'exclusion Git est vitale.
+- `.github/workflows/ci.yml` : jobs parallèles `front` (format, lint, tests, build, npm audit high),
+  `base` (`supabase db start` + `supabase test db`), `secrets` (gitleaks sur tout l'historique) ;
+  actions checkout v7 / setup-node v7, Node 24, droits `contents: read`, aucun secret requis.
+- Definition of Done : lint, format et CI verts ajoutés.
+
 ### 2026-10-01 — S0.5 Supabase local et environnements
 - `@supabase/supabase-js` 2.117 (dépendance) et CLI `supabase` 2.119 (devDependency, binaire fourni sans
   script d'installation) ; scripts `npm run db:start|db:stop|db:reset|db:test|db:types`. Pas de script
