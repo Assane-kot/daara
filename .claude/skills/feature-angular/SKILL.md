@@ -54,5 +54,6 @@ export class AbsencesService {
 
 ## Fin de feature
 - Tests unitaires du service (mock du client Supabase) et du composant principal.
-- Lancer l'agent `auditeur-securite`.
-- Mettre à jour PROGRESS.md, cocher la story dans SPRINTS.md, puis commit.
+- Lancer l'agent `auditeur-securite` en lui passant la liste des fichiers créés/modifiés.
+- Mettre à jour PROGRESS.md, cocher la story dans SPRINTS.md, puis donner au développeur la liste des
+  fichiers modifiés, les commandes git et le message de commit (Claude n'exécute aucune commande git).

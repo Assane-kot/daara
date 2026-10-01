@@ -51,10 +51,10 @@ Copy-Item "$V\vristo-angular-starter\.gitignore" .\.gitignore.starter -ErrorActi
 git add .
 git commit -m "chore: ajout du starter Vristo Angular"
 
-# Commit 3 : thème complet en référence (lecture seule)
-robocopy "$V\vristo-angular-main" .\_reference\vristo-full /E /XD node_modules .git dist .angular
-git add .
-git commit -m "chore: ajout du thème Vristo complet en référence"
+# Thème complet en référence : HORS dépôt (lecture seule, rien à commiter)
+robocopy "$V\vristo-angular-main" C:\projets\vristo-reference /E /XD node_modules .git dist .angular
+# → le déclarer dans .claude/settings.local.json (permissions.additionalDirectories).
+#   On n'en copie dans le projet que les éléments nécessaires, au cas par cas.
 ```
 Avant chaque `git add`, vérifier avec `git status` qu'aucun `node_modules` ni `.env` n'apparaît.
 
@@ -62,16 +62,25 @@ Avant chaque `git add`, vérifier avec `git status` qu'aucun `node_modules` ni `
 ```powershell
 git remote add origin https://github.com/<vous>/daara.git
 git push -u origin main
+git checkout -b develop
+git push -u origin develop
 ```
 
 ### 1.5 Règles de travail Git
-- `main` = toujours stable et déployable (déployé automatiquement en production par Cloudflare Pages).
-- Une branche par story : `s1/memberships`, `s5/absences-temps-reel`…
-- Pull request vers `main` (déclenche CI + preview Cloudflare), fusion en *squash*, branche supprimée.
+- **Le développeur fait toutes les commandes git.** Claude Code n'exécute jamais `git` ni `gh`, même en
+  lecture (bloqué par `deny` dans `.claude/settings.json`). En fin de tâche, il fournit la liste des
+  fichiers modifiés, les commandes git à lancer et le message de commit.
+- `main` = production : ne reçoit que des releases (fusion de `develop`) ; déployé automatiquement en
+  production par Cloudflare Pages.
+- `develop` = branche d'intégration.
+- Cloudflare Pages : production sur `main`, preview sur `develop` et sur chaque branche de story.
+- Une branche par story, créée depuis `develop` : `s1/memberships`, `s5/absences-temps-reel`…
+- Pull request de la story vers `develop` (déclenche CI + preview Cloudflare de la branche),
+  fusion en *squash*, branche supprimée.
+- Release : pull request `develop` → `main`, puis tag sur `main` : `git tag r0 && git push --tags`.
 - Commits en Conventional Commits : `feat:`, `fix:`, `docs:`, `chore:`, `test:`, `refactor:`.
-- Tag à chaque release : `git tag r0 && git push --tags`.
-- GitHub gratuit ne protège pas `main` sur un dépôt privé : la discipline (jamais de push direct sur `main`)
-  est inscrite dans CLAUDE.md et les permissions Claude Code demandent confirmation avant tout push.
+- GitHub gratuit ne protège pas les branches sur un dépôt privé : la discipline (jamais de push direct sur
+  `main` ni `develop`) repose sur le développeur, seul à exécuter les commandes git.
 
 ---
 
@@ -102,13 +111,14 @@ npm start          # le starter doit s'afficher
 ## Étape 4 — Première session Claude Code
 ```powershell
 cd C:\dev\daara
+git checkout develop
 git checkout -b s0/analyse-starter
 claude
 ```
 `/memory` pour vérifier que CLAUDE.md est chargé, puis :
 
 > Lis CLAUDE.md, docs/HLD.md, docs/LLD.md, docs/SPRINTS.md et docs/PROGRESS.md.
-> Analyse le projet Angular (starter Vristo) et `_reference/vristo-full` : versions d'Angular et de
+> Analyse le projet Angular (starter Vristo) et la référence `C:/projets/vristo-reference` : versions d'Angular et de
 > Tailwind, structure, dépendances, éléments à supprimer. Propose un plan détaillé du sprint 0, story par
 > story. Ne modifie rien avant ma validation. Termine en mettant à jour PROGRESS.md.
 

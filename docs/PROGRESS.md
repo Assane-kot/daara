@@ -15,5 +15,5 @@ proposer un plan de mise à niveau et de nettoyage. Ne rien modifier avant valid
 ## Historique
 ### [date] — Initialisation
 - Kit Claude Code (CLAUDE.md, rules, skills, agents, hooks) ajouté
-- Starter Vristo copié comme base, thème complet dans `_reference/vristo-full/`
+- Starter Vristo copié comme base, thème complet hors dépôt dans `C:/projets/vristo-reference/` (lecture seule)
 - Choix zéro abonnement (ADR-003)

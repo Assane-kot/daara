@@ -5,7 +5,8 @@ Modules : scolaire (classes, matières, notes, bulletins, absences) + Coran (cah
 Langue de travail : français. Réponses concises.
 
 ## Stack
-- Front : Angular, base = starter Vristo (Tailwind). Référence UI complète : `_reference/vristo-full/` (LECTURE SEULE).
+- Front : Angular, base = starter Vristo (Tailwind). Référence UI complète : thème Vristo hors dépôt dans `C:/projets/vristo-reference/` (LECTURE SEULE,
+  déclaré dans `.claude/settings.local.json`). On n'en copie que les éléments nécessaires, au cas par cas.
 - Back : Supabase Free (Postgres, Auth, Realtime, Storage, Edge Functions). Spring Boot éventuel plus tard, pas en V1.
 - Front sur Cloudflare Pages ; audios et sauvegardes sur Cloudflare R2. Projets Supabase : daara-dev, daara-prod.
 - Zéro abonnement (ADR-003) : ne jamais proposer de service payant sans le signaler explicitement.
@@ -16,12 +17,19 @@ Langue de travail : français. Réponses concises.
 3. Jamais de clé service_role, ni de secret, dans le code Angular ou dans Git.
 4. Schéma modifié UNIQUEMENT par migrations (`supabase migration new`), jamais via le dashboard.
 5. Chaque migration avec RLS a ses tests pgTAP dans `supabase/tests/` (accès autorisé + accès refusé inter-daara).
-6. Ne jamais modifier `_reference/`. On s'en inspire, on adapte, on n'importe pas en bloc.
+6. Ne jamais modifier `C:/projets/vristo-reference/`. On s'en inspire, on copie au cas par cas uniquement ce qui est
+   nécessaire, on adapte, on n'importe jamais en bloc.
 7. Je ne lance jamais `supabase db push` ni de commande sur la prod : c'est le développeur qui le fait.
 
 ## Git
-- Jamais de commit ni de push direct sur `main` : une branche par story (`sN/nom-story`), puis pull request.
-- Conventional Commits en français.
+- RÈGLE ABSOLUE : Claude n'exécute JAMAIS de commande `git` ni `gh`, même en lecture (status, diff, log
+  compris). Le développeur fait toutes les commandes git. Quand un travail est prêt, Claude donne : la liste
+  des fichiers modifiés, les commandes git à lancer et un message de commit (Conventional Commits, en français).
+- `main` = production : releases uniquement (fusion de `develop`), taguées (`r0`, `r1`…).
+- `develop` = branche d'intégration.
+- Une branche par story `sN/nom-story`, créée depuis `develop`, fusionnée dans `develop` par pull request.
+- Jamais de commit ni de push direct sur `main` ni sur `develop`.
+- Cloudflare Pages : production sur `main`, preview sur `develop` et sur chaque branche de story.
 
 ## Workflow par feature
 1. Mode plan → vérifier/compléter la section du LLD, spec dans `docs/features/<nom>.md` (modèle : `_TEMPLATE.md`) → validation du développeur.
@@ -29,7 +37,8 @@ Langue de travail : français. Réponses concises.
 3. `supabase gen types typescript --local > src/app/core/supabase/database.types.ts`
 4. Code Angular (skill feature-angular, composants via skill composant-vristo).
 5. Agent `auditeur-securite` (+ `auditeur-rls` si nouvelles tables) → corriger.
-6. Mettre à jour `docs/PROGRESS.md`, cocher la story dans `docs/SPRINTS.md`, commit (Conventional Commits).
+6. Mettre à jour `docs/PROGRESS.md`, cocher la story dans `docs/SPRINTS.md`, puis donner au développeur
+   les commandes git et le message de commit.
 
 ## Mémoire du projet
 - Avancement : @docs/PROGRESS.md
