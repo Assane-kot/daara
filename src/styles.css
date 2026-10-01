@@ -7,22 +7,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Couleur primaire et texte posé dessus : le vert s'éclaircit en mode sombre (contraste AA). */
+:root {
+    --color-primary: 26 107 60; /* #1a6b3c */
+    --color-on-primary: 255 255 255;
+}
+
+.dark {
+    --color-primary: 76 175 122; /* #4caf7a */
+    --color-on-primary: 11 18 14; /* #0b120e */
+}
+
 @layer components {
     html {
         @apply scroll-smooth;
     }
 
     body {
-        @apply bg-[#fafafa] font-nunito;
+        @apply bg-page font-nunito;
     }
 
     body.dark {
-        @apply bg-[#060818];
+        @apply bg-night-deep;
     }
 
     /* Panel */
     .panel {
-        @apply relative rounded-md bg-white p-5 shadow dark:bg-[#0e1726];
+        @apply relative rounded-md bg-white p-5 shadow dark:bg-night;
     }
 
     /* Navbar */
@@ -37,16 +48,18 @@
 
     .sidebar .nav-item > button,
     .sidebar .nav-item > a {
-        @apply mb-1 flex w-full items-center justify-between overflow-hidden whitespace-nowrap rounded-md p-2.5 text-[#506690] hover:bg-[#000]/[0.08] hover:text-black dark:hover:bg-[#181f32] dark:hover:text-white-dark;
+        @apply relative mb-1 flex w-full items-center justify-between overflow-hidden whitespace-nowrap rounded-md p-2.5 text-muted hover:bg-black/[0.06] hover:text-black max-lg:py-3 dark:text-night-muted dark:hover:bg-night-hover dark:hover:text-white-dark;
     }
+    /* Élément actif DAARA : fond vert clair et barre or sur le bord intérieur. */
     .sidebar .nav-item > button.active,
     .sidebar .nav-item > a.active {
-        @apply bg-[#000]/[0.08] text-black dark:bg-[#181f32] dark:text-white-dark;
+        @apply bg-primary-light text-primary before:absolute before:inset-y-2 before:w-1 before:rounded-full before:bg-secondary ltr:before:left-0 rtl:before:right-0 dark:bg-primary-dark-light;
     }
 
     .sidebar .nav-item > button.active > div > span,
-    .sidebar .nav-item > a.active > div > span {
-        @apply dark:!text-white-dark;
+    .sidebar .nav-item > a.active > div > span,
+    .sidebar .nav-item > a.active div:first-child svg {
+        @apply !text-primary;
     }
 
     .sidebar ul.sub-menu li button,
@@ -86,7 +99,11 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
 
     /* Buttons */
     .btn {
-        @apply relative flex items-center justify-center rounded-md border px-5 py-2 text-sm font-semibold shadow-[0_10px_20px_-10px] outline-none transition duration-300 hover:shadow-none;
+        @apply relative flex items-center justify-center rounded-md border px-5 py-2 text-sm font-semibold shadow-[0_10px_20px_-10px] outline-none transition duration-300 hover:shadow-none max-sm:min-h-11;
+    }
+    /* Bouton rond à icône (header) : zone tactile de 44 px en mobile. */
+    .icon-btn {
+        @apply flex items-center justify-center rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary max-sm:h-11 max-sm:w-11 dark:bg-dark/40 dark:hover:bg-dark/60;
     }
     .btn-lg {
         @apply px-7 py-2.5 text-base;
@@ -99,17 +116,18 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     }
 
     .btn-primary {
-        @apply border-primary bg-primary text-white shadow-primary/60;
+        @apply border-primary bg-primary text-on-primary shadow-primary/60;
     }
     .btn-outline-primary {
-        @apply border-primary text-primary shadow-none hover:bg-primary hover:text-white;
+        @apply border-primary text-primary shadow-none hover:bg-primary hover:text-on-primary;
     }
 
+    /* Or : texte vert très foncé (blanc sur or = contraste 2,3). */
     .btn-secondary {
-        @apply border-secondary bg-secondary text-white shadow-secondary/60;
+        @apply border-secondary bg-secondary text-primary-950 shadow-secondary/60;
     }
     .btn-outline-secondary {
-        @apply border-secondary text-secondary shadow-none hover:bg-secondary hover:text-white;
+        @apply border-secondary text-secondary-700 shadow-none hover:bg-secondary hover:text-primary-950 dark:text-secondary;
     }
 
     .btn-success {
@@ -153,10 +171,10 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
         @apply relative my-1 rounded border border-transparent px-2 py-0.5 text-xs font-semibold text-white;
     }
     .badge-outline-primary {
-        @apply border-primary text-primary hover:bg-primary-light dark:hover:bg-primary dark:hover:text-white-light;
+        @apply border-primary text-primary hover:bg-primary-light dark:hover:bg-primary dark:hover:text-on-primary;
     }
     .badge-outline-secondary {
-        @apply border-secondary text-secondary hover:bg-secondary-light dark:hover:bg-secondary dark:hover:text-white-light;
+        @apply border-secondary text-secondary-700 hover:bg-secondary-light dark:text-secondary dark:hover:bg-secondary dark:hover:text-primary-950;
     }
     .badge-outline-success {
         @apply border-success text-success hover:bg-success-light dark:hover:bg-success dark:hover:text-white-light;
@@ -179,7 +197,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     .form-textarea,
     .form-select,
     .form-multiselect {
-        @apply w-full rounded-md border border-[#e0e6ed] bg-white px-4 py-2 text-sm font-semibold text-black !outline-none focus:border-primary focus:ring-transparent dark:border-[#17263c] dark:bg-[#121e32] dark:text-white-dark dark:focus:border-primary;
+        @apply w-full rounded-md border border-white-light bg-white px-4 py-2 text-base font-semibold text-black max-sm:min-h-11 sm:text-body !outline-none focus:border-primary focus:ring-transparent dark:border-night-border dark:bg-night-input dark:text-white-dark dark:focus:border-primary;
     }
 
     .form-input-lg,
@@ -215,7 +233,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
         @apply text-danger;
     }
     .has-error .multiselect__input {
-        @apply bg-[#F7ECF0] !placeholder-danger/70;
+        @apply bg-danger-light !placeholder-danger/70;
     }
     .has-error .multiselect__tags:hover,
     .has-error .form-checkbox {
@@ -236,7 +254,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
         @apply text-success;
     }
     .has-success .multiselect__input {
-        @apply bg-[#F7ECF0] !placeholder-success/70;
+        @apply bg-success-light !placeholder-success/70;
     }
     .has-success .multiselect__tags:hover {
         @apply border-success;
@@ -245,17 +263,17 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     /* checkbox & radio */
     .form-radio,
     .form-checkbox {
-        @apply h-5 w-5 cursor-pointer rounded border-2 border-[#e0e6ed] bg-transparent text-primary !shadow-none !outline-none !ring-0 !ring-offset-0 checked:bg-[length:90%_90%] disabled:cursor-not-allowed disabled:bg-[#eee] ltr:mr-1.5 rtl:ml-1.5
-      dark:border-[#253b5c] dark:checked:border-transparent dark:disabled:bg-[#1b2e4b];
+        @apply h-5 w-5 cursor-pointer rounded border-2 border-white-light bg-transparent text-primary !shadow-none !outline-none !ring-0 !ring-offset-0 checked:bg-[length:90%_90%] disabled:cursor-not-allowed disabled:bg-gray-100 ltr:mr-1.5 rtl:ml-1.5
+      dark:border-night-border-strong dark:checked:border-transparent dark:disabled:bg-night-raised;
     }
 
     .form-checkbox.outline-primary:checked {
         @apply border-primary bg-transparent;
-        background-image: url("data:image/svg+xml,<svg viewBox='0 0 16 16' fill='%234361ee' xmlns='http://www.w3.org/2000/svg'><path d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/></svg>");
+        background-image: url("data:image/svg+xml,<svg viewBox='0 0 16 16' fill='%232a915c' xmlns='http://www.w3.org/2000/svg'><path d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/></svg>");
     }
     .form-checkbox.outline-secondary:checked {
         @apply border-secondary bg-transparent;
-        background-image: url("data:image/svg+xml,<svg viewBox='0 0 16 16' fill='%23805dca' xmlns='http://www.w3.org/2000/svg'><path d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/></svg>");
+        background-image: url("data:image/svg+xml,<svg viewBox='0 0 16 16' fill='%23c9a84c' xmlns='http://www.w3.org/2000/svg'><path d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/></svg>");
     }
     .form-checkbox.outline-success:checked {
         @apply border-success bg-transparent;
@@ -275,7 +293,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     }
     .form-checkbox.outline-dark:checked {
         @apply border-dark bg-transparent;
-        background-image: url("data:image/svg+xml,<svg viewBox='0 0 16 16' fill='%233b3f5c' xmlns='http://www.w3.org/2000/svg'><path d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/></svg>");
+        background-image: url("data:image/svg+xml,<svg viewBox='0 0 16 16' fill='%23334039' xmlns='http://www.w3.org/2000/svg'><path d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/></svg>");
     }
 
     .form-radio {
@@ -312,8 +330,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
         @apply flex;
     }
     .dropdown ul {
-        @apply absolute z-10 mt-1 min-w-[120px] rounded bg-white p-0 py-2 text-black shadow dark:bg-[#1b2e4b] dark:text-white-dark;
-        /* @apply my-1 min-w-[120px] rounded bg-white p-0 py-2 shadow dark:bg-[#1b2e4b]  text-black dark:text-white-dark; */
+        @apply absolute z-10 mt-1 min-w-[120px] rounded bg-white p-0 py-2 text-black shadow dark:bg-night-raised dark:text-white-dark;
     }
     .dropdown ul li > a,
     .dropdown ul li > button {
@@ -333,7 +350,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     }
     table thead tr,
     table tfoot tr {
-        @apply border-b-0 !bg-[#f6f8fa]  dark:!bg-[#1a2941];
+        @apply border-b-0 !bg-gray-50 dark:!bg-night-raised;
     }
     table thead tr th,
     table tfoot tr th,
@@ -345,18 +362,18 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
         @apply font-semibold;
     }
     table tbody tr {
-        @apply border-b !border-white-light/40 dark:!border-[#191e3a];
+        @apply border-b !border-white-light/40 dark:!border-night-border;
     }
     table.table-hover tbody tr {
-        @apply hover:!bg-white-light/20 dark:hover:!bg-[#1a2941]/40;
+        @apply hover:!bg-white-light/20 dark:hover:!bg-night-raised/40;
     }
     table.table-striped tbody tr:nth-child(odd) {
-        @apply !bg-white-light/20 dark:!bg-[#1a2941]/40;
+        @apply !bg-white-light/20 dark:!bg-night-raised/40;
     }
 
     table.dataTable-table tbody tr th,
     table.dataTable-table tbody tr td {
-        @apply border-b border-[#e5e7eb] py-3 px-4 ltr:text-left rtl:text-right dark:border-[#191e3a];
+        @apply border-b border-gray-200 py-3 px-4 ltr:text-left rtl:text-right dark:border-night-border;
     }
     table.dataTable-table tbody tr:last-child td {
         @apply border-b-0;
@@ -378,9 +395,17 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
 /* Barre de défilement native de la sidebar (remplace ngx-scrollbar) */
 .sidebar-scroll {
     scrollbar-width: thin;
-    scrollbar-color: #dddddd transparent;
+    scrollbar-color: theme("colors.gray.300") transparent;
 }
 
 .dark .sidebar-scroll {
-    scrollbar-color: #2d334c transparent;
+    scrollbar-color: theme("colors.night.border-strong") transparent;
+}
+
+/* Focus clavier visible (accessibilité) : placé hors des couches pour primer sur `outline-none` de Vristo. */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid rgb(var(--color-primary));
+    outline-offset: 2px;
 }

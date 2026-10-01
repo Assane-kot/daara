@@ -1,27 +1,30 @@
-# VristoAngular
+# DAARA
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.4.
+SaaS de gestion des daaras (écoles coraniques et franco-arabes) : scolarité, absences, notes, bulletins,
+suivi du Coran. Plateforme multi-tenant : chaque daara dispose de son espace (admin, enseignants, parents,
+apprenants).
 
-## Development server
+## Stack
+- Front : Angular 22 (standalone, signals, zoneless), Tailwind CSS 3.4, thème Vristo adapté (ADR-004).
+- Back : Supabase (Postgres + RLS, Auth, Realtime, Storage, Edge Functions) (ADR-001, ADR-002).
+- Hébergement : Cloudflare Pages ; fichiers lourds et sauvegardes sur Cloudflare R2 (ADR-003).
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Prérequis
+- Node 24 LTS (Angular 22 exige `^22.22.3 || ^24.15`)
+- Docker Desktop et Supabase CLI (à partir du sprint 0, story S0.5)
 
-## Code scaffolding
+## Commandes
+| Commande | Rôle |
+|---|---|
+| `npm install` | Installe les dépendances |
+| `npm start` | Serveur de développement (http://localhost:4200) |
+| `npm test` | Tests unitaires Vitest (mode watch) |
+| `npm run test:ci` | Tests unitaires, exécution unique |
+| `npm run build` | Build de production dans `dist/daara` |
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+En développement, la page `/dev/charte` présente la charte graphique (couleurs, boutons, formulaires).
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Documentation
+- Conception : `docs/HLD.md` (vue d'ensemble), `docs/LLD.md` (tables, RLS, routes, flux)
+- Décisions : `docs/decisions/`
+- Avancement : `docs/PROGRESS.md` · Sprints : `docs/SPRINTS.md`

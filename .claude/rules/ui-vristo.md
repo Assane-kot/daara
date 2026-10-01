@@ -14,6 +14,24 @@ paths:
   Ne pas inventer un style différent du thème.
 - Charte DAARA : couleur primaire `#1a6b3c` (vert), secondaire / accent `#C9A84C` (or). Configurées une seule fois
   dans la config Tailwind / variables du thème, jamais en dur dans les templates.
+- Or : jamais en couleur de texte sur fond clair (contraste 2,3). Sur fond clair : `text-secondary-700` ;
+  texte posé sur un fond or : `text-primary-950`. Boutons pleins primaires : `text-on-primary` (pas `text-white`).
+- Markup copié de la référence : remplacer les couleurs codées en dur par les jetons DAARA :
+
+  | Vristo | DAARA |
+  |---|---|
+  | `#fafafa` (fond de page) | `page` |
+  | `#060818` | `night-deep` |
+  | `#0e1726` (panneaux, sidebar, header) | `night` |
+  | `#121e32` (champs) | `night-input` |
+  | `#181f32` (survol) | `night-hover` |
+  | `#1b2e4b`, `#1a2941` (menus, en-têtes de tableau) | `night-raised` |
+  | `#17263c`, `#191e3a` (bordures) | `night-border` |
+  | `#253b5c`, `#2d334c` | `night-border-strong` |
+  | `#506690` (texte secondaire) | `muted` / `dark:text-night-muted` |
+  | `#e0e6ed`, `#d0d2d6` | `white-light` |
+  | `text-white` sur `bg-primary` | `text-on-primary` |
+- Boutons ronds à icône : classe `icon-btn` (zone tactile de 44 px en mobile).
 - Le mode sombre doit fonctionner sur chaque écran. Garder les classes `ltr:` / `rtl:` du markup Vristo
   (pas de vérification RTL en V1, ADR-005).
 - Ne pas copier les pages de démo inutiles (e-commerce, crypto, etc.) du thème complet.

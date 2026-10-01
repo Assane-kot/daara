@@ -6,7 +6,7 @@ import { RouterOutlet } from '@angular/router';
     selector: 'app-auth-layout',
     imports: [RouterOutlet],
     template: `
-        <div class="main-section relative font-nunito text-sm font-normal antialiased">
+        <div class="main-section relative font-nunito text-body font-normal antialiased">
             <div class="min-h-screen text-black dark:text-white-dark">
                 <router-outlet />
             </div>

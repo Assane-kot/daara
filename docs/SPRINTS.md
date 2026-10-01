@@ -27,7 +27,7 @@ Règle : une story n'entre dans un sprint que si sa section du LLD est détaill�
 ## Sprint 0 — Installation (1 semaine)
 Objectif : un projet propre qui tourne, avec l'outillage en place.
 - [x] Analyser le starter Vristo (versions, structure), mettre à niveau si nécessaire (ADR-004)
-- [ ] Nettoyer le starter, renommer en DAARA, appliquer la charte vert/or
+- [x] Nettoyer le starter, renommer en DAARA, appliquer la charte vert/or
 - [ ] `SupabaseService`, environnements, `supabase init` / `start`
 - [ ] i18n fr/en (ADR-005)
 - [ ] Composants `shared/ui` de base : page-header, empty-state, badge, confirm-dialog

@@ -5,14 +5,15 @@
 
 ## État actuel
 - Sprint en cours : 0 — Installation (voir docs/SPRINTS.md)
-- Dernière tâche terminée : S0.1 — socle Angular 22 (build, 13 tests Vitest verts)
+- Dernière tâche terminée : S0.2 — identité DAARA (charte en attente de validation visuelle)
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
+  - Page `/dev/charte` à retirer (route + `features/dev-charte/`) dès que la charte est validée.
+  - Pas encore d'icônes PNG (apple-touch-icon, PWA) : à générer depuis le logo avec la PWA (sprint 8).
 
 ## Prochaine étape
-S0.2 — Identité DAARA (charte, palette, mode sombre teinté vert, Nunito auto-hébergée, logo, favicon,
-README, page de référence de la charte). Puis S0.3 → S0.10 (plan ci-dessous).
+S0.3 — i18n fr/en (ngx-translate 18, `LanguageService`, `public/i18n/`), puis S0.4 → S0.10 (plan ci-dessous).
 
 ### Plan du sprint 0 (validé le 2026-10-01)
 | Story | Contenu |
@@ -31,6 +32,20 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-01 — S0.2 Identité DAARA
+- Charte dans `tailwind.config.js` : primaire vert (palette 50→950), secondaire or (50→950, alias `accent`),
+  jetons `page`, `muted`, `night-*` (mode sombre teinté vert, remplace le bleu nuit Vristo).
+- Contrastes mesurés : vert sur blanc 6,5 ; or sur blanc 2,3 (interdit en texte) ; vert #1a6b3c sur fond
+  sombre 2,7 → `--color-primary` passe à #4caf7a en mode sombre (7,0) et `on-primary` devient foncé.
+- Sidebar : élément actif sur fond vert clair + barre or. Base 15 px (`text-body`), champs en 16 px en
+  mobile (évite le zoom iOS), boutons et champs ≥ 44 px en mobile (`max-sm:min-h-11`, `icon-btn`).
+- Focus clavier visible (contour vert) hors des couches Tailwind pour primer sur `outline-none` de Vristo.
+- Police Nunito auto-hébergée (`@fontsource-variable/nunito`, devDependency) : plus d'appel à Google Fonts.
+- Logo DAARA (`public/images/logo.svg`, favicon SVG) nettoyé : métadonnées C2PA (~8 Ko) et taille fixe retirées.
+- Page `/dev/charte` (développement uniquement : `ngDevMode` → route et chunk absents en production).
+- Correspondance couleurs Vristo → jetons DAARA documentée dans `.claude/rules/ui-vristo.md`.
+- Vérifié dans le navigateur : clair, sombre, logo, élément actif de la sidebar. Build et 13 tests verts.
+
 ### 2026-10-01 — S0.1 Socle Angular 22
 - Projet recréé en Angular 22.2 / TypeScript 6.0 : standalone, OnPush, zoneless, builder `application`,
   Vitest (`npm test`, `npm run test:ci`). Tailwind 3.4.19 détecté automatiquement par `@angular/build`.

@@ -13,6 +13,17 @@ export const routes: Routes = [
                 title: 'Tableau de bord | DAARA',
                 loadComponent: () => import('./features/dashboard/dashboard-page').then((m) => m.DashboardPage),
             },
+            // Page de référence de la charte (S0.2) : développement uniquement (`ngDevMode` vaut false en build de
+            // production, la route et son chunk sont alors supprimés). À retirer après validation.
+            ...(ngDevMode
+                ? [
+                      {
+                          path: 'dev/charte',
+                          title: 'Charte | DAARA',
+                          loadComponent: () => import('./features/dev-charte/charte-page').then((m) => m.ChartePage),
+                      },
+                  ]
+                : []),
         ],
     },
     {

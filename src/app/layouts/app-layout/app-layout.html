@@ -1,8 +1,8 @@
-<div class="main-section vertical full relative font-nunito text-sm font-normal antialiased" [class.toggle-sidebar]="layout.sidebarToggled()">
+<div class="main-section vertical full relative font-nunito text-body font-normal antialiased" [class.toggle-sidebar]="layout.sidebarToggled()">
     <div class="relative">
         <!-- Fond assombri derrière la sidebar ouverte en mobile -->
         <div
-            class="fixed inset-0 z-50 bg-[black]/60 lg:hidden"
+            class="fixed inset-0 z-50 bg-black/60 lg:hidden"
             [class.hidden]="!layout.sidebarToggled()"
             aria-hidden="true"
             (click)="layout.toggleSidebar()"
@@ -12,7 +12,7 @@
             <div class="fixed bottom-6 z-50 ltr:right-6 rtl:left-6">
                 <button
                     type="button"
-                    class="btn btn-outline-primary animate-pulse rounded-full bg-[#fafafa] p-2 dark:bg-[#060818] dark:hover:bg-primary"
+                    class="btn btn-outline-primary animate-pulse rounded-full bg-page p-2 dark:bg-night-deep dark:hover:bg-primary"
                     aria-label="Remonter en haut de la page"
                     (click)="goToTop()"
                 >
