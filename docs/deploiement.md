@@ -181,3 +181,93 @@ Origines autorisées par la CSP :
 
 À ajouter plus tard : Sentry (`connect-src`, S0.10), Cloudflare R2 (`media-src` / `connect-src`, sprint 9).
 Toute modification de la CSP est testée en servant `dist/daara/browser` avec ces en-têtes avant le push.
+
+## 4. Sauvegardes et anti-pause (S0.9)
+
+### 4.1 Principe
+| Élément | Choix |
+|---|---|
+| Quoi | `daara-prod` : rôles, schéma complet, données des schémas `public` (métier) et `auth` (comptes) |
+| Quand | Chaque nuit à 02:30 (heure de Dakar), workflow `.github/workflows/sauvegarde.yml` ; perte maximale : 24 h |
+| Où | Cloudflare R2, bucket `daara-sauvegardes`, préfixe `daara-prod/` |
+| Protection | Archive chiffrée avec la clé **publique** `age` : GitHub et Cloudflare ne peuvent pas la lire |
+| Rétention | 30 jours (règle de cycle de vie R2) |
+| Non couvert | Les **fichiers** du Storage (photos, PDF) : seules leurs métadonnées sont dans la base → à traiter au sprint 4 (photos des apprenants) |
+
+Méthode testée en local le 2026-10-01 (dump → remise à zéro → restauration → comptes, données, RLS et
+politiques retrouvés). Le schéma `storage` est exclu des données : `postgres` n'a pas les droits d'écriture
+sur ses tables internes, et les buckets sont recréés par les migrations.
+
+### 4.2 Clé de chiffrement (une fois, sur votre poste)
+```powershell
+winget install FiloSottile.age
+age-keygen -o daara-sauvegarde.txt
+```
+- Le fichier contient la **clé privée** : la ranger dans le gestionnaire de mots de passe **et** sur un
+  support hors ligne (clé USB rangée), puis supprimer le fichier du disque. **Perdre cette clé rend toutes
+  les sauvegardes illisibles** ; la divulguer rend toutes les sauvegardes lisibles.
+- La ligne `# public key: age1…` est la **clé publique** : elle va dans GitHub (§4.6), elle n'est pas secrète.
+
+### 4.3 Bucket R2
+1. Cloudflare → **R2** → **Create bucket** : nom `daara-sauvegardes`, localisation Europe de l'Ouest.
+   Bucket distinct de `daara-files` (audios) : droits et durée de conservation séparés.
+2. Bucket → **Settings → Object lifecycle rules** → règle « suppression après 30 jours » sur le préfixe `daara-prod/`.
+3. R2 → **Manage API tokens** → **Create API token** :
+   - permission **Object Read & Write**, limitée au bucket `daara-sauvegardes` uniquement ;
+   - noter l'**Access Key ID**, le **Secret Access Key** et l'**Account ID** (affichés une seule fois).
+
+### 4.4 Chaîne de connexion de `daara-prod`
+`daara-prod` → **Connect** → **Session pooler** (IPv4 : les machines GitHub n'ont pas d'IPv6, la connexion
+directe ne fonctionne pas) :
+`postgresql://postgres.<ref>:<mot-de-passe>@aws-0-eu-west-3.pooler.supabase.com:5432/postgres`
+Si le mot de passe contient des caractères spéciaux, les encoder (`@` → `%40`, `:` → `%3A`, `/` → `%2F`…).
+
+### 4.5 Rôle `keepalive` (anti-pause, dans chaque projet)
+**SQL Editor** de `daara-dev` puis de `daara-prod`, avec un mot de passe généré différent pour chacun :
+```sql
+create role keepalive login password '<mot-de-passe-généré>';
+```
+Aucun `grant` : ce rôle peut seulement se connecter et exécuter `select 1` (vérifié en local : lecture des
+comptes, des tables et création de table refusées). Chaîne de connexion (Session pooler) :
+`postgresql://keepalive.<ref>:<mot-de-passe>@aws-0-eu-west-3.pooler.supabase.com:5432/postgres?sslmode=require`
+
+### 4.6 Configuration GitHub
+1. **Settings → Environments → New environment** `production` ; **Deployment branches** : `main` et `develop`.
+2. Dans l'environnement `production` :
+
+   | Type | Nom | Valeur |
+   |---|---|---|
+   | Secret | `SUPABASE_PROD_DB_URL` | chaîne du §4.4 (rôle `postgres`) |
+   | Secret | `R2_ACCOUNT_ID` | Account ID Cloudflare |
+   | Secret | `R2_ACCESS_KEY_ID` | jeton R2 du §4.3 |
+   | Secret | `R2_SECRET_ACCESS_KEY` | jeton R2 du §4.3 |
+   | Variable | `R2_BUCKET_SAUVEGARDES` | `daara-sauvegardes` |
+   | Variable | `SAUVEGARDE_AGE_RECIPIENT` | clé publique `age1…` du §4.2 |
+
+3. **Settings → Secrets and variables → Actions** (secrets du dépôt) : `SUPABASE_DEV_KEEPALIVE_URL` et
+   `SUPABASE_PROD_KEEPALIVE_URL` (chaînes du §4.5).
+
+### 4.7 Mise en service
+- GitHub n'exécute les workflows planifiés que depuis la branche par défaut (`main`) : ils deviennent
+  automatiques à la première release (R0). Avant, `daara-prod` ne contient pas de données réelles.
+- Premier test : **Actions → Sauvegarde daara-prod → Run workflow** (branche `develop`), puis vérifier dans
+  R2 qu'un fichier `daara-prod/daara-prod-AAAAMMJJ-HHMMSS.tar.gz.age` est apparu. Idem pour **Anti-pause Supabase**.
+- En cas d'échec d'un workflow planifié, GitHub envoie un e-mail. Consulter l'onglet Actions une fois par mois.
+
+### 4.8 Restauration
+**Test mensuel (recommandé) et avant chaque release** : télécharger la dernière archive depuis R2
+(tableau de bord → bucket → fichier → Download), puis sur le Supabase **local** :
+```powershell
+npm run db:start
+.\scripts\restaurer-sauvegarde-locale.ps1 -Archive .\daara-prod-AAAAMMJJ-HHMMSS.tar.gz.age -CleAge <chemin de la clé privée>
+npm run db:reset   # revenir à une base de développement
+```
+Le script supprime les fichiers déchiffrés à la fin. Supprimer aussi l'archive téléchargée.
+
+**Incident en production** (fait par le développeur, jamais par Claude) : créer un nouveau projet Supabase,
+appliquer les migrations, puis restaurer les trois fichiers avec la chaîne de connexion du nouveau projet :
+```powershell
+psql "<url>" -f roles.sql                     # erreurs sur les réglages internes : sans conséquence
+psql "<url>" --single-transaction -v ON_ERROR_STOP=1 -f schema.sql -c "SET session_replication_role = replica" -f data.sql
+```
+puis mettre à jour `SUPABASE_URL` / `SUPABASE_ANON_KEY` dans Cloudflare et les réglages Auth / SMTP (§2).

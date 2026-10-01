@@ -5,7 +5,7 @@
 
 ## État actuel
 - Sprint en cours : 0 — Installation (voir docs/SPRINTS.md)
-- Dernière tâche terminée : S0.8 — procédure Supabase cloud + Brevo rédigée (`docs/deploiement.md` §2)
+- Dernière tâche terminée : S0.9 — workflows sauvegarde chiffrée + anti-pause, restauration testée en local
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -21,10 +21,13 @@
     affiche des dates (pipe localisé basé sur `LanguageService`).
   - CI : jobs `base` (pgTAP) et `secrets` (gitleaks en mode git) jamais exécutés sur GitHub → vérifier le
     premier run après le push ; le job `front` a été rejoué localement à l'identique.
+  - Sauvegardes : configuration à faire par le développeur (`docs/deploiement.md` §4 : clé age, bucket R2,
+    rôle `keepalive`, secrets GitHub) puis premier lancement manuel ; workflows planifiés actifs à partir de R0.
+  - Fichiers du Storage (photos d'apprenants, PDF) non couverts par la sauvegarde → à traiter au sprint 4.
 
 ## Prochaine étape
-S0.9 — Workflows planifiés : `pg_dump` chiffré de `daara-prod` → Cloudflare R2 (rétention 30 jours) et
-requête anti-pause ; procédure de restauration testée en local. En parallèle, le développeur exécute S0.8 puis S0.7.
+S0.10 — Sentry sur Angular (offre gratuite) : aucune donnée personnelle (`sendDefaultPii: false`, nettoyage
+`beforeSend`), DSN injecté par `set-env.mjs`, désactivé en local, CSP mise à jour. Puis bilan du sprint 0.
 
 ### Plan du sprint 0 (validé le 2026-10-01)
 | Story | Contenu |
@@ -43,6 +46,25 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-01 — S0.9 Sauvegardes et anti-pause
+- `.github/workflows/sauvegarde.yml` : chaque nuit, `supabase db dump` de `daara-prod` (rôles, schéma,
+  données `public` + `auth`), archive chiffrée avec la clé publique `age` (GitHub ne peut pas la relire),
+  envoi vers R2 `daara-sauvegardes` ; rétention 30 jours par règle de cycle de vie R2. Secrets dans
+  l'environnement GitHub `production`.
+- `.github/workflows/anti-pause.yml` : `select 1` tous les deux jours sur les deux projets avec le rôle
+  `keepalive`, sans aucun droit (vérifié : lecture des comptes et des tables refusée).
+- Testé en local de bout en bout : données + compte réel → dump → chiffrement / déchiffrement `age` dans un
+  conteneur Ubuntu 24.04 (comme la CI) → remise à zéro → restauration → comptes, identités, table, RLS et
+  politiques retrouvés.
+- Pièges trouvés : `roles.sql` contient des réglages internes refusés au rôle `postgres` (appliqué à part,
+  erreurs tolérées) ; les tables internes du schéma `storage` ne sont pas inscriptibles (données limitées à
+  `public` + `auth`) ; PowerShell 5.1 bloque sur la sortie d'erreur des commandes natives et lit l'UTF-8
+  sans BOM comme de l'ANSI.
+- `scripts/restaurer-sauvegarde-locale.ps1` : déchiffre, restaure dans le Supabase local, contrôle, et
+  supprime toujours les fichiers déchiffrés. Testé.
+- `docs/deploiement.md` §4 : clé age, bucket et jeton R2 limités, chaînes Session pooler (IPv4), rôle
+  `keepalive`, secrets GitHub, mise en service, restauration mensuelle et en cas d'incident.
+
 ### 2026-10-01 — S0.8 Supabase cloud et e-mails (procédure)
 - Brevo retenu pour le SMTP (ADR-003, HLD mis à jour) : offre gratuite 300 e-mails / jour, société
   française, données dans l'UE.

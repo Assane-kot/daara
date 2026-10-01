@@ -218,7 +218,10 @@ URLs signées à durée courte pour les fichiers privés.
 - Edge Function `audio-url` : vérifie le droit (apprenant soi / enseignant / parent) puis renvoie une URL
   signée R2 (upload ou lecture, 15 min).
 
-**Sauvegardes** : GitHub Actions quotidien, `pg_dump` de `daara-prod` → R2 `backups/`, rétention 30 jours.
+**Sauvegardes** : GitHub Actions quotidien (`sauvegarde.yml`), `supabase db dump` de `daara-prod` (rôles, schéma, données
+`public` + `auth`) chiffré avec la clé publique `age` → R2 `daara-sauvegardes/daara-prod/`, rétention 30 jours.
+Fichiers du Storage non couverts (à traiter au sprint 4). Restauration : `scripts/restaurer-sauvegarde-locale.ps1`.
+Anti-pause : `anti-pause.yml`, rôle `keepalive` sans droits, tous les deux jours.
 
 ## 6. Edge Functions
 | Fonction | Entrée | Sortie | Sécurité |
