@@ -1,0 +1,26 @@
+# ADR-003 — Fonctionnement sans abonnement jusqu'aux premiers revenus
+
+Statut : acceptée
+
+## Contexte
+Aucune dépense récurrente souhaitée avant que les daaras paient. Claude Code est déjà couvert (Claude Pro).
+
+## Décision
+| Besoin | Service gratuit |
+|---|---|
+| Backend | Supabase Free : 2 projets (`daara-dev`, `daara-prod`), région Europe de l'Ouest |
+| Front | Cloudflare Pages (preview par branche, production sur `main`) |
+| Fichiers lourds (audios) | Cloudflare R2 (10 Go gratuits), URLs signées via Edge Function |
+| Sauvegardes | `pg_dump` quotidien par GitHub Actions → R2 |
+| Anti-pause | Requête planifiée GitHub Actions (vacances scolaires) |
+| Emails | Brevo ou Resend (SMTP branché sur Supabase Auth) |
+| Notifications | Web Push ; WhatsApp par liens `wa.me` ; pas de SMS en V1 |
+| Erreurs | Sentry (offre gratuite) |
+| CI | GitHub Actions |
+
+## Conséquences
++ Coût fixe nul. Code identique à Supabase Pro ou auto-hébergé : migration sans réécriture.
+− Limites : base 500 Mo, stockage Supabase ~1 Go, connexions temps réel limitées, pas de sauvegardes managées.
+− Purge/archivage de `audit_log` obligatoire (> 12 mois).
+→ Passage à Supabase Pro (ou auto-hébergement) déclenché par : premières daaras payantes, OU base > 350 Mo,
+  OU besoin de SLA.

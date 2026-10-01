@@ -1,0 +1,10 @@
+# Fins de ligne normalisées (Windows ↔ CI Linux)
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.pdf binary

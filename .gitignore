@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.angular/
+coverage/
+.env
+.env.*
+!.env.example
+supabase/.env
+supabase/.temp/
+supabase/.branches/
+CLAUDE.local.md
+.claude/settings.local.json
+_reference/**/node_modules/
+.DS_Store
+Thumbs.db

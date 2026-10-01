@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./supabase/.env)",
+      "Edit(./_reference/**)",
+      "Write(./_reference/**)",
+      "Bash(supabase db push:*)",
+      "Bash(supabase link:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(npm install:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/session-start.mjs" }
+        ]
+      }
+    ]
+  }
+}
