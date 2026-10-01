@@ -1,10 +1,11 @@
-import { Component, Input, ViewChild, ViewContainerRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef, inject } from '@angular/core';
+
+// Icône Vristo : le contenu SVG remplace l'élément hôte (comportement du thème, pour que les classes s'appliquent au SVG).
 @Component({
-    moduleId: module.id,
     selector: 'icon-sun',
     template: `
         <ng-template #template>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" [ngClass]="class">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" [class]="class">
                 <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5" />
                 <path d="M12 2V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                 <path d="M12 20V22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
@@ -17,12 +18,14 @@ import { Component, Input, ViewChild, ViewContainerRef } from '@angular/core';
             </svg>
         </ng-template>
     `,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IconSunComponent {
-    @Input() class: any = '';
-    @ViewChild('template', { static: true }) template: any;
-    constructor(private viewContainerRef: ViewContainerRef) {}
-    ngOnInit() {
+export class IconSun implements OnInit {
+    @Input() class = '';
+    @ViewChild('template', { static: true }) private template!: TemplateRef<unknown>;
+    private readonly viewContainerRef = inject(ViewContainerRef);
+
+    ngOnInit(): void {
         this.viewContainerRef.createEmbeddedView(this.template);
         this.viewContainerRef.element.nativeElement.remove();
     }

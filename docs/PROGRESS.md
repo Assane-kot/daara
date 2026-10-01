@@ -5,14 +5,14 @@
 
 ## État actuel
 - Sprint en cours : 0 — Installation (voir docs/SPRINTS.md)
-- Dernière tâche terminée : analyse du starter, plan du sprint 0 validé, ADR-004 et ADR-005
+- Dernière tâche terminée : S0.1 — socle Angular 22 (build, 13 tests Vitest verts)
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
 
 ## Prochaine étape
-S0.1 — Socle Angular 22 (projet neuf, option B de l'ADR-004) : standalone, zoneless, Tailwind 3.4,
-layouts Vristo réécrits sans démo, `ThemeService`, Vitest. Puis S0.2 → S0.10 (plan ci-dessous).
+S0.2 — Identité DAARA (charte, palette, mode sombre teinté vert, Nunito auto-hébergée, logo, favicon,
+README, page de référence de la charte). Puis S0.3 → S0.10 (plan ci-dessous).
 
 ### Plan du sprint 0 (validé le 2026-10-01)
 | Story | Contenu |
@@ -31,6 +31,23 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-01 — S0.1 Socle Angular 22
+- Projet recréé en Angular 22.2 / TypeScript 6.0 : standalone, OnPush, zoneless, builder `application`,
+  Vitest (`npm test`, `npm run test:ci`). Tailwind 3.4.19 détecté automatiquement par `@angular/build`.
+- Supprimés : AppModule, NgRx, AppService, theme.config, personnaliseur, 16 langues, 265 drapeaux,
+  images de démo, 135 icônes, animate.css, headlessui-angular, ngx-scrollbar, @angular/animations, Karma.
+- Styles Vristo repris dans `src/styles.css` (386 lignes) sans menus horizontal/repliable, boxed ni styles
+  de librairies non utilisées. Scroll natif dans la sidebar.
+- `ThemeService` (clair / sombre / système, mémorisé), `LayoutService` (sidebar), layouts app et auth,
+  header (logo, burger, thème), sidebar (Tableau de bord), footer, page dashboard provisoire.
+- Icônes : 6 icônes Vristo converties en standalone (`shared/icon/`), même mécanisme que le thème.
+- Bundle initial : 269 kB brut / 73 kB transféré.
+- Provisoire : libellés en dur en français (traduits en S0.3), logo/favicon Vristo et Google Fonts (S0.2).
+- Pièges : supprimer `node_modules` avant `npm install` après une montée de version majeure (conflit de
+  peer deps avec les anciens paquets) ; npm 11 bloque les scripts d'installation (esbuild, lmdb,
+  msgpackr-extract, @parcel/watcher) — sans impact constaté sur build et tests.
+- Non vérifié par Claude : rendu en 375 px (redimensionnement du navigateur impossible) → à contrôler à la main.
+
 ### 2026-10-01 — Analyse du starter et décisions d'architecture
 - Starter : Angular 15.2 (fin de support), NgModules, NgRx, zone.js, ngx-translate 14, headlessui-angular
   (abandonné), 16 langues, 265 drapeaux, 141 icônes, header/sidebar de démo, `bypassSecurityTrustHtml`

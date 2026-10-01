@@ -22,7 +22,7 @@ src/app/
 │   ├── notifications/   notification-center.service.ts, push.service.ts
 │   └── errors/          error-handler, messages utilisateur
 ├── shared/ui/           data-table, form-field, modal, confirm-dialog, stat-card, badge, empty-state, page-header
-├── layouts/             auth-layout, app-layout (menu selon rôle)
+├── layouts/             auth-layout, app-layout (menu selon rôle), layout.service.ts (état de la sidebar)
 └── features/
     ├── auth/            connexion, inscription, mot de passe, acceptation d'invitation
     ├── onboarding/      création de daara, sélection de daara
