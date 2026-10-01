@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Badge } from '../../shared/ui/badge/badge';
+import { ConfirmDialogService } from '../../shared/ui/confirm-dialog/confirm-dialog.service';
+import { EmptyState } from '../../shared/ui/empty-state/empty-state';
+import { FormField, FormFieldControl } from '../../shared/ui/form-field/form-field';
+import { PageHeader } from '../../shared/ui/page-header/page-header';
+import { Skeleton } from '../../shared/ui/skeleton/skeleton';
 
 interface Swatch {
     readonly label: string;
@@ -35,15 +42,44 @@ const SECONDARY: readonly Swatch[] = [
 ];
 
 /**
- * Page de référence de la charte (S0.2), servie uniquement en développement (`/dev/charte`).
- * Sert à valider le rendu clair / sombre ; à retirer une fois la charte validée.
+ * Page de référence de la charte et des composants `shared/ui` (S0.2, S0.4), servie uniquement en
+ * développement (`/dev/charte`). À retirer une fois la charte validée.
  */
 @Component({
     selector: 'app-charte-page',
+    imports: [ReactiveFormsModule, PageHeader, Badge, EmptyState, Skeleton, FormField, FormFieldControl],
     templateUrl: './charte-page.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChartePage {
+    private readonly confirmation = inject(ConfirmDialogService);
+
     protected readonly primary = PRIMARY;
     protected readonly secondary = SECONDARY;
+    protected readonly chargement = signal(false);
+    protected readonly resultatConfirmation = signal('aucune');
+    protected readonly erreurMatricule = signal<string | null>(null);
+
+    protected readonly form = new FormGroup({
+        nom: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(3)] }),
+        matricule: new FormControl('A-12', { nonNullable: true, validators: [Validators.required] }),
+        email: new FormControl('', { nonNullable: true, validators: [Validators.email] }),
+        classe: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    });
+
+    protected async supprimer(): Promise<void> {
+        const confirme = await this.confirmation.confirmer({
+            titre: "Supprimer l'évaluation ?",
+            message: 'Les notes saisies pour cette évaluation seront perdues.',
+            libelleConfirmer: 'Supprimer',
+            danger: true,
+        });
+        this.resultatConfirmation.set(confirme ? 'confirmée' : 'annulée');
+    }
+
+    protected valider(): void {
+        this.form.markAllAsTouched();
+        // Simule une contrainte unique refusée par la base.
+        this.erreurMatricule.set(this.form.controls.matricule.value === 'A-12' ? 'Ce matricule existe déjà dans la daara.' : null);
+    }
 }

@@ -21,7 +21,7 @@ src/app/
 │   ├── theme/           theme.service.ts (clair / sombre / système)
 │   ├── notifications/   notification-center.service.ts, push.service.ts
 │   └── errors/          error-handler, messages utilisateur
-├── shared/ui/           data-table, form-field, modal, confirm-dialog, stat-card, badge, empty-state, page-header
+├── shared/ui/           page-header, empty-state, badge, skeleton, form-field, confirm-dialog (S0.4) ; data-table (S3), stat-card
 ├── layouts/             auth-layout, app-layout (menu selon rôle), layout.service.ts (état de la sidebar)
 └── features/
     ├── auth/            connexion, inscription, mot de passe, acceptation d'invitation

@@ -12,7 +12,8 @@
         "langue": {
             "autre_code": "EN",
             "changer": "Switch to English"
-        }
+        },
+        "fil_ariane": "Fil d’Ariane"
     },
     "menu": {
         "tableau_de_bord": "Tableau de bord"
@@ -24,5 +25,24 @@
     "dashboard": {
         "titre": "Tableau de bord",
         "bienvenue": "Bienvenue sur DAARA."
+    },
+    "commun": {
+        "confirmer": "Confirmer",
+        "annuler": "Annuler",
+        "fermer": "Fermer",
+        "chargement": "Chargement en cours…",
+        "obligatoire": "obligatoire"
+    },
+    "formulaire": {
+        "erreurs": {
+            "requis": "Ce champ est obligatoire.",
+            "email": "Adresse e-mail invalide.",
+            "min_longueur": "Au moins {{min}} caractères.",
+            "max_longueur": "Au plus {{max}} caractères.",
+            "min": "La valeur minimale est {{min}}.",
+            "max": "La valeur maximale est {{max}}.",
+            "motif": "Format invalide.",
+            "invalide": "Valeur invalide."
+        }
     }
 }

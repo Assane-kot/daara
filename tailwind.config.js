@@ -53,28 +53,35 @@ module.exports = {
                 secondary,
                 accent: secondary,
                 'on-primary': 'rgb(var(--color-on-primary) / <alpha-value>)',
+                // `strong` : texte sur fond clair (AA) ; `soft` : texte sur fond sombre (AA).
                 success: {
                     DEFAULT: '#00ab55',
+                    strong: '#007a3d',
                     light: '#ddf5f0',
                     'dark-light': 'rgba(0,171,85,.15)',
                 },
                 danger: {
                     DEFAULT: '#e7515a',
+                    strong: '#b42f37',
+                    soft: '#ef7a81',
                     light: '#fff5f5',
                     'dark-light': 'rgba(231,81,90,.15)',
                 },
                 warning: {
                     DEFAULT: '#e2a03f',
+                    strong: '#8a5a12',
                     light: '#fff9ed',
                     'dark-light': 'rgba(226,160,63,.15)',
                 },
                 info: {
                     DEFAULT: '#2196f3',
+                    strong: '#0b62a8',
                     light: '#e7f7ff',
                     'dark-light': 'rgba(33,150,243,.15)',
                 },
                 dark: {
                     DEFAULT: '#334039',
+                    soft: '#b8c2bc',
                     light: '#eaeceb',
                     'dark-light': 'rgba(51,64,57,.15)',
                 },

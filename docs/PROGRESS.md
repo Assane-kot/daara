@@ -5,11 +5,12 @@
 
 ## État actuel
 - Sprint en cours : 0 — Installation (voir docs/SPRINTS.md)
-- Dernière tâche terminée : S0.3 — i18n fr/en (21 tests verts)
+- Dernière tâche terminée : S0.4 — composants `shared/ui` (39 tests verts)
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
-  - Page `/dev/charte` à retirer (route + `features/dev-charte/`) dès que la charte est validée.
+  - Page `/dev/charte` (charte + démonstration `shared/ui`) à retirer (route + `features/dev-charte/`)
+    dès que la charte est validée par le développeur.
   - Pas encore d'icônes PNG (apple-touch-icon, PWA) : à générer depuis le logo avec la PWA (sprint 8).
   - S0.7 : les fichiers `public/i18n/*.json` ne sont pas hachés → en-tête `Cache-Control: no-cache` à prévoir
     dans `_headers`, sinon des navigateurs garderont d'anciennes traductions après un déploiement.
@@ -17,8 +18,8 @@
     affiche des dates (pipe localisé basé sur `LanguageService`).
 
 ## Prochaine étape
-S0.4 — composants `shared/ui` (page-header, empty-state, badge, confirm-dialog via CDK Dialog, squelettes,
-formulaires harmonisés), puis S0.5 → S0.10 (plan ci-dessous).
+S0.5 — Supabase local (`supabase init` / `start`, Docker Desktop requis), `SupabaseService`,
+environnements (`scripts/set-env.mjs`), test pgTAP minimal. Puis S0.6 → S0.10 (plan ci-dessous).
 
 ### Plan du sprint 0 (validé le 2026-10-01)
 | Story | Contenu |
@@ -37,6 +38,20 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-01 — S0.4 Composants shared/ui
+- `@angular/cdk` 22 ajouté (prévu par ADR-004) ; `overlay-prebuilt.css` dans les styles du build.
+- `app-page-header` (fil d'Ariane Vristo, titre h1, actions projetées), `app-empty-state`, `app-badge`
+  (7 variantes), `app-skeleton` (annoncé aux lecteurs d'écran, animation coupée si mouvement réduit),
+  `app-form-field` + directive `appFormControl` (libellé relié, astérisque déduit de `Validators.required`,
+  aide, erreur traduite après `touched`, erreur serveur prioritaire, `aria-invalid` / `aria-describedby`),
+  `ConfirmDialogService.confirmer()` (CDK Dialog : `alertdialog`, focus sur « Annuler », Échap, focus restauré).
+- Accessibilité : les couleurs d'état Vristo échouent en AA avec du texte blanc (2,3 à 3,7) → teintes `strong`
+  (texte sur fond clair, boutons pleins) et `danger-soft` (sombre) ajoutées ; boutons `btn-success|danger|
+  warning|info` et badges outline corrigés ; badges « doux » mesurés ≥ 4,7 en clair et en sombre.
+- Traductions `commun.*`, `formulaire.erreurs.*`, `layout.fil_ariane`. Dashboard utilise `app-page-header`.
+- `/dev/charte` montre tous les composants en situation (formulaire validé, modale, squelette).
+- Vérifié dans le navigateur : erreurs de formulaire, modale, fermeture par Échap. 39 tests verts.
+
 ### 2026-10-01 — S0.3 i18n fr/en
 - `@ngx-translate/core` et `http-loader` 18 ; traductions dans `public/i18n/fr.json` et `en.json`.
 - `LanguageService` (signals `langue`, `autreLangue`) : bascule sans rechargement, `<html lang>`, mémorisé ;

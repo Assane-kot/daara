@@ -1,11 +1,24 @@
 <!-- Page de développement : textes en dur assumés, page retirée après validation de la charte. -->
+<app-page-header titre="Charte DAARA" [filAriane]="[{ libelle: 'Tableau de bord', lien: '/' }, { libelle: 'Charte' }]">
+    <button actions type="button" class="btn btn-outline-primary" (click)="chargement.set(!chargement())">
+        {{ chargement() ? 'Masquer' : 'Voir' }} le chargement
+    </button>
+    <button actions type="button" class="btn btn-danger" (click)="supprimer()">Supprimer…</button>
+</app-page-header>
+
 <div class="space-y-6">
     <div class="panel">
-        <h1 class="text-xl font-semibold dark:text-white-light">Charte DAARA</h1>
-        <p class="mt-1 text-muted dark:text-night-muted">
-            Utilisez le bouton de thème du header pour comparer le mode clair et le mode sombre. Testez aussi la navigation au clavier (Tab).
+        <p class="text-muted dark:text-night-muted">
+            Utilisez le bouton de thème du header pour comparer le mode clair et le mode sombre, et testez la navigation au clavier (Tab).
+            Dernière confirmation : <strong>{{ resultatConfirmation() }}</strong>
         </p>
     </div>
+
+    @if (chargement()) {
+        <div class="panel">
+            <app-skeleton [lignes]="4" [avecTitre]="true" />
+        </div>
+    }
 
     <div class="panel">
         <h2 class="mb-4 text-lg font-semibold dark:text-white-light">Couleurs</h2>
@@ -19,21 +32,13 @@
             }
         </div>
         <p class="mb-2 font-semibold">Secondaire — or</p>
-        <div class="mb-5 grid grid-cols-6 gap-2 sm:grid-cols-11">
+        <div class="grid grid-cols-6 gap-2 sm:grid-cols-11">
             @for (swatch of secondary; track swatch.label) {
                 <div>
                     <div class="h-10 rounded-md" [class]="swatch.className"></div>
                     <span class="text-xs">{{ swatch.label }}</span>
                 </div>
             }
-        </div>
-        <p class="mb-2 font-semibold">Jetons</p>
-        <div class="flex flex-wrap gap-3">
-            <span class="rounded-md bg-primary px-3 py-2 text-on-primary">primary (variable selon le thème)</span>
-            <span class="rounded-md bg-primary-light px-3 py-2 text-primary dark:bg-primary-dark-light">primary-light</span>
-            <span class="rounded-md bg-secondary px-3 py-2 text-primary-950">secondary</span>
-            <span class="rounded-md bg-secondary-light px-3 py-2 text-secondary-700 dark:bg-secondary-dark-light dark:text-secondary">secondary-light</span>
-            <span class="rounded-md border border-white-light px-3 py-2 text-muted dark:border-night-border dark:text-night-muted">muted</span>
         </div>
     </div>
 
@@ -46,64 +51,55 @@
             <button type="button" class="btn btn-outline-secondary">Aperçu</button>
             <button type="button" class="btn btn-success">Valider</button>
             <button type="button" class="btn btn-danger">Supprimer</button>
+            <button type="button" class="btn btn-outline-danger">Retirer</button>
             <button type="button" class="btn btn-primary" disabled>Désactivé</button>
-        </div>
-        <div class="mt-4 flex flex-wrap items-center gap-3">
-            <button type="button" class="btn btn-primary btn-sm">Petit</button>
-            <button type="button" class="btn btn-primary btn-lg">Grand</button>
         </div>
     </div>
 
     <div class="panel">
         <h2 class="mb-4 text-lg font-semibold dark:text-white-light">Badges</h2>
         <div class="flex flex-wrap items-center gap-2">
-            <span class="badge bg-primary text-on-primary">Actif</span>
-            <span class="badge bg-secondary text-primary-950">Publié</span>
-            <span class="badge bg-success">Présent</span>
-            <span class="badge bg-danger">Absent</span>
-            <span class="badge bg-warning">En retard</span>
-            <span class="badge badge-outline-primary">Enseignant</span>
-            <span class="badge badge-outline-secondary">Parent</span>
+            <app-badge>Enseignant</app-badge>
+            <app-badge variante="secondary">Parent</app-badge>
+            <app-badge variante="success">Présent</app-badge>
+            <app-badge variante="danger">Absent</app-badge>
+            <app-badge variante="warning">En retard</app-badge>
+            <app-badge variante="info">Justifiée</app-badge>
+            <app-badge variante="dark">Archivé</app-badge>
         </div>
     </div>
 
     <div class="panel">
         <h2 class="mb-4 text-lg font-semibold dark:text-white-light">Formulaire</h2>
-        <form class="grid gap-5 md:grid-cols-2" (submit)="$event.preventDefault()">
-            <div>
-                <label for="charte-nom">Nom de l'apprenant <span class="text-danger">*</span></label>
-                <input id="charte-nom" type="text" class="form-input" placeholder="Ex. Moussa Diop" />
-            </div>
-            <div class="has-error">
-                <label for="charte-matricule">Matricule <span class="text-danger">*</span></label>
-                <input id="charte-matricule" type="text" class="form-input" value="A-12" aria-invalid="true" aria-describedby="charte-matricule-erreur" />
-                <p id="charte-matricule-erreur" class="mt-1 text-danger">Ce matricule existe déjà dans la daara.</p>
-            </div>
-            <div>
-                <label for="charte-classe">Classe</label>
-                <select id="charte-classe" class="form-select">
-                    <option>CP</option>
-                    <option>CE1</option>
+        <form class="grid gap-5 md:grid-cols-2" [formGroup]="form" (ngSubmit)="valider()" novalidate>
+            <app-form-field label="Nom de l'apprenant" aide="Tel qu'il figure sur l'acte de naissance.">
+                <input appFormControl type="text" class="form-input" formControlName="nom" placeholder="Ex. Moussa Diop" />
+            </app-form-field>
+            <app-form-field label="Matricule" [erreur]="erreurMatricule()">
+                <input appFormControl type="text" class="form-input" formControlName="matricule" />
+            </app-form-field>
+            <app-form-field label="E-mail du parent">
+                <input appFormControl type="email" class="form-input" formControlName="email" />
+            </app-form-field>
+            <app-form-field label="Classe">
+                <select appFormControl class="form-select" formControlName="classe">
+                    <option value="">Choisir…</option>
+                    <option value="cp">CP</option>
+                    <option value="ce1">CE1</option>
                 </select>
-            </div>
-            <div class="flex items-center gap-6 pt-7">
-                <label class="mb-0 flex items-center">
-                    <input type="checkbox" class="form-checkbox" checked />
-                    Présent
-                </label>
-                <label class="mb-0 flex items-center">
-                    <input type="radio" name="charte-creneau" class="form-radio" checked />
-                    Matin
-                </label>
+            </app-form-field>
+            <div class="md:col-span-2">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
             </div>
         </form>
     </div>
 
     <div class="grid gap-6 md:grid-cols-2">
         <div class="panel">
-            <h2 class="mb-2 text-lg font-semibold dark:text-white-light">Carte</h2>
-            <p class="text-muted dark:text-night-muted">Classe de CE1 — 32 apprenants, 2 absences aujourd'hui.</p>
-            <button type="button" class="btn btn-outline-primary mt-4">Voir la classe</button>
+            <h2 class="mb-2 text-lg font-semibold dark:text-white-light">État vide</h2>
+            <app-empty-state titre="Aucun apprenant" message="Ajoutez un premier apprenant ou importez un fichier CSV.">
+                <button type="button" class="btn btn-primary">Ajouter un apprenant</button>
+            </app-empty-state>
         </div>
         <div class="panel">
             <h2 class="mb-2 text-lg font-semibold dark:text-white-light">Tableau</h2>
@@ -112,36 +108,20 @@
                     <thead>
                         <tr>
                             <th>Apprenant</th>
-                            <th>Moyenne</th>
+                            <th>Statut</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>Awa Ndiaye</td>
-                            <td>15,5</td>
+                            <td><app-badge variante="success">Présente</app-badge></td>
                         </tr>
                         <tr>
                             <td>Ibrahima Fall</td>
-                            <td>12,0</td>
+                            <td><app-badge variante="danger">Absent</app-badge></td>
                         </tr>
                     </tbody>
                 </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="panel">
-        <h2 class="mb-4 text-lg font-semibold dark:text-white-light">Modale (aperçu statique, composant en S0.4)</h2>
-        <div class="mx-auto w-full max-w-lg overflow-hidden rounded-lg border-0 bg-white p-0 shadow-lg dark:bg-night-raised">
-            <div class="flex items-center justify-between bg-gray-50 px-5 py-3 dark:bg-night-hover">
-                <h3 class="text-lg font-bold dark:text-white-light">Supprimer l'évaluation ?</h3>
-            </div>
-            <div class="p-5">
-                <p>Les notes saisies pour cette évaluation seront perdues.</p>
-                <div class="mt-8 flex items-center justify-end gap-3">
-                    <button type="button" class="btn btn-outline-primary">Annuler</button>
-                    <button type="button" class="btn btn-danger">Supprimer</button>
-                </div>
             </div>
         </div>
     </div>

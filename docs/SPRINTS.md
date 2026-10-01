@@ -30,7 +30,7 @@ Objectif : un projet propre qui tourne, avec l'outillage en place.
 - [x] Nettoyer le starter, renommer en DAARA, appliquer la charte vert/or
 - [ ] `SupabaseService`, environnements, `supabase init` / `start`
 - [x] i18n fr/en (ADR-005)
-- [ ] Composants `shared/ui` de base : page-header, empty-state, badge, confirm-dialog
+- [x] Composants `shared/ui` de base : page-header, empty-state, badge, confirm-dialog
 - [ ] CI GitHub Actions (lint, tests, build, pgTAP, scan secrets)
 - [ ] Cloudflare Pages branché sur le dépôt (production `main`, preview `develop`)
 - [ ] Projets Supabase Free `daara-dev` et `daara-prod`, SMTP Brevo/Resend

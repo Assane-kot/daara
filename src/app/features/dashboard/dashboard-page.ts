@@ -1,14 +1,15 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { PageHeader } from '../../shared/ui/page-header/page-header';
 
 // Page provisoire : les tableaux de bord par rôle arrivent au sprint 8.
 @Component({
     selector: 'app-dashboard-page',
-    imports: [TranslatePipe],
+    imports: [TranslatePipe, PageHeader],
     template: `
+        <app-page-header [titre]="'dashboard.titre' | translate" />
         <div class="panel">
-            <h1 class="text-lg font-semibold dark:text-white-light">{{ 'dashboard.titre' | translate }}</h1>
-            <p class="mt-2 text-muted dark:text-night-muted">{{ 'dashboard.bienvenue' | translate }}</p>
+            <p class="text-muted dark:text-night-muted">{{ 'dashboard.bienvenue' | translate }}</p>
         </div>
     `,
     changeDetection: ChangeDetectionStrategy.OnPush,

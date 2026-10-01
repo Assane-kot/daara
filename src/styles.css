@@ -131,31 +131,31 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     }
 
     .btn-success {
-        @apply border-success bg-success text-white shadow-success/60;
+        @apply border-success-strong bg-success-strong text-white shadow-success/60;
     }
     .btn-outline-success {
-        @apply border-success text-success shadow-none hover:bg-success hover:text-white;
+        @apply border-success-strong text-success-strong shadow-none hover:bg-success-strong hover:text-white dark:border-success dark:text-success;
     }
 
     .btn-danger {
-        @apply border-danger bg-danger text-white shadow-danger/60;
+        @apply border-danger-strong bg-danger-strong text-white shadow-danger/60;
     }
     .btn-outline-danger {
-        @apply border-danger text-danger shadow-none hover:bg-danger hover:text-white;
+        @apply border-danger-strong text-danger-strong shadow-none hover:bg-danger-strong hover:text-white dark:border-danger dark:text-danger-soft;
     }
 
     .btn-warning {
-        @apply border-warning bg-warning text-white shadow-warning/60;
+        @apply border-warning-strong bg-warning-strong text-white shadow-warning/60;
     }
     .btn-outline-warning {
-        @apply border-warning text-warning shadow-none hover:bg-warning hover:text-white;
+        @apply border-warning-strong text-warning-strong shadow-none hover:bg-warning-strong hover:text-white dark:border-warning dark:text-warning;
     }
 
     .btn-info {
-        @apply border-info bg-info text-white shadow-info/60;
+        @apply border-info-strong bg-info-strong text-white shadow-info/60;
     }
     .btn-outline-info {
-        @apply border-info text-info shadow-none hover:bg-info hover:text-white;
+        @apply border-info-strong text-info-strong shadow-none hover:bg-info-strong hover:text-white dark:border-info dark:text-info;
     }
 
     .btn-dark {
@@ -177,16 +177,16 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
         @apply border-secondary text-secondary-700 hover:bg-secondary-light dark:text-secondary dark:hover:bg-secondary dark:hover:text-primary-950;
     }
     .badge-outline-success {
-        @apply border-success text-success hover:bg-success-light dark:hover:bg-success dark:hover:text-white-light;
+        @apply border-success-strong text-success-strong hover:bg-success-light dark:border-success dark:text-success dark:hover:bg-success-dark-light;
     }
     .badge-outline-danger {
-        @apply border-danger text-danger hover:bg-danger-light dark:hover:bg-danger dark:hover:text-white-light;
+        @apply border-danger-strong text-danger-strong hover:bg-danger-light dark:border-danger dark:text-danger-soft dark:hover:bg-danger-dark-light;
     }
     .badge-outline-warning {
-        @apply border-warning text-warning hover:bg-warning-light dark:hover:bg-warning dark:hover:text-white-light;
+        @apply border-warning-strong text-warning-strong hover:bg-warning-light dark:border-warning dark:text-warning dark:hover:bg-warning-dark-light;
     }
     .badge-outline-info {
-        @apply border-info text-info hover:bg-info-light dark:hover:bg-info dark:hover:text-white-light;
+        @apply border-info-strong text-info-strong hover:bg-info-light dark:border-info dark:text-info dark:hover:bg-info-dark-light;
     }
     .badge-outline-dark {
         @apply border-dark text-dark hover:bg-dark-light dark:hover:bg-dark dark:hover:text-white-light;

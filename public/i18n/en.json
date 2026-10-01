@@ -12,7 +12,8 @@
         "langue": {
             "autre_code": "FR",
             "changer": "Passer en français"
-        }
+        },
+        "fil_ariane": "Breadcrumb"
     },
     "menu": {
         "tableau_de_bord": "Dashboard"
@@ -24,5 +25,24 @@
     "dashboard": {
         "titre": "Dashboard",
         "bienvenue": "Welcome to DAARA."
+    },
+    "commun": {
+        "confirmer": "Confirm",
+        "annuler": "Cancel",
+        "fermer": "Close",
+        "chargement": "Loading…",
+        "obligatoire": "required"
+    },
+    "formulaire": {
+        "erreurs": {
+            "requis": "This field is required.",
+            "email": "Invalid email address.",
+            "min_longueur": "At least {{min}} characters.",
+            "max_longueur": "At most {{max}} characters.",
+            "min": "The minimum value is {{min}}.",
+            "max": "The maximum value is {{max}}.",
+            "motif": "Invalid format.",
+            "invalide": "Invalid value."
+        }
     }
 }
