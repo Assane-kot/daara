@@ -176,10 +176,10 @@ Origines autorisées par la CSP :
 |---|---|---|
 | `script-src` | `'self'` | Aucun script inline : l'inlining du CSS critique est désactivé (`angular.json`), car il injecte un script inline |
 | `style-src` | `'self' 'unsafe-inline'` | Angular et le CDK insèrent des balises `<style>` ; pas de nonce possible sur un hébergement statique |
-| `connect-src` | `'self'`, `https://*.supabase.co`, `wss://*.supabase.co` | API, Auth, Storage, Realtime (WebSocket) |
+| `connect-src` | `'self'`, `https://*.supabase.co`, `wss://*.supabase.co`, `https://*.ingest.de.sentry.io` | API, Auth, Storage, Realtime (WebSocket) ; envoi des erreurs à Sentry (région UE uniquement) |
 | `img-src` | `'self' data: blob:`, `https://*.supabase.co` | Icônes CSS en `data:`, aperçus locaux, photos et logos du Storage |
 
-À ajouter plus tard : Sentry (`connect-src`, S0.10), Cloudflare R2 (`media-src` / `connect-src`, sprint 9).
+À ajouter plus tard : Cloudflare R2 (`media-src` / `connect-src`, sprint 9).
 Toute modification de la CSP est testée en servant `dist/daara/browser` avec ces en-têtes avant le push.
 
 ## 4. Sauvegardes et anti-pause (S0.9)
@@ -271,3 +271,38 @@ psql "<url>" -f roles.sql                     # erreurs sur les réglages intern
 psql "<url>" --single-transaction -v ON_ERROR_STOP=1 -f schema.sql -c "SET session_replication_role = replica" -f data.sql
 ```
 puis mettre à jour `SUPABASE_URL` / `SUPABASE_ANON_KEY` dans Cloudflare et les réglages Auth / SMTP (§2).
+
+## 5. Suivi des erreurs : Sentry (S0.10)
+
+### 5.1 Principe
+- Offre gratuite (5 000 erreurs / mois), **région UE** (données hébergées en Allemagne) : seule région
+  acceptée par `scripts/set-env.mjs` et par la CSP.
+- Activé uniquement sur Cloudflare (production et preview) quand `SENTRY_DSN` est défini ; jamais en local.
+- **Aucune donnée personnelle** (données de mineurs, CDP) : le SDK ne collecte ni utilisateur, ni cookies,
+  ni en-têtes, ni paramètres d'URL, ni corps de requêtes, ni variables locales ; avant chaque envoi, e-mails,
+  numéros, identifiants et jetons sont remplacés par `[email]`, `[numéro]`, `[id]`, `[jeton]`
+  (`src/app/core/errors/sentry.ts`, testé ; vérifié sur un build de production le 2026-10-01).
+- SDK chargé en différé (28 kB, hors chargement initial) ; pas de Session Replay ni de suivi de performance.
+
+### 5.2 Création (une fois)
+1. https://sentry.io → créer un compte, puis une **organisation en choisissant la région « EU »**
+   (Data Storage Location : **ce choix est définitif**).
+2. **Projects → Create project** : plateforme **Angular**, nom `daara-front`, alertes : « Alert me on every new issue ».
+3. **Settings → Projects → daara-front → Client Keys (DSN)** : copier le DSN
+   (`https://<clé>@o<n>.ingest.de.sentry.io/<projet>`). Il est public par conception : il ne permet que
+   d'envoyer des erreurs.
+4. **Settings → Security & Privacy** (organisation) : activer **Data Scrubber**, **Use Default Scrubbers** et
+   **Prevent Storing of IP Addresses** (seconde protection côté serveur).
+5. **Settings → Subscription → Spike Protection** : activée (une boucle d'erreurs ne consomme pas tout le quota).
+6. Cloudflare Pages → **Settings → Variables and Secrets** : `SENTRY_DSN` = le DSN, pour **Production** et
+   **Preview** (même projet ; les erreurs sont distinguées par l'environnement `production` / `preview`).
+   Redéployer pour prendre en compte la variable.
+
+### 5.3 Vérification
+Après le déploiement de la preview : ouvrir la console du navigateur (F12) sur `https://develop.daara.pages.dev`
+et exécuter `setTimeout(() => { throw new Error('Test Sentry DAARA') })`. L'erreur apparaît dans Sentry
+(**Issues**, environnement `preview`, version `daara@<commit>`) ; la résoudre ensuite.
+
+### 5.4 Limite connue
+Les traces de pile sont minifiées : les source maps ne sont pas envoyées à Sentry (cela demanderait un jeton
+secret dans le build). À ajouter si les erreurs deviennent difficiles à lire (sprint 12, durcissement).

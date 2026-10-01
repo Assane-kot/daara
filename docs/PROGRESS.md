@@ -5,7 +5,8 @@
 
 ## État actuel
 - Sprint en cours : 0 — Installation (voir docs/SPRINTS.md)
-- Dernière tâche terminée : S0.9 — workflows sauvegarde chiffrée + anti-pause, restauration testée en local
+- Dernière tâche terminée : S0.10 — Sentry (région UE, sans données personnelles, chargé en différé).
+  Côté code, toutes les stories du sprint 0 sont faites ; restent les configurations manuelles ci-dessous.
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -24,10 +25,16 @@
   - Sauvegardes : configuration à faire par le développeur (`docs/deploiement.md` §4 : clé age, bucket R2,
     rôle `keepalive`, secrets GitHub) puis premier lancement manuel ; workflows planifiés actifs à partir de R0.
   - Fichiers du Storage (photos d'apprenants, PDF) non couverts par la sauvegarde → à traiter au sprint 4.
+  - Sentry : organisation en région UE, projet `daara-front`, `SENTRY_DSN` dans Cloudflare
+    (`docs/deploiement.md` §5) ; source maps non envoyées (traces minifiées), à voir au sprint 12.
 
 ## Prochaine étape
-S0.10 — Sentry sur Angular (offre gratuite) : aucune donnée personnelle (`sendDefaultPii: false`, nettoyage
-`beforeSend`), DSN injecté par `set-env.mjs`, désactivé en local, CSP mise à jour. Puis bilan du sprint 0.
+Clôture du sprint 0 :
+1. Développeur : configurations manuelles dans l'ordre §2 (Supabase + Brevo) → §1 (Cloudflare) → §5 (Sentry)
+   → §4 (sauvegardes) de `docs/deploiement.md`, puis vérifier le premier run de la CI sur GitHub.
+2. Validation de la charte sur `/dev/charte` → retrait de la page.
+3. Audit de sécurité du sprint (agent `auditeur-securite`, Definition of Done) puis bilan du sprint 0 et tag.
+Ensuite : sprint 1 (socle multi-tenant), en commençant par détailler le LLD §3.2 / §4.
 
 ### Plan du sprint 0 (validé le 2026-10-01)
 | Story | Contenu |
@@ -46,6 +53,25 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-01 — S0.10 Sentry
+- `@sentry/angular` 11.2 (prévu par ADR-003). Sentry v11 remplace `sendDefaultPii` par `dataCollection`,
+  dont les valeurs par défaut collectent utilisateur, cookies, en-têtes, paramètres d'URL, corps de requêtes
+  et variables locales → tout désactivé explicitement.
+- `core/errors/sentry.ts` : nettoyage avant envoi (e-mails, numéros ≥ 8 chiffres, UUID, JWT ; URL sans
+  paramètres ni fragment, donc sans `#access_token` ni jeton d'invitation ; utilisateur, `extra` et détails
+  de requête supprimés ; fil d'actions nettoyé). `core/errors/error-handler.ts` : console + Sentry.
+- SDK chargé en différé via `sentry-sdk.ts` (imports nommés) : 28 kB hors chargement initial au lieu de
+  124 kB (import complet) ou +28 kB au démarrage (import statique). Erreurs survenues avant le chargement
+  mises en file (10 max).
+- `set-env.mjs` : `SENTRY_DSN` facultatif, refusé s'il n'est pas de la région UE ; environnement
+  `production` / `preview` déduit de la branche Cloudflare, version `daara@<commit>`. CSP : ajout de
+  `https://*.ingest.de.sentry.io` uniquement.
+- Vérifié sur un build de production servi avec la CSP : une erreur contenant un e-mail et un téléphone
+  produit une seule enveloppe, message « [email] … [numéro] », sans utilisateur ni paramètres d'URL,
+  environnement et version corrects ; aucune violation CSP. 53 tests verts.
+- `docs/deploiement.md` §5 (création de l'organisation UE, scrubbing serveur, protection contre les pics) ;
+  règle ajoutée à `.claude/rules/securite.md`.
+
 ### 2026-10-01 — S0.9 Sauvegardes et anti-pause
 - `.github/workflows/sauvegarde.yml` : chaque nuit, `supabase db dump` de `daara-prod` (rôles, schéma,
   données `public` + `auth`), archive chiffrée avec la clé publique `age` (GitHub ne peut pas la relire),

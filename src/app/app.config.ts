@@ -1,9 +1,10 @@
 import { provideHttpClient, withFetch } from '@angular/common/http';
-import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { TitleStrategy, provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideMissingTranslationHandler, provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { routes } from './app.routes';
+import { DaaraErrorHandler } from './core/errors/error-handler';
 import { LANGUE_PAR_DEFAUT, LanguageService } from './core/i18n/language.service';
 import { DevMissingTranslationHandler } from './core/i18n/missing-translation.handler';
 import { TranslatedTitleStrategy } from './core/i18n/translated-title.strategy';
@@ -13,6 +14,8 @@ import { ThemeService } from './core/theme/theme.service';
 export const appConfig: ApplicationConfig = {
     providers: [
         provideBrowserGlobalErrorListeners(),
+        // Console + Sentry quand il est configuré (Cloudflare), données personnelles retirées.
+        { provide: ErrorHandler, useClass: DaaraErrorHandler },
         provideHttpClient(withFetch()),
         provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })),
         { provide: TitleStrategy, useClass: TranslatedTitleStrategy },

@@ -20,7 +20,8 @@ src/app/
 │   ├── i18n/            language.service.ts (fr, en), translated-title.strategy.ts — traductions dans public/i18n/{fr,en}.json
 │   ├── theme/           theme.service.ts (clair / sombre / système)
 │   ├── notifications/   notification-center.service.ts, push.service.ts
-│   └── errors/          error-handler, messages utilisateur
+│   └── errors/          error-handler.ts (console + Sentry), sentry.ts (chargement différé, nettoyage des données
+│                        personnelles), messages utilisateur (sprint 1)
 ├── shared/ui/           page-header, empty-state, badge, skeleton, form-field, confirm-dialog (S0.4) ; data-table (S3), stat-card
 ├── layouts/             auth-layout, app-layout (menu selon rôle), layout.service.ts (état de la sidebar)
 └── features/

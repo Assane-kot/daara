@@ -10,3 +10,5 @@
 - Uploads : vérifier type MIME et taille (audio ≤ 50 Mo), noms de fichiers générés côté serveur.
 - Dépendances : pas de nouveau paquet npm sans le signaler et le justifier.
 - Toute faille découverte est notée dans PROGRESS.md (section « Problèmes ouverts ») si non corrigée immédiatement.
+- Suivi des erreurs (Sentry) : jamais de `setUser`, de `setContext` ni de données métier dans les erreurs ; tout envoi
+  passe par `nettoyerEvenement` (`src/app/core/errors/sentry.ts`). Région UE uniquement.

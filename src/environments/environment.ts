@@ -8,4 +8,8 @@ export const environment: Environment = {
     production: false,
     supabaseUrl: 'http://127.0.0.1:54321',
     supabaseAnonKey: 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH',
+    // Pas de suivi des erreurs en local.
+    sentryDsn: null,
+    sentryEnvironment: 'development',
+    release: 'dev',
 };
