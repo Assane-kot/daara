@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { LayoutService } from '../layout.service';
 import { Footer } from './footer';
 import { Header } from './header';
@@ -11,7 +12,7 @@ const SCROLL_TOP_THRESHOLD = 50;
 
 @Component({
     selector: 'app-app-layout',
-    imports: [RouterOutlet, Header, Sidebar, Footer],
+    imports: [RouterOutlet, TranslatePipe, Header, Sidebar, Footer],
     templateUrl: './app-layout.html',
     host: { '(window:scroll)': 'onScroll()' },
     changeDetection: ChangeDetectionStrategy.OnPush,

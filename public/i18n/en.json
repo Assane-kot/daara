@@ -1,0 +1,28 @@
+{
+    "layout": {
+        "menu_principal": "Main menu",
+        "afficher_menu": "Show menu",
+        "replier_menu": "Collapse menu",
+        "remonter": "Back to top",
+        "theme": {
+            "light": "Light theme (switch to dark)",
+            "dark": "Dark theme (follow system)",
+            "system": "System theme (switch to light)"
+        },
+        "langue": {
+            "autre_code": "FR",
+            "changer": "Passer en français"
+        }
+    },
+    "menu": {
+        "tableau_de_bord": "Dashboard"
+    },
+    "titres": {
+        "tableau_de_bord": "Dashboard",
+        "charte": "Style guide"
+    },
+    "dashboard": {
+        "titre": "Dashboard",
+        "bienvenue": "Welcome to DAARA."
+    }
+}

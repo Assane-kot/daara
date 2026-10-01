@@ -29,7 +29,7 @@ Objectif : un projet propre qui tourne, avec l'outillage en place.
 - [x] Analyser le starter Vristo (versions, structure), mettre à niveau si nécessaire (ADR-004)
 - [x] Nettoyer le starter, renommer en DAARA, appliquer la charte vert/or
 - [ ] `SupabaseService`, environnements, `supabase init` / `start`
-- [ ] i18n fr/en (ADR-005)
+- [x] i18n fr/en (ADR-005)
 - [ ] Composants `shared/ui` de base : page-header, empty-state, badge, confirm-dialog
 - [ ] CI GitHub Actions (lint, tests, build, pgTAP, scan secrets)
 - [ ] Cloudflare Pages branché sur le dépôt (production `main`, preview `develop`)

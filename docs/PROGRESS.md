@@ -5,15 +5,20 @@
 
 ## État actuel
 - Sprint en cours : 0 — Installation (voir docs/SPRINTS.md)
-- Dernière tâche terminée : S0.2 — identité DAARA (charte en attente de validation visuelle)
+- Dernière tâche terminée : S0.3 — i18n fr/en (21 tests verts)
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
   - Page `/dev/charte` à retirer (route + `features/dev-charte/`) dès que la charte est validée.
   - Pas encore d'icônes PNG (apple-touch-icon, PWA) : à générer depuis le logo avec la PWA (sprint 8).
+  - S0.7 : les fichiers `public/i18n/*.json` ne sont pas hachés → en-tête `Cache-Control: no-cache` à prévoir
+    dans `_headers`, sinon des navigateurs garderont d'anciennes traductions après un déploiement.
+  - Formats de date et de nombre (fr / en, fuseau `Africa/Dakar`) : à traiter avec le premier écran qui
+    affiche des dates (pipe localisé basé sur `LanguageService`).
 
 ## Prochaine étape
-S0.3 — i18n fr/en (ngx-translate 18, `LanguageService`, `public/i18n/`), puis S0.4 → S0.10 (plan ci-dessous).
+S0.4 — composants `shared/ui` (page-header, empty-state, badge, confirm-dialog via CDK Dialog, squelettes,
+formulaires harmonisés), puis S0.5 → S0.10 (plan ci-dessous).
 
 ### Plan du sprint 0 (validé le 2026-10-01)
 | Story | Contenu |
@@ -32,6 +37,19 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-01 — S0.3 i18n fr/en
+- `@ngx-translate/core` et `http-loader` 18 ; traductions dans `public/i18n/fr.json` et `en.json`.
+- `LanguageService` (signals `langue`, `autreLangue`) : bascule sans rechargement, `<html lang>`, mémorisé ;
+  traductions chargées dans un initialiseur avant le premier rendu (pas d'affichage de clés brutes).
+- `TranslatedTitleStrategy` : `title` des routes = clé de traduction, titre d'onglet retraduit au changement de langue.
+- `DevMissingTranslationHandler` : clé manquante signalée dans la console en développement.
+- Header : bouton FR/EN, libellé écrit dans la langue proposée (attribut `lang`). Plus aucun texte en dur
+  dans les layouts ni la page dashboard (hors page `/dev/charte`, provisoire).
+- Tests : `provideTranslateTesting()` (traductions réelles sans HTTP), test de parité des clés fr/en et de
+  valeurs non vides. Conventions i18n ajoutées à `.claude/rules/angular.md`.
+- Vérifié dans le navigateur : bascule FR → EN (sidebar, contenu, titre d'onglet), mémorisation après
+  rechargement, aucune clé manquante en console. Bundle initial : 86 kB transférés (+9 kB).
+
 ### 2026-10-01 — S0.2 Identité DAARA
 - Charte dans `tailwind.config.js` : primaire vert (palette 50→950), secondaire or (50→950, alias `accent`),
   jetons `page`, `muted`, `night-*` (mode sombre teinté vert, remplace le bleu nuit Vristo).

@@ -1,7 +1,7 @@
-<!-- Menu par rôle : sprint 2 (LLD §2). Libellés provisoires : traduction en S0.3. -->
+<!-- Menu par rôle : sprint 2 (LLD §2). -->
 <nav
     class="sidebar fixed bottom-0 top-0 z-50 h-full min-h-screen w-[260px] shadow-[5px_0_25px_0_rgba(14,26,20,0.08)] transition-all duration-300"
-    aria-label="Menu principal"
+    [attr.aria-label]="'layout.menu_principal' | translate"
 >
     <div class="h-full bg-white dark:bg-night">
         <div class="flex items-center justify-between px-4 py-3">
@@ -12,7 +12,7 @@
             <button
                 type="button"
                 class="collapse-icon flex h-8 w-8 items-center rounded-full transition duration-300 hover:bg-gray-500/10 hover:text-primary rtl:rotate-180 dark:text-white-light dark:hover:bg-dark-light/10"
-                aria-label="Replier le menu"
+                [attr.aria-label]="'layout.replier_menu' | translate"
                 (click)="layout.toggleSidebar()"
             >
                 <icon-carets-down class="m-auto rotate-90" />
@@ -31,7 +31,7 @@
                     >
                         <div class="flex items-center">
                             <icon-menu-dashboard class="shrink-0 group-hover:!text-primary" />
-                            <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-night-muted dark:group-hover:text-white-dark">Tableau de bord</span>
+                            <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-night-muted dark:group-hover:text-white-dark">{{ 'menu.tableau_de_bord' | translate }}</span>
                         </div>
                     </a>
                 </li>

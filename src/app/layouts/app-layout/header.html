@@ -10,7 +10,7 @@
         <button
             type="button"
             class="icon-btn collapse-icon flex-none ltr:ml-2 rtl:mr-2 dark:text-white-light lg:hidden"
-            aria-label="Afficher le menu"
+            [attr.aria-label]="'layout.afficher_menu' | translate"
             (click)="layout.toggleSidebar()"
         >
             <icon-menu class="h-5 w-5" />
@@ -18,11 +18,23 @@
     </div>
 
     <div class="flex items-center space-x-1.5 ltr:ml-auto rtl:mr-auto rtl:space-x-reverse dark:text-white-light lg:space-x-2">
+        <!-- Libellé écrit dans la langue proposée (attribut lang), pratique d'accessibilité courante. -->
+        <button
+            type="button"
+            class="icon-btn min-w-9 text-xs font-bold"
+            [attr.aria-label]="'layout.langue.changer' | translate"
+            [attr.title]="'layout.langue.changer' | translate"
+            [attr.lang]="language.autreLangue()"
+            (click)="language.basculer()"
+        >
+            {{ 'layout.langue.autre_code' | translate }}
+        </button>
+
         <button
             type="button"
             class="icon-btn"
-            [attr.aria-label]="themeLabels[theme.mode()]"
-            [attr.title]="themeLabels[theme.mode()]"
+            [attr.aria-label]="'layout.theme.' + theme.mode() | translate"
+            [attr.title]="'layout.theme.' + theme.mode() | translate"
             (click)="theme.cycleMode()"
         >
             @switch (theme.mode()) {

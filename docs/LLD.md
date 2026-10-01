@@ -17,7 +17,7 @@ src/app/
 │   ├── supabase/        supabase.service.ts, database.types.ts
 │   ├── auth/            auth.service.ts, auth.guard.ts, role.guard.ts
 │   ├── daara/           current-daara.service.ts, daara.resolver.ts
-│   ├── i18n/            language.service.ts (fr, en) — traductions dans public/i18n/{fr,en}.json
+│   ├── i18n/            language.service.ts (fr, en), translated-title.strategy.ts — traductions dans public/i18n/{fr,en}.json
 │   ├── theme/           theme.service.ts (clair / sombre / système)
 │   ├── notifications/   notification-center.service.ts, push.service.ts
 │   └── errors/          error-handler, messages utilisateur
@@ -260,7 +260,7 @@ sequenceDiagram
 - PDF : décision par ADR au sprint 7 (spike sur le rendu de l'arabe).
 
 ## 8. Gestion des erreurs
-- Erreurs Supabase traduites en messages utilisateur français (violation RLS → « Accès non autorisé »,
+- Erreurs Supabase converties en messages utilisateur traduits (fr/en) (violation RLS → « Accès non autorisé »,
   contrainte unique → message métier).
 - Erreurs inattendues : journalisées (sans données personnelles) et affichées de manière générique.
 

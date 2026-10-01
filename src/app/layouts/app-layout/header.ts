@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
+import { LanguageService } from '../../core/i18n/language.service';
 import { ThemeService } from '../../core/theme/theme.service';
 import { IconLaptop } from '../../shared/icon/icon-laptop';
 import { IconMenu } from '../../shared/icon/icon-menu';
@@ -10,7 +12,7 @@ import { LayoutService } from '../layout.service';
 @Component({
     // Sélecteur sur l'élément <header> : le CSS Vristo `.navbar-sticky header` le rend collant.
     selector: 'header[appHeader]',
-    imports: [RouterLink, IconMenu, IconSun, IconMoon, IconLaptop],
+    imports: [RouterLink, TranslatePipe, IconMenu, IconSun, IconMoon, IconLaptop],
     templateUrl: './header.html',
     host: { class: 'z-40 shadow-sm' },
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,11 +20,5 @@ import { LayoutService } from '../layout.service';
 export class Header {
     protected readonly layout = inject(LayoutService);
     protected readonly theme = inject(ThemeService);
-
-    // Libellés provisoires : passeront dans les fichiers de traduction en S0.3.
-    protected readonly themeLabels = {
-        light: 'Thème clair (passer en sombre)',
-        dark: 'Thème sombre (suivre le système)',
-        system: 'Thème du système (passer en clair)',
-    } as const;
+    protected readonly language = inject(LanguageService);
 }

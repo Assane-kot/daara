@@ -1,0 +1,28 @@
+{
+    "layout": {
+        "menu_principal": "Menu principal",
+        "afficher_menu": "Afficher le menu",
+        "replier_menu": "Replier le menu",
+        "remonter": "Remonter en haut de la page",
+        "theme": {
+            "light": "Thème clair (passer en sombre)",
+            "dark": "Thème sombre (suivre le système)",
+            "system": "Thème du système (passer en clair)"
+        },
+        "langue": {
+            "autre_code": "EN",
+            "changer": "Switch to English"
+        }
+    },
+    "menu": {
+        "tableau_de_bord": "Tableau de bord"
+    },
+    "titres": {
+        "tableau_de_bord": "Tableau de bord",
+        "charte": "Charte"
+    },
+    "dashboard": {
+        "titre": "Tableau de bord",
+        "bienvenue": "Bienvenue sur DAARA."
+    }
+}
