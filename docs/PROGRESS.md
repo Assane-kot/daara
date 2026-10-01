@@ -5,23 +5,23 @@
 
 ## État actuel
 - Sprint en cours : 0 — Installation (voir docs/SPRINTS.md)
-- Dernière tâche terminée : S0.6 — ESLint, Prettier, CI GitHub Actions (job front rejoué localement : vert)
+- Dernière tâche terminée : S0.7 — fichiers Cloudflare Pages prêts (`_headers`, procédure) ; branchement à faire
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
   - Page `/dev/charte` (charte + démonstration `shared/ui`) à retirer (route + `features/dev-charte/`)
     dès que la charte est validée par le développeur.
   - Pas encore d'icônes PNG (apple-touch-icon, PWA) : à générer depuis le logo avec la PWA (sprint 8).
-  - S0.7 : les fichiers `public/i18n/*.json` ne sont pas hachés → en-tête `Cache-Control: no-cache` à prévoir
-    dans `_headers`, sinon des navigateurs garderont d'anciennes traductions après un déploiement.
+  - Cloudflare Pages à brancher par le développeur (`docs/deploiement.md` §1), après création de `daara-dev`
+    (S0.8) : sans `SUPABASE_URL` / `SUPABASE_ANON_KEY`, le build Cloudflare échoue volontairement.
   - Formats de date et de nombre (fr / en, fuseau `Africa/Dakar`) : à traiter avec le premier écran qui
     affiche des dates (pipe localisé basé sur `LanguageService`).
   - CI : jobs `base` (pgTAP) et `secrets` (gitleaks en mode git) jamais exécutés sur GitHub → vérifier le
     premier run après le push ; le job `front` a été rejoué localement à l'identique.
 
 ## Prochaine étape
-S0.7 — Cloudflare Pages : `public/_redirects` (fallback SPA), `public/_headers` (CSP, HSTS, no-cache sur
-`/i18n/*`), `docs/deploiement.md` ; branchement du dépôt par le développeur. Puis S0.8 → S0.10.
+S0.8 — Projets Supabase cloud `daara-dev` / `daara-prod` + SMTP (Brevo ou Resend) : procédure dans
+`docs/deploiement.md` §2, exécutée par le développeur ; puis branchement Cloudflare (§1). Puis S0.9, S0.10.
 
 ### Plan du sprint 0 (validé le 2026-10-01)
 | Story | Contenu |
@@ -40,6 +40,18 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-01 — S0.7 Cloudflare Pages
+- `public/_headers` : CSP stricte (`script-src 'self'`, connexions limitées à `*.supabase.co`), HSTS,
+  `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` (tout désactivé), `no-cache` sur `/i18n/*`,
+  `X-Robots-Tag: noindex` sur les previews. Origines justifiées dans `docs/deploiement.md` §3.
+- Piège évité : l'inlining du CSS critique (Beasties) injecte un script inline → bloqué par la CSP, l'app
+  s'afficherait sans styles. Désactivé (`optimization.styles.inlineCritical: false`) : plus aucun script inline.
+- Pas de `_redirects` : sans `404.html`, Cloudflare Pages sert `index.html` pour toute route (mode SPA).
+- `.node-version` (24). `docs/deploiement.md` : création du projet Pages, variables par environnement,
+  preview limitée à `develop`, vérifications.
+- Vérifié en servant le build de production avec les en-têtes de `_headers` : route profonde → app,
+  styles, traductions et bascule de langue OK, aucune violation CSP.
+
 ### 2026-10-01 — S0.6 Qualité et CI
 - ESLint 10 via `ng add angular-eslint` (22.5) : règles recommandées TS + templates + accessibilité ;
   ajoutées : OnPush obligatoire, `no-explicit-any`, control flow obligatoire, `no-console` (sauf warn/error).
