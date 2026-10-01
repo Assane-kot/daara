@@ -5,23 +5,26 @@
 
 ## État actuel
 - Sprint en cours : 0 — Installation (voir docs/SPRINTS.md)
-- Dernière tâche terminée : S0.7 — fichiers Cloudflare Pages prêts (`_headers`, procédure) ; branchement à faire
+- Dernière tâche terminée : S0.8 — procédure Supabase cloud + Brevo rédigée (`docs/deploiement.md` §2)
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
   - Page `/dev/charte` (charte + démonstration `shared/ui`) à retirer (route + `features/dev-charte/`)
     dès que la charte est validée par le développeur.
   - Pas encore d'icônes PNG (apple-touch-icon, PWA) : à générer depuis le logo avec la PWA (sprint 8).
-  - Cloudflare Pages à brancher par le développeur (`docs/deploiement.md` §1), après création de `daara-dev`
-    (S0.8) : sans `SUPABASE_URL` / `SUPABASE_ANON_KEY`, le build Cloudflare échoue volontairement.
+  - À faire par le développeur, dans cet ordre : S0.8 (`docs/deploiement.md` §2 : projets `daara-dev` /
+    `daara-prod`, Auth, Brevo, tests d'envoi), puis S0.7 (§1 : branchement Cloudflare Pages). Sans
+    `SUPABASE_URL` / `SUPABASE_ANON_KEY`, le build Cloudflare échoue volontairement.
+  - Nom de domaine (DKIM / DMARC pour Brevo, puis domaine de l'app) : dépense annuelle à décider, au plus
+    tard avant le pilote R1 (ADR-003).
   - Formats de date et de nombre (fr / en, fuseau `Africa/Dakar`) : à traiter avec le premier écran qui
     affiche des dates (pipe localisé basé sur `LanguageService`).
   - CI : jobs `base` (pgTAP) et `secrets` (gitleaks en mode git) jamais exécutés sur GitHub → vérifier le
     premier run après le push ; le job `front` a été rejoué localement à l'identique.
 
 ## Prochaine étape
-S0.8 — Projets Supabase cloud `daara-dev` / `daara-prod` + SMTP (Brevo ou Resend) : procédure dans
-`docs/deploiement.md` §2, exécutée par le développeur ; puis branchement Cloudflare (§1). Puis S0.9, S0.10.
+S0.9 — Workflows planifiés : `pg_dump` chiffré de `daara-prod` → Cloudflare R2 (rétention 30 jours) et
+requête anti-pause ; procédure de restauration testée en local. En parallèle, le développeur exécute S0.8 puis S0.7.
 
 ### Plan du sprint 0 (validé le 2026-10-01)
 | Story | Contenu |
@@ -40,6 +43,15 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-01 — S0.8 Supabase cloud et e-mails (procédure)
+- Brevo retenu pour le SMTP (ADR-003, HLD mis à jour) : offre gratuite 300 e-mails / jour, société
+  française, données dans l'UE.
+- `docs/deploiement.md` §2 : double authentification sur tous les comptes, création de `daara-dev` /
+  `daara-prod` (région Paris), réglages Auth identiques au local (confirmation d'e-mail, mot de passe ≥ 8
+  lettres + chiffres), redirections strictes en production (aucun `localhost` ni preview), clés publishable
+  vers Cloudflare et clés secrètes hors de tout dépôt, SMTP Brevo, tests d'envoi, application des migrations.
+- Décision à prendre : nom de domaine (seule dépense annuelle) pour authentifier l'expéditeur avant le pilote.
+
 ### 2026-10-01 — S0.7 Cloudflare Pages
 - `public/_headers` : CSP stricte (`script-src 'self'`, connexions limitées à `*.supabase.co`), HSTS,
   `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` (tout désactivé), `no-cache` sur `/i18n/*`,

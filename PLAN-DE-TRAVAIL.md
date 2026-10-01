@@ -86,7 +86,7 @@ git push -u origin develop
 |---|---|
 | Supabase | Créer `daara-dev` et `daara-prod` (offre Free, région Europe de l'Ouest). Garder les mots de passe DB dans un gestionnaire de mots de passe |
 | Cloudflare | Pages : connecter le dépôt GitHub (procédure : `docs/deploiement.md` §1, sortie `dist/daara/browser`). R2 : créer un bucket `daara-files` (l'activation peut demander une carte, sans débit dans les limites gratuites) |
-| Brevo ou Resend | Compte gratuit, vérifier l'expéditeur, configurer le SMTP dans Supabase Auth (les deux projets) |
+| Brevo | Compte gratuit, vérifier l'expéditeur, configurer le SMTP dans Supabase Auth (les deux projets) : `docs/deploiement.md` §2 |
 | Sentry | Projet Angular gratuit |
 Les clés (anon, DSN Sentry) iront dans les environnements Angular et les secrets GitHub/Cloudflare,
 jamais dans un fichier commité.

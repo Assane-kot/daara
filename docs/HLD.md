@@ -130,7 +130,7 @@ Les migrations vers dev/prod sont appliquées manuellement par le développeur.
 |---|---|---|
 | Web Push | Notifications PWA (gratuit) | 8 |
 | WhatsApp (liens `wa.me`, envoi manuel) | Alertes parents ; SMS payant reporté | 8 |
-| Email (Brevo ou Resend, SMTP de Supabase Auth) | Invitations, mot de passe | 0-2 |
+| Email (Brevo, SMTP de Supabase Auth) | Invitations, mot de passe | 0-2 |
 | Cloudflare R2 | Audios de récitation, sauvegardes | 0, 9 |
 | Sentry | Suivi des erreurs | 0 |
 | Agrégateur de paiement mobile (ex. PayTech : Wave, Orange Money) | Abonnements | 11 |

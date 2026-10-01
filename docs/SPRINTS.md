@@ -34,7 +34,7 @@ Objectif : un projet propre qui tourne, avec l'outillage en place.
 - [x] Composants `shared/ui` de base : page-header, empty-state, badge, confirm-dialog
 - [x] CI GitHub Actions (lint, tests, build, pgTAP, scan secrets)
 - [ ] Cloudflare Pages branché sur le dépôt (production `main`, preview `develop`)
-- [ ] Projets Supabase Free `daara-dev` et `daara-prod`, SMTP Brevo/Resend
+- [ ] Projets Supabase Free `daara-dev` et `daara-prod`, SMTP Brevo
 - [ ] Workflows planifiés : sauvegarde `pg_dump` → R2, anti-pause
 - [ ] Sentry branché sur Angular
 Livrable : application vide aux couleurs DAARA, en ligne sur Cloudflare Pages, CI verte. Coût : 0.
