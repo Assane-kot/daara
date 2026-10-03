@@ -20,16 +20,199 @@ export type Database = {
     };
     public: {
         Tables: {
-            [_ in never]: never;
+            audit_log: {
+                Row: {
+                    action: string;
+                    at: string;
+                    daara_id: string;
+                    id: number;
+                    new_data: Json | null;
+                    old_data: Json | null;
+                    record_id: string | null;
+                    table_name: string;
+                    user_id: string | null;
+                };
+                Insert: {
+                    action: string;
+                    at?: string;
+                    daara_id: string;
+                    id?: never;
+                    new_data?: Json | null;
+                    old_data?: Json | null;
+                    record_id?: string | null;
+                    table_name: string;
+                    user_id?: string | null;
+                };
+                Update: {
+                    action?: string;
+                    at?: string;
+                    daara_id?: string;
+                    id?: never;
+                    new_data?: Json | null;
+                    old_data?: Json | null;
+                    record_id?: string | null;
+                    table_name?: string;
+                    user_id?: string | null;
+                };
+                Relationships: [];
+            };
+            daaras: {
+                Row: {
+                    bareme: number;
+                    created_at: string;
+                    created_by: string | null;
+                    id: string;
+                    langue_defaut: string;
+                    logo_path: string | null;
+                    nom: string;
+                    slug: string;
+                    statut: string;
+                    telephone: string | null;
+                    updated_at: string;
+                    ville: string | null;
+                };
+                Insert: {
+                    bareme?: number;
+                    created_at?: string;
+                    created_by?: string | null;
+                    id?: string;
+                    langue_defaut?: string;
+                    logo_path?: string | null;
+                    nom: string;
+                    slug: string;
+                    statut?: string;
+                    telephone?: string | null;
+                    updated_at?: string;
+                    ville?: string | null;
+                };
+                Update: {
+                    bareme?: number;
+                    created_at?: string;
+                    created_by?: string | null;
+                    id?: string;
+                    langue_defaut?: string;
+                    logo_path?: string | null;
+                    nom?: string;
+                    slug?: string;
+                    statut?: string;
+                    telephone?: string | null;
+                    updated_at?: string;
+                    ville?: string | null;
+                };
+                Relationships: [];
+            };
+            memberships: {
+                Row: {
+                    actif: boolean;
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    id: string;
+                    role: Database['public']['Enums']['role_membre'];
+                    updated_at: string;
+                    user_id: string;
+                };
+                Insert: {
+                    actif?: boolean;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id: string;
+                    id?: string;
+                    role: Database['public']['Enums']['role_membre'];
+                    updated_at?: string;
+                    user_id: string;
+                };
+                Update: {
+                    actif?: boolean;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id?: string;
+                    id?: string;
+                    role?: Database['public']['Enums']['role_membre'];
+                    updated_at?: string;
+                    user_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'memberships_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'memberships_user_id_fkey';
+                        columns: ['user_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
+            platform_admins: {
+                Row: {
+                    created_at: string;
+                    user_id: string;
+                };
+                Insert: {
+                    created_at?: string;
+                    user_id: string;
+                };
+                Update: {
+                    created_at?: string;
+                    user_id?: string;
+                };
+                Relationships: [];
+            };
+            profiles: {
+                Row: {
+                    avatar_path: string | null;
+                    created_at: string;
+                    id: string;
+                    langue: string;
+                    nom: string;
+                    prenom: string;
+                    telephone: string | null;
+                    updated_at: string;
+                };
+                Insert: {
+                    avatar_path?: string | null;
+                    created_at?: string;
+                    id: string;
+                    langue?: string;
+                    nom?: string;
+                    prenom?: string;
+                    telephone?: string | null;
+                    updated_at?: string;
+                };
+                Update: {
+                    avatar_path?: string | null;
+                    created_at?: string;
+                    id?: string;
+                    langue?: string;
+                    nom?: string;
+                    prenom?: string;
+                    telephone?: string | null;
+                    updated_at?: string;
+                };
+                Relationships: [];
+            };
         };
         Views: {
             [_ in never]: never;
         };
         Functions: {
-            [_ in never]: never;
+            creer_daara: {
+                Args: { p_bareme?: number; p_langue_defaut?: string; p_nom: string; p_slug: string; p_telephone?: string; p_ville?: string };
+                Returns: string;
+            };
+            has_role: { Args: { p_daara: string; p_roles: Database['public']['Enums']['role_membre'][] }; Returns: boolean };
+            is_member: { Args: { p_daara: string }; Returns: boolean };
+            is_platform_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+            membres_administres: { Args: Record<PropertyKey, never>; Returns: string[] };
         };
         Enums: {
-            [_ in never]: never;
+            role_membre: 'admin' | 'enseignant' | 'parent' | 'apprenant';
         };
         CompositeTypes: {
             [_ in never]: never;
@@ -137,6 +320,8 @@ export const Constants = {
         Enums: {},
     },
     public: {
-        Enums: {},
+        Enums: {
+            role_membre: ['admin', 'enseignant', 'parent', 'apprenant'],
+        },
     },
 } as const;

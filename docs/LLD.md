@@ -75,7 +75,7 @@ preview → `daara-dev`). Il échoue sur Cloudflare si elles manquent, refuse to
 | Service | Responsabilité |
 |---|---|
 | `SupabaseService` | Instance unique du client, configuration par environnement ; flux PKCE à partir du sprint 1 (ADR-006) |
-| `AuthService` | Session (signal `user`), connexion, déconnexion, écoute `onAuthStateChange` |
+| `AuthService` | Session (signals `user`, `aal`), inscription, connexion, codes e-mail, mot de passe, MFA, déconnexion, écoute `onAuthStateChange` (§7.0) |
 | `CurrentDaaraService` | Signals `daara`, `roles`, `id` ; `hasRole(...)` ; mémorise le dernier slug utilisé |
 | `NotificationCenterService` | Abonnement Realtime à `notifications` de l'utilisateur, compteur non lus |
 | `PushService` | Inscription Web Push (sprint 8) |
@@ -116,14 +116,31 @@ erDiagram
 ```
 
 ### 3.2 Socle (sprints 1-2)
+Sprint 1 : `daaras`, `profiles`, `memberships`, `audit_log`, `platform_admins` (détaillées ci-dessous).
+Sprint 2 : `invitations`, `codes_acces`, `notifications` (à détailler au sprint 2).
+
+Type : `public.role_membre` = enum (`admin`, `enseignant`, `parent`, `apprenant`).
+`created_at timestamptz not null default now()` partout ; `updated_at` (trigger `set_updated_at`) sur `daaras`,
+`profiles`, `memberships`.
+
+| Table | Colonnes | Contraintes |
+|---|---|---|
+| `daaras` | id, nom text (2-120), slug text, ville text null (≤ 80), telephone text null (≤ 20), logo_path text null, langue_defaut text (`fr`/`en`, défaut `fr`), bareme smallint (10/20, défaut 20), statut text (`active`/`suspendue`, défaut `active`), created_by uuid (défaut `auth.uid()`) | slug unique, `^[a-z0-9]+(-[a-z0-9]+)*$`, 3-50 car., hors liste des slugs réservés (segments de routes, `admin`, `api`…) ; `logo_path` = `<id>/<fichier>.<ext>` ; sans `daara_id` (exception) ; créée uniquement par `creer_daara()` |
+| `profiles` | id (pk, fk `auth.users` on delete cascade), nom text (≤ 100), prenom text (≤ 100), telephone text null (≤ 20), langue text (`fr`/`en`, défaut `fr`), avatar_path text null | `avatar_path` = `<id>/<fichier>.<ext>` ; sans `daara_id` (exception) ; créé par `handle_new_user` |
+| `memberships` | id, daara_id (fk cascade), user_id (fk `profiles` cascade), role `role_membre`, actif bool (défaut true), created_by | unique (daara_id, user_id, role) ; index `daara_id`, index `(user_id, daara_id)` ; aucune écriture directe par le client (§4) |
+| `audit_log` | id bigint identity, daara_id (**sans** clé étrangère : le journal est écrit pendant la suppression en cascade d'une daara et lui survit ; conservation et purge à décider avant le sprint 5), table_name text, record_id uuid, action text (`INSERT`/`UPDATE`/`DELETE`), old_data jsonb, new_data jsonb, user_id uuid (`auth.uid()`), at timestamptz | index `(daara_id, at desc)` ; écrit uniquement par `audit_trigger` |
+| `platform_admins` | user_id (pk, fk `auth.users` cascade), created_at | sans `daara_id` (exception) ; rempli à la main en SQL par le développeur |
+
+Textes affichés (`daaras.nom`, `ville`, `profiles.nom`, `prenom`, puis tout nom saisi) : contrainte `check` qui interdit
+les caractères de contrôle, invisibles et de mise en forme bidirectionnelle (`[[:cntrl:]]`, U+00AD, U+200B-200F,
+U+202A-202E, U+2060-2064, U+2066-2069, U+FEFF) : usurpation d'un nom dans les listes, e-mails et PDF.
+`handle_new_user` retire ces mêmes caractères des métadonnées d'inscription.
+
+Lignes du sprint 2 (à détailler) :
+
 | Table | Colonnes principales | Contraintes |
 |---|---|---|
-| `daaras` | nom, slug, ville, telephone, logo_path, langue_defaut, bareme (10/20), statut (active/suspendue) | slug unique |
-| `profiles` | id (= auth.users.id), nom, prenom, telephone, langue, avatar_path | créé par trigger sur `auth.users` |
-| `memberships` | daara_id, user_id, role (`admin`/`enseignant`/`parent`/`apprenant`), actif | unique (daara_id, user_id, role) |
 | `invitations` | daara_id, email, telephone, role, token_hash, expires_at, accepted_at, invited_by | expire après 7 jours |
-| `audit_log` | id bigserial, daara_id, table_name, record_id, action, old_data, new_data, user_id, at | insert par trigger uniquement |
-| `platform_admins` | user_id | lecture via fonction `is_platform_admin()` |
 | `codes_acces` | daara_id, user_id, code_hash, expires_at, used_at, tentatives, cree_par | un code actif par utilisateur ; 24 h, usage unique, 5 essais (ADR-006, sprint 2) ; écrit uniquement par les Edge Functions |
 | `notifications` | daara_id, user_id, type, titre, message, ref_table, ref_id, lue | RLS : user_id = auth.uid() |
 
@@ -173,8 +190,9 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 
 | Table | Admin | Enseignant | Parent | Apprenant |
 |---|---|---|---|---|
-| daaras | L E | L | L | L |
-| memberships | L E S | L (sa daara) | L (soi) | L (soi) |
+| daaras | L E (colonnes autorisées) | L | L | L |
+| profiles | L (soi + membres de ses daaras) E (soi) | L E (soi) | L E (soi) | L E (soi) |
+| memberships | L ; E S au sprint 2 (gestion des membres) | L (soi + enseignants de sa daara) | L (soi) | L (soi) |
 | invitations | L E S | — | — | — |
 | codes_acces | L (métadonnées, sans `code_hash`) | — | — | — |
 | annees / periodes / classes / matieres | L E S | L | L | L |
@@ -197,14 +215,53 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 | `has_role(daara_id, roles[])` | membre actif avec un des rôles ; pour `admin`, exige aussi `auth.jwt() ->> 'aal' = 'aal2'` (double authentification, ADR-006) |
 | `is_parent_of(apprenant_id)` | lien dans `parent_links` |
 | `teaches_class(classe_id)` | enseignant affecté à la classe (titulaire ou classe_matieres) |
-| `is_platform_admin()` | super-admin |
+| `membres_administres()` → setof uuid | membres **actifs** des daaras dont l'appelant est admin actif (`aal2`) ; lecture des profils via `id in (select membres_administres())`, évalué une fois par requête. Un membre désactivé n'est plus lisible (minimisation) |
+| `is_platform_admin()` | présent dans `platform_admins` **et** session en `aal2` (ADR-006) |
 Toutes : `security definer`, `stable`, `search_path = ''`, appelées via `(select ...)`.
+Un utilisateur admin + enseignant en `aal1` garde ses droits d'enseignant (le rôle admin seul est ignoré).
+La suspension d'une daara (`statut`) n'est pas vérifiée par les helpers en V1 : traitée au sprint 11.
+
+### Socle (sprint 1) : politiques détaillées
+Toutes les politiques visent `authenticated` ; aucune ne vise `anon`.
+
+| Table | select | insert | update | delete |
+|---|---|---|---|---|
+| `daaras` | `is_member(id)` ou `is_platform_admin()` | aucune (via `creer_daara`) | `has_role(id, admin)` ; colonnes accordées : nom, ville, telephone, logo_path, langue_defaut, bareme (`statut`, `slug` non modifiables) | aucune |
+| `profiles` | `id = auth.uid()` ou `id in (select membres_administres())` | aucune (trigger) | `id = auth.uid()` ; colonnes : nom, prenom, telephone, langue, avatar_path | aucune (cascade depuis `auth.users`) |
+| `memberships` | `user_id = auth.uid()` ou `has_role(daara_id, admin)` ou (`role = 'enseignant'` et `has_role(daara_id, enseignant)`) | aucune (`creer_daara`, puis `accept-invitation` au sprint 2) | aucune (sprint 2) | aucune (sprint 2) |
+| `audit_log` | `has_role(daara_id, admin)` | aucune | aucune | aucune |
+| `platform_admins` | `user_id = auth.uid()` | aucune | aucune | aucune |
+
+Pourquoi pas d'insert direct sur `memberships` : un admin ajouterait n'importe quel `user_id` à sa daara et lirait
+ensuite son profil. Les memberships naissent uniquement d'une action de la personne elle-même (création de daara,
+acceptation d'invitation). Au sprint 2 : modification du rôle / désactivation par l'admin, avec garde-fou
+« au moins un admin actif par daara ».
+
+### Privilèges (migration `securite_socle`, sprint 1)
+- `revoke execute on all functions in schema public from public, anon` + `alter default privileges for role postgres
+  revoke execute on functions from public` (**global**, sans `in schema` : la forme limitée au schéma ne retire pas
+  le droit de PUBLIC) + même retrait pour `anon` dans `public` ; `grant execute` explicite à `authenticated` sur les
+  seules fonctions appelables (helpers, `creer_daara`). Supabase accorde encore par défaut l'exécution à
+  `authenticated` : le garde-fou `000_garde_fous` tient la liste blanche des fonctions exécutables par ce rôle.
+- `revoke all on all tables in schema public from anon` + privilèges par défaut équivalents (défense en profondeur :
+  aucune politique ne vise `anon`).
+- Séquences : aucun droit pour `anon` ni `authenticated` (pas de RLS, `setval` casserait les identités) ; les
+  colonnes identity sont alimentées sans contrôle de droit sur la séquence.
+- Extensions : schéma `extensions`, jamais `public` (vérifié par le garde-fou).
+- Colonnes : `revoke update` sur la table, puis `grant update (colonnes autorisées)` (`daaras`, `profiles`).
+- `audit_log`, `platform_admins` : `revoke insert, update, delete` à `authenticated`.
+
+### Fonctions RPC
+| Fonction | Rôle | Sécurité |
+|---|---|---|
+| `creer_daara(p_nom, p_slug, p_ville, p_telephone, p_langue_defaut, p_bareme)` → slug | crée la daara et le membership admin du créateur, dans la même transaction | `security definer`, `search_path = ''` ; `auth.uid()` non nul, session `aal2`, au plus 3 daaras créées par utilisateur (`created_by`), entrées validées par la fonction (paramètre nul, langue, barème) et par les contraintes ; erreurs traduites côté front : `42501` (non authentifié, `aal2` requis), `P0001` (limite), `23505` (slug déjà pris), `23514` (donnée invalide, slug réservé) |
 
 ### Triggers
 | Trigger | Tables | Rôle |
 |---|---|---|
-| `handle_new_user` | auth.users | crée `profiles` |
-| `audit_trigger` | memberships, absences, notes, bulletins, cahier_entrees | journal d'audit |
+| `handle_new_user` | auth.users | crée `profiles` à partir de `raw_user_meta_data` (nom, prenom, langue) : valeurs saisies par l'utilisateur, donc nettoyées (trim, longueur bornée, langue hors `fr`/`en` → `fr`) |
+| `set_updated_at` | daaras, profiles, memberships (puis toute table avec `updated_at`) | met à jour `updated_at` |
+| `audit_trigger` | daaras (sprint 1, `daara_id` = `id`), memberships ; puis absences, notes, bulletins, cahier_entrees | journal d'audit ; copie la ligne entière : exclusion des colonnes sensibles et durée de conservation à décider (ADR) avant de le brancher sur des données d'apprenants |
 | `check_same_daara` | tables avec FK métier | refuse une référence vers une autre daara |
 | `lock_closed_period` | notes, evaluations | refuse les modifications si période clôturée |
 | `notify_*` | absences, bulletins (publication), recitations | crée les lignes `notifications` |
@@ -243,6 +300,26 @@ Anti-pause : `anti-pause.yml`, rôle `keepalive` sans droits, tous les deux jour
 Toutes vérifient le JWT, le membership et valident les entrées.
 
 ## 7. Flux principaux
+
+### 7.0 Authentification et onboarding (sprint 1, ADR-006)
+Client Supabase en flux PKCE. Les e-mails d'Auth contiennent un **code à 6 chiffres** (`{{ .Token }}`), jamais de
+lien : un lien ouvert depuis une messagerie s'ouvre souvent dans un autre navigateur (session PKCE perdue).
+Codes valables 30 minutes (`otp_expiry = 1800`). Modèles bilingues dans `supabase/templates/`, langue choisie par
+`{{ .Data.langue }}`. Cloudflare Turnstile (gratuit) sur l'inscription et le mot de passe oublié, vérifié par
+Supabase Auth (`[auth.captcha]`) ; clés de test Cloudflare en local.
+
+| Flux | Étapes |
+|---|---|
+| Inscription `/auth/inscription` | nom, prénom, e-mail, mot de passe (≥ 8, lettres + chiffres), Turnstile → `signUp` (métadonnées nom, prenom, langue) → écran du code → `verifyOtp(type: 'email')` → session ouverte |
+| Connexion `/auth/connexion` | `signInWithPassword` → facteur TOTP vérifié et session `aal1` → `/auth/mfa` (code) ; admin d'une daara sans facteur → `/auth/mfa` (enrôlement imposé) ; puis routage (ci-dessous) |
+| Mot de passe oublié `/auth/mot-de-passe-oublie` | e-mail + Turnstile → `resetPasswordForEmail` → message neutre → code + nouveau mot de passe → `verifyOtp(type: 'recovery')` → `updateUser({ password })` |
+| Double authentification `/auth/mfa` | enrôlement : `mfa.enroll` (QR code + clé texte) → `challengeAndVerify` ; vérification : `challenge` + `verify` → session `aal2` ; second appareil proposé (pas de codes de secours si Supabase Auth n'en fournit pas) |
+| Onboarding `/onboarding` | étape 1 : TOTP (si session pas encore `aal2`) ; étape 2 : nom, slug (proposé depuis le nom, modifiable), ville, téléphone, langue, barème → `rpc('creer_daara')` → tableau de bord |
+| Déconnexion | `signOut()` → `/auth/connexion` |
+
+Routage après connexion (sprint 1) : aucune daara → `/onboarding` ; sinon → `/dashboard` (provisoire ; `/d/:slug`,
+`/select-daara` au sprint 2). Guards : `authGuard` (session), `anonymeGuard` (pages `/auth` hors `mfa`, utilisateur non connecté),
+`mfaGuard` (admin ⇒ `aal2`). Le front n'est qu'un confort : la RLS exige `aal2` pour tout droit d'admin.
 
 ### 7.1 Invitation d'un membre
 ```mermaid

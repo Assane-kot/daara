@@ -6,7 +6,10 @@
 ## État actuel
 - Sprint en cours : 0 — Installation, **code terminé** (bilan ci-dessous, 2026-10-03) ; clôture effective
   après les configurations manuelles du développeur. Sprint suivant : 1 — Socle multi-tenant.
-- Dernière tâche terminée : audit de sécurité du sprint 0 clos, ADR-006 (authentification et récupération d'accès).
+- Sprint 1 en cours (code) : partie base du socle multi-tenant terminée et auditée (S1.1, S1.2, S1.3 ; S1.6 côté
+  base : `creer_daara`).
+- Dernière tâche terminée : migrations `securite_socle` + `socle_multi_tenant`, 123 tests pgTAP, audits RLS et
+  sécurité clos (2026-10-03).
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -27,23 +30,41 @@
   - Fichiers du Storage (photos d'apprenants, PDF) non couverts par la sauvegarde → à traiter au sprint 4.
   - Sentry : organisation en région UE, projet `daara-front`, `SENTRY_DSN` dans Cloudflare
     (`docs/deploiement.md` §5) ; source maps non envoyées (traces minifiées), à voir au sprint 12.
-  - Sécurité, reporté au sprint 1 (audit sprint 0, à traiter dans la PREMIÈRE migration) :
-    - garde-fous pgTAP étendus : vues de `public` sans `security_invoker = true`, vues matérialisées,
-      fonctions `security definer` sans `search_path`, tables sans `daara_id not null` + index (liste blanche :
-      `daaras`, `profiles`, `platform_admins`) ;
-    - `revoke execute on all functions in schema public from public, anon` + privilèges par défaut + test ;
+  - Sécurité, reporté au sprint 1 (audit sprint 0) — garde-fous pgTAP et `revoke` faits ; restent pour la story
+    authentification :
     - client Supabase en flux PKCE (`flowType: 'pkce'`), consigné au LLD §2 et dans l'ADR-006 ;
     - mise en œuvre de l'ADR-006 : code de réinitialisation par e-mail et TOTP obligatoire pour les admins
       (sprint 1), réinitialisation assistée par l'admin (sprint 2). À vérifier au sprint 1 : codes de secours
-      MFA dans la version de Supabase Auth.
+      MFA dans la version de Supabase Auth ;
+    - `supabase/config.toml` pas encore conforme à `authentification.md` : `[auth.mfa.totp] enroll_enabled` et
+      `verify_enabled` à `false` (aucun `aal2` possible), `otp_expiry = 3600` au lieu de 1800, `[auth.captcha]`
+      (Turnstile) commenté.
+  - Audit du socle (2026-10-03), points reportés :
+    - sprint 2 : les Edge Functions écriront `memberships` en service_role → `audit_log.user_id` nul ; transmettre
+      l'auteur (ex. `set_config` lu par `audit_trigger`) ;
+    - sprint 2 : le claim `aal2` reste valable jusqu'à l'expiration du JWT (1 h) après retrait d'un facteur TOTP →
+      révoquer les sessions dans la procédure de retrait (journalisée) ;
+    - AVANT le sprint 5 (ADR) : `audit_trigger` copie les lignes entières, sans durée de conservation, et les
+      lignes d'une daara ou d'un utilisateur supprimés restent (effacement CDP) → colonnes exclues ou diff,
+      purge planifiée et purge à la suppression d'une daara ;
+    - sprint 4 (exports CSV / PDF) : neutraliser `= + - @` en tête de cellule (injection de formules) ;
+    - sprint 12 : performance des politiques (`(select has_role(daara_id …))` dépend de la ligne).
 
 ## Prochaine étape
 1. Développeur, pour clore le sprint 0 : configurations de `docs/deploiement.md` dans l'ordre §2 (Supabase +
    Brevo) → §1 (Cloudflare) → §5 (Sentry) → §4 (sauvegardes) ; premier run de la CI sur GitHub ; validation de
    `/dev/charte` (puis retrait de la page) ; tag de sprint `s0` sur `develop`.
-2. Sprint 1 — jour 1 (planification, sans coder) : détailler le LLD §3.2 (daaras, profiles, memberships,
-   audit_log, platform_admins), §4 (helpers, `aal2` pour les admins, politiques) et §7 (inscription,
-   onboarding), et la première migration de sécurité (garde-fous pgTAP étendus, `revoke execute`).
+2. Sprint 1 : partie base faite (commit à faire par le développeur). Suite : story authentification
+   (`docs/features/authentification.md`) : `config.toml` (TOTP, `otp_expiry`, Turnstile), client PKCE,
+   inscription / connexion / code de réinitialisation, enrôlement TOTP, écran d'onboarding (`creer_daara`).
+
+### Décisions de planification du sprint 1 (validées le 2026-10-03)
+- Confirmation d'e-mail par code à 6 chiffres (pas de lien), comme la réinitialisation ; codes valables 30 min.
+- Enrôlement TOTP avant la création de la daara : `creer_daara` exige `aal2` ; 3 daaras créées max par utilisateur.
+- Aucune écriture directe du client sur `memberships` (évite qu'un admin s'attache un inconnu et lise son
+  profil) ; modification / désactivation au sprint 2.
+- Cloudflare Turnstile (gratuit) sur inscription et mot de passe oublié, pour protéger le quota Brevo.
+- Rôle en enum Postgres `role_membre`.
 
 ### Plan du sprint 0 (validé le 2026-10-01)
 | Story | Contenu |
@@ -62,6 +83,28 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-03 — Sprint 1 : socle multi-tenant, partie base (S1.1, S1.2, S1.3, S1.6 côté base)
+- Migration `securite_socle` : `anon` sans aucun droit ; TRUNCATE / REFERENCES / TRIGGER / MAINTAIN et séquences
+  retirés à `authenticated` ; `alter default privileges for role postgres revoke execute on functions from public`
+  **global** (la forme `in schema` ne retire pas le droit de PUBLIC : vérifié).
+- Migration `socle_multi_tenant` : enum `role_membre`, `daaras`, `profiles`, `memberships`, `audit_log`,
+  `platform_admins` ; helpers `is_member`, `has_role` (admin seulement en `aal2`), `membres_administres()`,
+  `is_platform_admin()` ; triggers `handle_new_user`, `set_updated_at`, `audit_trigger` ; RPC `creer_daara`
+  (`aal2`, 3 daaras max, verrou consultatif contre la concurrence) ; droits par colonne.
+- Tests : `000_garde_fous` (15 : RLS, politiques, vues, `search_path = ''`, tables étrangères, extensions,
+  `daara_id` + index + clé étrangère, liste blanche des fonctions `authenticated`, séquences, `anon`) ;
+  `001_socle_isolation` (108 : 2 daaras, 4 rôles, admin désactivé, super-admin, sans daara, `anon`). 123 verts.
+- Audits `auditeur-rls` et `auditeur-securite` : 0 critique, 0 important, aucune fuite inter-daara ni escalade.
+  Mineurs corrigés : privilèges par défaut des fonctions (global) et des séquences ; contraintes contre les
+  caractères de contrôle / invisibles / bidirectionnels (usurpation de nom) ; `logo_path` / `avatar_path` limités
+  à `<id>/<fichier>.<ext>` ; slugs réservés ; `creer_daara` renvoie `23514` pour toute donnée invalide ; lecture des
+  profils par l'admin évaluée une fois par requête ; garde-fous et cas d'isolation complétés.
+- Décisions (validées) : l'enseignant ne voit que les memberships des enseignants de sa daara ; l'admin ne lit plus
+  le profil d'un membre désactivé (`membres_administres()` remplace `est_admin_de_membre`) ; migrations non
+  commitées corrigées en place. LLD §3.2 et §4, spec et `.claude/rules/supabase-rls.md` mis à jour.
+- Contre-épreuve : une fonction créée sans `grant` n'est plus exécutable par `anon` ; elle reste exécutable par
+  `authenticated` (privilège par défaut de Supabase) → détectée par la liste blanche.
+
 ### 2026-10-03 — Bilan du sprint 0 (Installation)
 **Objectif** : un projet propre qui tourne, avec l'outillage en place. **Côté code : atteint.** Livrable « en
 ligne sur Cloudflare Pages » en attente des configurations manuelles (comptes Supabase, Cloudflare, Sentry, R2).

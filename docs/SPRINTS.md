@@ -41,9 +41,9 @@ Livrable : application vide aux couleurs DAARA, en ligne sur Cloudflare Pages, C
 
 ## Sprint 1 — Socle multi-tenant
 Objectif : isolation des daaras prouvée par les tests.
-- [ ] Tables `daaras`, `profiles`, `memberships`, `audit_log`, `platform_admins`
-- [ ] Helpers RLS + triggers `handle_new_user`, `audit_trigger`
-- [ ] Tests pgTAP d'isolation (2 daaras, 4 rôles)
+- [x] Tables `daaras`, `profiles`, `memberships`, `audit_log`, `platform_admins`
+- [x] Helpers RLS + triggers `handle_new_user`, `audit_trigger`
+- [x] Tests pgTAP d'isolation (2 daaras, 4 rôles)
 - [ ] Inscription, connexion, déconnexion (flux PKCE) ; mot de passe oublié par code à 6 chiffres (ADR-006 niveau 1)
 - [ ] Double authentification TOTP obligatoire pour les admins, `aal2` exigé dans `has_role` (ADR-006 niveau 3)
 - [ ] Onboarding : création d'une daara (le créateur devient admin)
