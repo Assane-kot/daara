@@ -1,0 +1,67 @@
+<div class="auth-carte">
+    <p class="auth-surtitre">{{ 'auth.confirmation.surtitre' | translate }}</p>
+    <h1 class="auth-titre">{{ 'auth.confirmation.titre' | translate }}</h1>
+    <p class="auth-intro">
+        @if (emailConnu) {
+            {{ 'auth.confirmation.intro' | translate }} <b class="text-black dark:text-white-light">{{ emailConnu }}</b>
+        } @else {
+            {{ 'auth.confirmation.intro_email' | translate }}
+        }
+    </p>
+
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="confirmer()" novalidate>
+        @if (!emailConnu) {
+            <app-form-field [label]="'auth.champs.email' | translate">
+                <div class="auth-champ-icone">
+                    <icon-mail />
+                    <input appFormControl class="form-input" type="email" formControlName="email" autocomplete="email" inputmode="email" />
+                </div>
+            </app-form-field>
+        }
+
+        <div [class.has-error]="form.controls.code.touched && form.controls.code.invalid">
+            <p id="code-confirmation-libelle" class="mb-1.5 text-[13.5px] font-extrabold">{{ 'auth.champs.code_email' | translate }}</p>
+            <app-code-otp
+                formControlName="code"
+                libelleId="code-confirmation-libelle"
+                [invalide]="form.controls.code.touched && form.controls.code.invalid"
+                [descriptionId]="form.controls.code.touched && form.controls.code.invalid ? 'code-confirmation-erreur' : null"
+            />
+            @if (form.controls.code.touched && form.controls.code.invalid) {
+                <p id="code-confirmation-erreur" class="mt-1 text-danger-strong dark:text-danger-soft">{{ 'formulaire.erreurs.code' | translate }}</p>
+            }
+        </div>
+
+        @if (erreur(); as erreur) {
+            <div class="auth-erreur" role="alert">{{ erreur | translate }}</div>
+        }
+        @if (info(); as info) {
+            <div class="auth-info" role="status">{{ info | translate }}</div>
+        }
+
+        <button class="btn-auth" type="submit" [disabled]="envoi()">
+            @if (envoi()) {
+                <span class="auth-spinner" aria-hidden="true"></span>
+            }
+            {{ 'auth.confirmation.bouton' | translate }}
+        </button>
+
+        @if (attente() > 0) {
+            <p class="text-center text-sm text-muted dark:text-night-muted">
+                {{ 'auth.confirmation.renvoyer_dans' | translate: { secondes: attente() } }}
+            </p>
+        } @else {
+            <div class="grid gap-2">
+                <app-turnstile (jeton)="captcha.set($event)" />
+                <button type="button" class="btn-auth-secondaire" [disabled]="!captcha()" (click)="renvoyer()">
+                    {{ 'auth.confirmation.renvoyer' | translate }}
+                </button>
+            </div>
+        }
+    </form>
+
+    <p class="auth-bas">
+        {{ 'auth.confirmation.indesirables' | translate }}<br />
+        <a class="auth-lien" routerLink="/auth/connexion">{{ 'auth.confirmation.retour' | translate }}</a>
+    </p>
+</div>

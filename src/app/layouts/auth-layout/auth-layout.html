@@ -1,0 +1,116 @@
+<div class="ecran font-nunito text-body antialiased">
+    <!-- Panneau de présentation -->
+    <section class="cour" [attr.aria-label]="'auth.cour.presentation' | translate">
+        <svg class="zellige" aria-hidden="true" focusable="false">
+            <defs>
+                <pattern id="daara-khatam" width="96" height="96" patternUnits="userSpaceOnUse">
+                    <g fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="miter">
+                        <rect x="27" y="27" width="42" height="42" />
+                        <rect x="27" y="27" width="42" height="42" transform="rotate(45 48 48)" />
+                        <path d="M48 36 L60 48 L48 60 L36 48 Z" stroke-opacity=".7" />
+                        <path d="M48 18.3 L48 0 M48 77.7 L48 96 M18.3 48 L0 48 M77.7 48 L96 48" stroke-opacity=".55" />
+                        <path d="M0 14 L14 0 M82 0 L96 14 M96 82 L82 96 M14 96 L0 82" stroke-opacity=".45" />
+                    </g>
+                    <circle cx="48" cy="48" r="2" fill="currentColor" />
+                </pattern>
+            </defs>
+            <rect class="derive" x="0" y="0" width="200%" height="200%" fill="url(#daara-khatam)" />
+        </svg>
+
+        <div class="marque"><img src="/images/logo.svg" alt="" width="44" height="44" />DAARA</div>
+
+        <div class="these">
+            <p class="these-titre">
+                {{ 'auth.cour.titre_debut' | translate }} <em>{{ 'auth.cour.titre_accent' | translate }}</em>
+                {{ 'auth.cour.titre_fin' | translate }}
+            </p>
+            <p class="these-texte">{{ 'auth.cour.texte' | translate }}</p>
+        </div>
+
+        <ul class="fiches" [attr.aria-label]="'auth.cour.exemples' | translate">
+            <li class="fiche">
+                <span class="pastille" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Z" />
+                        <path d="M8 7h7" />
+                    </svg>
+                </span>
+                <span>
+                    <b>{{ 'auth.cour.fiche_cahier_titre' | translate }}</b>
+                    <span
+                        >{{ 'auth.cour.fiche_cahier_texte' | translate }} · <span class="ok">{{ 'auth.cour.fiche_cahier_statut' | translate }}</span></span
+                    >
+                </span>
+            </li>
+            <li class="fiche">
+                <span class="pastille" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="17" rx="2" />
+                        <path d="M3 9h18M8 2v4M16 2v4" />
+                    </svg>
+                </span>
+                <span>
+                    <b>{{ 'auth.cour.fiche_appel_titre' | translate }}</b>
+                    <span>{{ 'auth.cour.fiche_appel_texte' | translate }}</span>
+                </span>
+            </li>
+            <li class="fiche">
+                <span class="pastille" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                        <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z" />
+                    </svg>
+                </span>
+                <span>
+                    <b>{{ 'auth.cour.fiche_bulletins_titre' | translate }}</b>
+                    <span>{{ 'auth.cour.fiche_bulletins_texte' | translate }}</span>
+                </span>
+            </li>
+        </ul>
+
+        <p class="pied-cour">
+            <span>{{ 'auth.cour.pied_ue' | translate }}</span>
+            <span>{{ 'auth.cour.pied_mfa' | translate }}</span>
+        </p>
+    </section>
+
+    <!-- Formulaire -->
+    <main class="cote">
+        <div class="outils">
+            <span class="marque-mobile"><img src="/images/logo.svg" alt="" width="36" height="36" />DAARA</span>
+            <button
+                type="button"
+                class="auth-outil"
+                [attr.aria-label]="'layout.langue.changer' | translate"
+                [attr.title]="'layout.langue.changer' | translate"
+                [attr.lang]="language.autreLangue()"
+                (click)="language.basculer()"
+            >
+                {{ 'layout.langue.autre_code' | translate }}
+            </button>
+            <button
+                type="button"
+                class="auth-outil"
+                [attr.aria-label]="'layout.theme.' + theme.mode() | translate"
+                [attr.title]="'layout.theme.' + theme.mode() | translate"
+                (click)="theme.cycleMode()"
+            >
+                @switch (theme.mode()) {
+                    @case ('light') {
+                        <icon-sun />
+                    }
+                    @case ('dark') {
+                        <icon-moon />
+                    }
+                    @default {
+                        <icon-laptop />
+                    }
+                }
+            </button>
+        </div>
+
+        <div class="contenu">
+            <router-outlet />
+        </div>
+    </main>
+</div>

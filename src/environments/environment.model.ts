@@ -7,6 +7,8 @@ export interface Environment {
     readonly production: boolean;
     readonly supabaseUrl: string;
     readonly supabaseAnonKey: string;
+    /** Clé de site Cloudflare Turnstile (publique) : anti-robot de l'inscription, connexion, mot de passe oublié. */
+    readonly turnstileSiteKey: string;
     /** `null` : suivi des erreurs désactivé (développement, builds hors Cloudflare). */
     readonly sentryDsn: string | null;
     /** `production` (branche main), `preview` (autres branches), `development`. */

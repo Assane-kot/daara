@@ -406,3 +406,157 @@ button:focus-visible,
     outline: 2px solid rgb(var(--color-primary));
     outline-offset: 2px;
 }
+
+/*
+ * Pages d'authentification et d'onboarding (maquette validée le 2026-10-03), dans le layout « cover ».
+ * Globaux pour que la variante `dark:` (classe sur <body>) s'applique aux pages encapsulées.
+ */
+@layer components {
+    /* Boutons langue / thème du layout « cover » */
+    .auth-outil {
+        @apply inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-[10px] border border-white-light bg-white px-3 text-[13px] font-extrabold text-black hover:border-primary hover:text-primary dark:border-night-border dark:bg-night dark:text-white-dark;
+    }
+    .auth-outil > svg {
+        @apply h-[18px] w-[18px];
+    }
+    .auth-carte {
+        @apply w-full max-w-[420px];
+        animation: auth-entree 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    .auth-surtitre {
+        @apply text-[11.5px] font-extrabold uppercase tracking-[0.12em] text-secondary-700 dark:text-secondary-400;
+    }
+    .auth-titre {
+        @apply mb-1.5 mt-1.5 text-[30px] font-black leading-tight tracking-[-0.015em] text-black dark:text-white-light;
+        text-wrap: balance;
+    }
+    .auth-intro {
+        @apply mb-6 text-muted dark:text-night-muted;
+    }
+    .auth-form {
+        @apply grid gap-4;
+    }
+    .auth-form .form-input,
+    .auth-form .form-select {
+        @apply min-h-12 rounded-xl border-[1.5px] bg-primary-50/50 text-base font-normal focus:bg-white dark:bg-night-input dark:focus:bg-night;
+    }
+    .auth-form .form-input:focus,
+    .auth-form .form-select:focus {
+        box-shadow: 0 0 0 4px rgb(var(--color-primary) / 0.25);
+    }
+    .auth-form label {
+        @apply mb-1.5 text-[13.5px] font-extrabold;
+    }
+    .auth-champ-icone {
+        @apply relative;
+    }
+    .auth-champ-icone > svg {
+        @apply pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted dark:text-night-muted;
+    }
+    .auth-champ-icone > .form-input {
+        @apply pl-11;
+    }
+    .auth-voir {
+        @apply absolute right-1.5 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-lg text-muted hover:text-primary dark:text-night-muted;
+    }
+    .auth-lien {
+        @apply text-[13.5px] font-extrabold text-primary no-underline hover:underline;
+        text-underline-offset: 3px;
+    }
+    .auth-bas {
+        @apply mt-5 text-center text-sm text-muted dark:text-night-muted;
+    }
+    .auth-erreur {
+        @apply rounded-xl border border-danger/30 bg-danger-light px-3.5 py-3 text-[13.5px] font-semibold text-danger-strong dark:bg-danger-dark-light dark:text-danger-soft;
+    }
+    .auth-info {
+        @apply rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-3 text-[13.5px] text-black dark:text-white-light;
+    }
+
+    /* Bouton principal : dégradé vert, filet or */
+    .btn-auth {
+        @apply relative inline-flex min-h-[50px] w-full items-center justify-center gap-2 overflow-hidden rounded-xl border-0 text-[15.5px] font-black text-on-primary transition disabled:cursor-not-allowed disabled:opacity-60;
+        background: linear-gradient(180deg, rgb(var(--color-primary) / 0.88), rgb(var(--color-primary)));
+        box-shadow:
+            0 10px 22px -10px rgb(var(--color-primary) / 0.7),
+            inset 0 -2px 0 rgb(0 0 0 / 0.12);
+    }
+    .btn-auth::after {
+        content: '';
+        @apply absolute bottom-0 left-[18%] right-[18%] h-0.5 rounded-sm;
+        background: linear-gradient(90deg, transparent, theme('colors.secondary.DEFAULT'), transparent);
+    }
+    .btn-auth:not(:disabled):hover {
+        filter: brightness(1.06);
+    }
+    .btn-auth-secondaire {
+        @apply inline-flex min-h-12 w-full items-center justify-center rounded-xl border-[1.5px] border-white-light bg-transparent font-extrabold text-black hover:border-primary hover:text-primary disabled:opacity-60 dark:border-night-border dark:text-white-light;
+    }
+    .auth-spinner {
+        @apply inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent;
+    }
+
+    /* Code à 6 chiffres (app-code-otp) */
+    .code-otp {
+        @apply grid gap-2;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .code-otp-case {
+        @apply min-h-[58px] w-full rounded-xl border-[1.5px] border-white-light bg-primary-50/50 p-0 text-center text-2xl font-black text-black outline-none focus:border-primary focus:bg-white dark:border-night-border dark:bg-night-input dark:text-white-light dark:focus:bg-night;
+        font-variant-numeric: tabular-nums;
+    }
+    .code-otp-case:focus {
+        box-shadow: 0 0 0 4px rgb(var(--color-primary) / 0.25);
+    }
+    .code-otp-case[aria-invalid='true'] {
+        @apply border-danger;
+    }
+    .code-otp-milieu {
+        @apply mr-2;
+    }
+    @media (max-width: 420px) {
+        .code-otp {
+            @apply gap-1.5;
+        }
+        .code-otp-case {
+            @apply min-h-[50px] text-[21px];
+        }
+        .code-otp-milieu {
+            @apply mr-1;
+        }
+    }
+
+    /* Étapes de l'onboarding */
+    .auth-etapes {
+        @apply mb-5 flex gap-2.5;
+    }
+    .auth-etape {
+        @apply flex flex-1 items-center gap-2 text-[12.5px] font-extrabold text-muted dark:text-night-muted;
+    }
+    .auth-etape > i {
+        @apply grid h-[26px] w-[26px] flex-none place-items-center rounded-full border-[1.5px] border-white-light not-italic dark:border-night-border;
+    }
+    .auth-etape-faite > i {
+        @apply border-primary bg-primary text-on-primary;
+    }
+    .auth-etape-active {
+        @apply text-black dark:text-white-light;
+    }
+    .auth-etape-active > i {
+        @apply border-secondary;
+        box-shadow: 0 0 0 4px rgb(201 168 76 / 0.18);
+    }
+}
+
+@keyframes auth-entree {
+    from {
+        opacity: 0.001;
+        transform: translateY(10px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-carte {
+        animation: none;
+    }
+}

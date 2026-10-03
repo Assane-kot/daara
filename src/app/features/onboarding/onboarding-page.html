@@ -1,0 +1,109 @@
+<div class="auth-carte">
+    <ol class="auth-etapes mt-0 list-none p-0" [attr.aria-label]="'onboarding.titre' | translate">
+        <li class="auth-etape" [class.auth-etape-faite]="etape() === 'daara'" [class.auth-etape-active]="etape() !== 'daara'">
+            <i aria-hidden="true">{{ etape() === 'daara' ? '✓' : '1' }}</i>
+            {{ (etape() === 'daara' ? 'onboarding.etape_securite' : 'onboarding.etape_securite_a_faire') | translate }}
+        </li>
+        <li class="auth-etape" [class.auth-etape-active]="etape() === 'daara'" [attr.aria-current]="etape() === 'daara' ? 'step' : null">
+            <i aria-hidden="true">2</i>
+            {{ 'onboarding.etape_daara' | translate }}
+        </li>
+    </ol>
+
+    @switch (etape()) {
+        @case ('chargement') {
+            @if (erreurChargement(); as erreurChargement) {
+                <div class="grid gap-4">
+                    <div class="auth-erreur" role="alert">{{ erreurChargement | translate }}</div>
+                    <button type="button" class="btn-auth-secondaire" (click)="demarrer()">{{ 'auth.mfa.reessayer' | translate }}</button>
+                </div>
+            } @else {
+                <app-skeleton [lignes]="6" [avecTitre]="true" />
+            }
+        }
+
+        @case ('securite') {
+            <p class="auth-surtitre">{{ 'onboarding.surtitre' | translate }}</p>
+            <h1 class="auth-titre">{{ 'auth.mfa.titre_enrolement' | translate }}</h1>
+            <p class="auth-intro">{{ 'onboarding.intro_securite' | translate }}</p>
+            <app-mfa-panel (valide)="etape.set('daara')" />
+        }
+
+        @case ('daara') {
+            <p class="auth-surtitre">{{ 'onboarding.surtitre' | translate }}</p>
+            <h1 class="auth-titre">{{ 'onboarding.titre' | translate }}</h1>
+            <p class="auth-intro">{{ 'onboarding.intro' | translate }}</p>
+
+            <form class="auth-form" [formGroup]="form" (ngSubmit)="creer()" novalidate>
+                <app-form-field [label]="'onboarding.champs.nom' | translate">
+                    <input appFormControl class="form-input" type="text" formControlName="nom" maxlength="120" autocomplete="organization" />
+                </app-form-field>
+
+                <app-form-field [label]="'onboarding.champs.slug' | translate" [aide]="'onboarding.champs.aide_slug' | translate">
+                    <div
+                        class="flex items-stretch overflow-hidden rounded-xl border-[1.5px] border-white-light bg-primary-50/50 focus-within:border-primary dark:border-night-border dark:bg-night-input"
+                    >
+                        <span
+                            class="flex items-center whitespace-nowrap border-r border-white-light px-2.5 text-[13.5px] text-muted dark:border-night-border dark:text-night-muted"
+                            aria-hidden="true"
+                            >/d/</span
+                        >
+                        <input
+                            appFormControl
+                            class="form-input min-w-0 !rounded-none !border-0 !bg-transparent !shadow-none"
+                            type="text"
+                            formControlName="slug"
+                            [attr.maxlength]="slugMax"
+                            autocapitalize="none"
+                            spellcheck="false"
+                            (input)="slugSaisi()"
+                        />
+                    </div>
+                </app-form-field>
+
+                <div class="grid gap-3 min-[421px]:grid-cols-2">
+                    <app-form-field [label]="'onboarding.champs.ville' | translate">
+                        <input appFormControl class="form-input" type="text" formControlName="ville" maxlength="80" autocomplete="address-level2" />
+                    </app-form-field>
+                    <app-form-field [label]="'onboarding.champs.telephone' | translate">
+                        <input appFormControl class="form-input" type="tel" formControlName="telephone" maxlength="20" autocomplete="tel" />
+                    </app-form-field>
+                </div>
+
+                <div class="grid gap-3 min-[421px]:grid-cols-2">
+                    <app-form-field [label]="'onboarding.champs.langue' | translate">
+                        <select appFormControl class="form-select" formControlName="langueDefaut">
+                            <option value="fr" lang="fr">{{ 'onboarding.langues.fr' | translate }}</option>
+                            <option value="en" lang="en">{{ 'onboarding.langues.en' | translate }}</option>
+                        </select>
+                    </app-form-field>
+
+                    <fieldset class="m-0 border-0 p-0">
+                        <legend class="mb-1.5 text-[13.5px] font-extrabold">{{ 'onboarding.champs.bareme' | translate }}</legend>
+                        <div class="grid grid-cols-2 gap-2">
+                            @for (bareme of [10, 20]; track bareme) {
+                                <label
+                                    class="!mb-0 flex min-h-12 cursor-pointer items-center justify-center rounded-xl border-[1.5px] border-white-light font-extrabold has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:text-primary has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary dark:border-night-border"
+                                >
+                                    <input class="sr-only" type="radio" formControlName="bareme" [value]="bareme" />
+                                    {{ (bareme === 10 ? 'onboarding.champs.sur_10' : 'onboarding.champs.sur_20') | translate }}
+                                </label>
+                            }
+                        </div>
+                    </fieldset>
+                </div>
+
+                @if (erreur(); as erreur) {
+                    <div class="auth-erreur" role="alert">{{ erreur | translate }}</div>
+                }
+
+                <button class="btn-auth" type="submit" [disabled]="envoi()">
+                    @if (envoi()) {
+                        <span class="auth-spinner" aria-hidden="true"></span>
+                    }
+                    {{ 'onboarding.bouton' | translate }}
+                </button>
+            </form>
+        }
+    }
+</div>

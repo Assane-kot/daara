@@ -211,11 +211,14 @@ token_verifications = 30
 # Number of Web3 logins that can be made in a 5 minute interval per IP address.
 web3 = 30
 
-# Configure one of the supported captcha providers: `hcaptcha`, `turnstile`.
-# [auth.captcha]
-# enabled = true
-# provider = "hcaptcha"
-# secret = ""
+# Cloudflare Turnstile (gratuit) : protège le quota d'e-mails Brevo (LLD §7.0). Supabase Auth l'exige sur
+# l'inscription, la connexion par mot de passe et le mot de passe oublié.
+# Local : clé secrète de TEST publiée par Cloudflare (toujours valide, publique par conception), associée à la clé
+# de site de test 1x00000000000000000000AA du front. Cloud : vraie clé dans le dashboard, jamais dans Git.
+[auth.captcha]
+enabled = true
+provider = "turnstile"
+secret = "1x0000000000000000000000000000000AA"
 
 [auth.email]
 # Allow/disallow new user signups via email to your project.
@@ -231,8 +234,17 @@ secure_password_change = true
 max_frequency = "1s"
 # Number of characters used in the email OTP.
 otp_length = 6
-# Number of seconds before the email OTP expires (defaults to 1 hour).
-otp_expiry = 3600
+# Number of seconds before the email OTP expires (defaults to 1 hour). DAARA : 30 minutes (LLD §7.0).
+otp_expiry = 1800
+
+# Modèles DAARA : code à 6 chiffres, jamais de lien (LLD §7.0), français / anglais selon {{ .Data.langue }}.
+[auth.email.template.confirmation]
+subject = "Votre code DAARA / Your DAARA code"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = "Réinitialisation DAARA / DAARA password reset"
+content_path = "./supabase/templates/recovery.html"
 
 # Use a production-ready SMTP server
 # [auth.email.smtp]
@@ -294,15 +306,15 @@ message_service_sid = ""
 # DO NOT commit your Twilio auth token to git. Use environment variable substitution instead:
 auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
 
-# Multi-factor-authentication is available to Supabase Pro plan.
+# TOTP : gratuit sur toutes les offres (seul le MFA par téléphone est payant). Obligatoire pour les admins (ADR-006).
 [auth.mfa]
 # Control how many MFA factors can be enrolled at once per user.
 max_enrolled_factors = 10
 
 # Control MFA via App Authenticator (TOTP)
 [auth.mfa.totp]
-enroll_enabled = false
-verify_enabled = false
+enroll_enabled = true
+verify_enabled = true
 
 # Configure MFA via Phone Messaging
 [auth.mfa.phone]

@@ -24,14 +24,14 @@ revoke execute on function public.set_updated_at() from public, anon, authentica
 
 -- Textes affichés (noms, ville) : caractères de contrôle et caractères invisibles ou de mise en forme
 -- bidirectionnelle interdits (usurpation d'un nom dans les listes, e-mails, PDF). Même liste dans handle_new_user.
---   [[:cntrl:]] ­ ​-‏ ‪-‮ ⁠-⁤ ⁦-⁩
+--   [[:cntrl:]], U+00AD, U+200B-200F, U+202A-202E, U+2060-2064, U+2066-2069, U+FEFF
 -- Chemins Storage : `<id de la ligne>/<fichier>.<ext>`, sans sous-dossier ni `..` (règle supabase-rls, Storage).
 
 -- Daara (tenant). Sans daara_id : c'est la racine. Créée uniquement par creer_daara().
 create table public.daaras (
     id uuid primary key default gen_random_uuid(),
     nom text not null check (char_length(btrim(nom)) between 2 and 120)
-        check (nom !~ '[[:cntrl:]­​-‏‪-‮⁠-⁤⁦-⁩﻿]'),
+        check (nom !~ '[[:cntrl:]\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]'),
     -- Slugs réservés : segments de routes de l'application et noms trompeurs.
     slug text not null unique
         check (char_length(slug) between 3 and 50 and slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$')
@@ -42,7 +42,7 @@ create table public.daaras (
             'static', 'support', 'superadmin', 'super-admin', 'system', 'test', 'www'
         )),
     ville text check (char_length(ville) <= 80)
-        check (ville !~ '[[:cntrl:]­​-‏‪-‮⁠-⁤⁦-⁩﻿]'),
+        check (ville !~ '[[:cntrl:]\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]'),
     telephone text check (telephone ~ '^\+?[0-9][0-9 .-]{5,19}$'),
     logo_path text check (logo_path ~ ('^' || id::text || '/[a-z0-9_-]{1,100}\.[a-z0-9]{2,5}$')),
     langue_defaut text not null default 'fr' check (langue_defaut in ('fr', 'en')),
@@ -58,9 +58,9 @@ create index daaras_created_by_idx on public.daaras (created_by);
 create table public.profiles (
     id uuid primary key references auth.users (id) on delete cascade,
     nom text not null default '' check (char_length(nom) <= 100)
-        check (nom !~ '[[:cntrl:]­​-‏‪-‮⁠-⁤⁦-⁩﻿]'),
+        check (nom !~ '[[:cntrl:]\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]'),
     prenom text not null default '' check (char_length(prenom) <= 100)
-        check (prenom !~ '[[:cntrl:]­​-‏‪-‮⁠-⁤⁦-⁩﻿]'),
+        check (prenom !~ '[[:cntrl:]\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]'),
     telephone text check (telephone ~ '^\+?[0-9][0-9 .-]{5,19}$'),
     langue text not null default 'fr' check (langue in ('fr', 'en')),
     avatar_path text check (avatar_path ~ ('^' || id::text || '/[a-z0-9_-]{1,100}\.[a-z0-9]{2,5}$')),
@@ -203,7 +203,7 @@ set search_path = ''
 as $$
 declare
     v_meta jsonb := coalesce(new.raw_user_meta_data, '{}'::jsonb);
-    v_interdits constant text := '[[:cntrl:]­​-‏‪-‮⁠-⁤⁦-⁩﻿]';
+    v_interdits constant text := '[[:cntrl:]\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]';
 begin
     insert into public.profiles (id, nom, prenom, langue)
     values (

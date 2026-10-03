@@ -31,8 +31,12 @@ Configuration Supabase (`supabase/config.toml`, reportée à l'identique en clou
   daara → `/onboarding`, sinon → `/dashboard` (provisoire jusqu'au sprint 2).
 - Onboarding : la création de la daara exige `aal2` → l'enrôlement TOTP est la première étape.
 - Slug proposé à partir du nom (minuscules, sans accents, tirets), modifiable ; slug déjà pris → message dédié.
-- Second facteur TOTP proposé après le premier (secours en cas de perte du téléphone) ; codes de secours si la
-  version de Supabase Auth les fournit (à vérifier à l'implémentation).
+- Second facteur TOTP et codes de secours : **reportés au sprint 2** (vérifié à l'implémentation : codes de secours
+  disponibles mais expérimentaux dans supabase-js 2.117 / Auth 2.197 ; à décider avec la procédure super-admin de
+  retrait d'un facteur).
+- Turnstile aussi sur la **connexion** : Supabase Auth l'exige sur `signInWithPassword` dès que le captcha est activé.
+- Mot de passe oublié sur un compte avec TOTP : Supabase exige `aal2` pour changer le mot de passe → code TOTP
+  demandé après le code e-mail.
 - Aucun texte en dur : clés `auth.*`, `onboarding.*` en fr et en.
 
 ## Écrans (liste, détail, formulaire) — composants Vristo de référence

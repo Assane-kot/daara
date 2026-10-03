@@ -49,5 +49,30 @@
                 }
             }
         </button>
+
+        <!-- Menu du compte (CDK Menu : clavier, Échap, focus restauré). -->
+        <button
+            type="button"
+            class="icon-btn h-9 w-9 rounded-full bg-primary/10 font-extrabold uppercase text-primary"
+            [cdkMenuTriggerFor]="menuCompte"
+            [attr.aria-label]="'layout.compte.menu' | translate"
+            [attr.title]="'layout.compte.menu' | translate"
+        >
+            {{ initiale() }}
+        </button>
+        <ng-template #menuCompte>
+            <div cdkMenu class="mt-2 min-w-[220px] rounded-lg border border-white-light bg-white p-1.5 shadow-lg dark:border-night-border dark:bg-night-raised">
+                <p class="truncate px-3 py-2 text-xs text-muted dark:text-night-muted">{{ auth.email() }}</p>
+                <button
+                    cdkMenuItem
+                    type="button"
+                    class="flex min-h-11 w-full items-center gap-2 rounded-md px-3 text-left font-semibold hover:bg-primary/10 hover:text-primary focus:bg-primary/10"
+                    (cdkMenuItemTriggered)="deconnecter()"
+                >
+                    <icon-logout class="h-[18px] w-[18px]" />
+                    {{ 'layout.compte.deconnexion' | translate }}
+                </button>
+            </div>
+        </ng-template>
     </div>
 </div>

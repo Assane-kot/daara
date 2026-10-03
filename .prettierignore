@@ -16,3 +16,6 @@ supabase/config.toml
 
 # Kit Claude Code (configuration, hors code applicatif)
 .claude/
+
+# Modèles d’e-mail Supabase Auth : Go templates dans les attributs, illisibles pour Prettier.
+supabase/templates/

@@ -33,6 +33,19 @@ export function messageValidation(erreurs: ValidationErrors): MessageChamp {
     if (erreurs['pattern']) {
         return { cle: 'formulaire.erreurs.motif' };
     }
+    // Validateurs DAARA (validateurs.ts).
+    if (erreurs['motDePasse']) {
+        return { cle: 'formulaire.erreurs.mot_de_passe' };
+    }
+    if (erreurs['code']) {
+        return { cle: 'formulaire.erreurs.code' };
+    }
+    if (erreurs['different']) {
+        return { cle: 'formulaire.erreurs.different' };
+    }
+    if (erreurs['slug']) {
+        return { cle: 'formulaire.erreurs.slug' };
+    }
     return { cle: 'formulaire.erreurs.invalide' };
 }
 

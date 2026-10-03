@@ -1,0 +1,68 @@
+<div class="auth-carte">
+    <p class="auth-surtitre">{{ 'auth.connexion.surtitre' | translate }}</p>
+    <h1 class="auth-titre">{{ 'auth.connexion.titre' | translate }}</h1>
+    <p class="auth-intro">{{ 'auth.connexion.intro' | translate }}</p>
+
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="connecter()" novalidate>
+        <app-form-field [label]="'auth.champs.email' | translate">
+            <div class="auth-champ-icone">
+                <icon-mail />
+                <input appFormControl class="form-input" type="email" formControlName="email" autocomplete="email" inputmode="email" />
+            </div>
+        </app-form-field>
+
+        <div>
+            <app-form-field [label]="'auth.champs.mot_de_passe' | translate">
+                <div class="auth-champ-icone">
+                    <icon-lock-dots />
+                    <input
+                        appFormControl
+                        class="form-input pr-12"
+                        [type]="voirMotDePasse() ? 'text' : 'password'"
+                        formControlName="motDePasse"
+                        autocomplete="current-password"
+                    />
+                    <button
+                        type="button"
+                        class="auth-voir"
+                        [attr.aria-label]="(voirMotDePasse() ? 'auth.champs.masquer_mot_de_passe' : 'auth.champs.afficher_mot_de_passe') | translate"
+                        [attr.aria-pressed]="voirMotDePasse()"
+                        (click)="voirMotDePasse.set(!voirMotDePasse())"
+                    >
+                        @if (voirMotDePasse()) {
+                            <icon-eye-off class="h-[18px] w-[18px]" />
+                        } @else {
+                            <icon-eye class="h-[18px] w-[18px]" />
+                        }
+                    </button>
+                </div>
+            </app-form-field>
+            <p class="mt-2 text-right">
+                <a class="auth-lien" routerLink="/auth/mot-de-passe-oublie">{{ 'auth.connexion.oublie' | translate }}</a>
+            </p>
+        </div>
+
+        <app-turnstile (jeton)="captcha.set($event)" />
+
+        @if (erreur(); as erreur) {
+            <div class="auth-erreur" role="alert">
+                {{ erreur | translate }}
+                @if (emailNonConfirme()) {
+                    <a class="auth-lien ml-1" routerLink="/auth/confirmation">{{ 'auth.connexion.confirmer_email' | translate }}</a>
+                }
+            </div>
+        }
+
+        <button class="btn-auth" type="submit" [disabled]="envoi()">
+            @if (envoi()) {
+                <span class="auth-spinner" aria-hidden="true"></span>
+            }
+            {{ 'auth.connexion.bouton' | translate }}
+        </button>
+    </form>
+
+    <p class="auth-bas">
+        {{ 'auth.connexion.nouveau' | translate }}
+        <a class="auth-lien" routerLink="/auth/inscription">{{ 'auth.connexion.creer_compte' | translate }}</a>
+    </p>
+</div>

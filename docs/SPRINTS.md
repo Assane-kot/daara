@@ -44,9 +44,9 @@ Objectif : isolation des daaras prouvée par les tests.
 - [x] Tables `daaras`, `profiles`, `memberships`, `audit_log`, `platform_admins`
 - [x] Helpers RLS + triggers `handle_new_user`, `audit_trigger`
 - [x] Tests pgTAP d'isolation (2 daaras, 4 rôles)
-- [ ] Inscription, connexion, déconnexion (flux PKCE) ; mot de passe oublié par code à 6 chiffres (ADR-006 niveau 1)
-- [ ] Double authentification TOTP obligatoire pour les admins, `aal2` exigé dans `has_role` (ADR-006 niveau 3)
-- [ ] Onboarding : création d'une daara (le créateur devient admin)
+- [x] Inscription, connexion, déconnexion (flux PKCE) ; mot de passe oublié par code à 6 chiffres (ADR-006 niveau 1)
+- [x] Double authentification TOTP obligatoire pour les admins, `aal2` exigé dans `has_role` (ADR-006 niveau 3)
+- [x] Onboarding : création d'une daara (le créateur devient admin)
 Livrable : un utilisateur crée sa daara ; une autre daara est invisible.
 
 ## Sprint 2 — Membres et navigation

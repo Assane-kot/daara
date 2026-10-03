@@ -46,7 +46,7 @@ insert into auth.users (id, email, aud, role, raw_user_meta_data) values
     ('00000000-0000-0000-0000-0000000000c1', 'sans.daara@test.local', 'authenticated', 'authenticated',
         '{"nom": "Ba", "prenom": "Cheikh"}'),
     ('00000000-0000-0000-0000-0000000000c2', 'meta@test.local', 'authenticated', 'authenticated',
-        jsonb_build_object('nom', repeat('x', 150), 'prenom', E'  Mou\nss‮a​\t ', 'langue', 'xx')),
+        jsonb_build_object('nom', repeat('x', 150), 'prenom', E'  Mou\nss\u202Ea\u200B\t ', 'langue', 'xx')),
     ('00000000-0000-0000-0000-0000000000d1', 'plateforme@test.local', 'authenticated', 'authenticated',
         '{"nom": "Gueye", "prenom": "Ousmane"}');
 
@@ -294,7 +294,7 @@ select results_eq(
 -- Contraintes sur les saisies (mise à jour directe, hors handle_new_user)
 select tests.connecter('00000000-0000-0000-0000-0000000000a3');
 select throws_ok(
-    $$ update public.profiles set nom = E'Ndi‮aye' where id = '00000000-0000-0000-0000-0000000000a3' $$,
+    $$ update public.profiles set nom = E'Ndi\u202Eaye' where id = '00000000-0000-0000-0000-0000000000a3' $$,
     '23514',
     null,
     'profiles : caractère bidirectionnel refusé dans le nom'
@@ -615,7 +615,7 @@ select throws_ok(
     'creer_daara : slug réservé refusé'
 );
 select throws_ok(
-    $$ select public.creer_daara(E'Daara ‮Touba', 'test-daara-bidi') $$,
+    $$ select public.creer_daara(E'Daara \u202ETouba', 'test-daara-bidi') $$,
     '23514',
     null,
     'creer_daara : nom avec caractère bidirectionnel refusé'

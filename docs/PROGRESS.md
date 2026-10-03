@@ -6,10 +6,9 @@
 ## État actuel
 - Sprint en cours : 0 — Installation, **code terminé** (bilan ci-dessous, 2026-10-03) ; clôture effective
   après les configurations manuelles du développeur. Sprint suivant : 1 — Socle multi-tenant.
-- Sprint 1 en cours (code) : partie base du socle multi-tenant terminée et auditée (S1.1, S1.2, S1.3 ; S1.6 côté
-  base : `creer_daara`).
-- Dernière tâche terminée : migrations `securite_socle` + `socle_multi_tenant`, 123 tests pgTAP, audits RLS et
-  sécurité clos (2026-10-03).
+- Sprint 1 : **code terminé** (S1.1 à S1.6) : socle multi-tenant (base) puis authentification et onboarding (front).
+- Dernière tâche terminée : authentification (inscription, connexion, code e-mail, mot de passe oublié, TOTP,
+  onboarding) avec le design « cover » validé, parcours complet vérifié dans le navigateur (2026-10-03).
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -30,15 +29,20 @@
   - Fichiers du Storage (photos d'apprenants, PDF) non couverts par la sauvegarde → à traiter au sprint 4.
   - Sentry : organisation en région UE, projet `daara-front`, `SENTRY_DSN` dans Cloudflare
     (`docs/deploiement.md` §5) ; source maps non envoyées (traces minifiées), à voir au sprint 12.
-  - Sécurité, reporté au sprint 1 (audit sprint 0) — garde-fous pgTAP et `revoke` faits ; restent pour la story
-    authentification :
-    - client Supabase en flux PKCE (`flowType: 'pkce'`), consigné au LLD §2 et dans l'ADR-006 ;
-    - mise en œuvre de l'ADR-006 : code de réinitialisation par e-mail et TOTP obligatoire pour les admins
-      (sprint 1), réinitialisation assistée par l'admin (sprint 2). À vérifier au sprint 1 : codes de secours
-      MFA dans la version de Supabase Auth ;
-    - `supabase/config.toml` pas encore conforme à `authentification.md` : `[auth.mfa.totp] enroll_enabled` et
-      `verify_enabled` à `false` (aucun `aal2` possible), `otp_expiry = 3600` au lieu de 1800, `[auth.captcha]`
-      (Turnstile) commenté.
+  - ADR-006, reste à faire au sprint 2 : réinitialisation assistée par l'admin (niveau 2) ; second facteur TOTP
+    et codes de secours (disponibles mais **expérimentaux** dans supabase-js 2.117 / Auth 2.197 : à décider avec la
+    procédure super-admin de retrait d'un facteur).
+  - À faire par le développeur avant la preview : widget Turnstile, variable `TURNSTILE_SITE_KEY` dans Cloudflare,
+    clé secrète Turnstile, TOTP, expiration des codes à 30 min et modèles d'e-mail dans les deux projets Supabase
+    (`docs/deploiement.md` §1.2, §2.2, §2.4 étape 6, §2.6).
+  - Audit de l'authentification (2026-10-03), points reportés :
+    - AVANT le sprint 2 (invitations, changement d'e-mail) : modèles `magic_link`, `email_change`, `invite`,
+      `reauthentication` encore ceux de Supabase (avec lien) → modèles code seul fr / en ;
+    - AVANT le sprint 3 (décision) : `is_member` n'exige pas `aal2` ; un admin avec TOTP dont seul le mot de passe
+      est compromis reste « membre » en `aal1` (lecture de sa daara). Toute politique future fondée sur `is_member`
+      s'ouvrirait sans second facteur → par ex. `aal2` exigé si l'utilisateur a un facteur vérifié ou est admin ;
+    - sprint 2 : un admin invité sans facteur peut être devancé à l'enrôlement TOTP par qui détient son mot de passe ;
+    - sprint 12 : verrouillage par compte des codes e-mail ; énumération résiduelle par limite de fréquence (LLD §7.0).
   - Audit du socle (2026-10-03), points reportés :
     - sprint 2 : les Edge Functions écriront `memberships` en service_role → `audit_log.user_id` nul ; transmettre
       l'auteur (ex. `set_config` lu par `audit_trigger`) ;
@@ -54,9 +58,8 @@
 1. Développeur, pour clore le sprint 0 : configurations de `docs/deploiement.md` dans l'ordre §2 (Supabase +
    Brevo) → §1 (Cloudflare) → §5 (Sentry) → §4 (sauvegardes) ; premier run de la CI sur GitHub ; validation de
    `/dev/charte` (puis retrait de la page) ; tag de sprint `s0` sur `develop`.
-2. Sprint 1 : partie base faite (commit à faire par le développeur). Suite : story authentification
-   (`docs/features/authentification.md`) : `config.toml` (TOTP, `otp_expiry`, Turnstile), client PKCE,
-   inscription / connexion / code de réinitialisation, enrôlement TOTP, écran d'onboarding (`creer_daara`).
+2. Sprint 1 : code terminé (commit de l'authentification à faire par le développeur). Clôture : bilan du sprint,
+   vérification en 375 px par le développeur, tag `s1`. Puis sprint 2 (membres et navigation) : planification.
 
 ### Décisions de planification du sprint 1 (validées le 2026-10-03)
 - Confirmation d'e-mail par code à 6 chiffres (pas de lien), comme la réinitialisation ; codes valables 30 min.
@@ -83,6 +86,46 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-03 — Sprint 1 : authentification et onboarding (S1.4, S1.5, S1.6)
+- Design « cover » validé sur maquette : panneau vert profond, motif géométrique or animé (étoile à 8 branches du
+  logo, mouvement coupé si réduction des animations), exemples de la vie d'une daara ; formulaire à droite ; mobile :
+  bandeau puis formulaire. Mode sombre et fr / en.
+- Supabase local : TOTP activé, codes e-mail de 6 chiffres valables 30 min, modèles `confirmation` / `recovery`
+  bilingues (code seul, sans lien, uniquement `{{ .Token }}` et `{{ .Data.langue }}`), Turnstile (clés de test).
+- Front : client en flux PKCE (`detectSessionInUrl: false`) ; `AuthService` (session en signals, destination après
+  connexion, rôles en cache) ; guards `authGuard`, `anonymeGuard`, `mfaGuard`, `avecDaaraGuard`, `sansDaaraGuard` ;
+  pages `/auth/connexion`, `inscription`, `confirmation`, `mot-de-passe-oublie`, `mfa`, `/onboarding` ;
+  `app-mfa-panel` (enrôlement QR + clé, vérification), `app-code-otp` (6 cases, collage, remplissage auto),
+  `app-turnstile` (script chargé à la demande), validateurs mot de passe / code / slug ; menu du compte (CDK Menu)
+  avec déconnexion. 6 icônes Vristo ajoutées. Aucun paquet npm ajouté.
+- Vérifié dans le navigateur (Supabase local + Mailpit) : inscription → code e-mail → enrôlement TOTP → création de
+  la daara → tableau de bord ; déconnexion ; mauvais mot de passe (message neutre, Turnstile réinitialisé) ;
+  reconnexion admin → code TOTP ; mot de passe oublié sur compte TOTP (`insufficient_aal` → code TOTP → mot de passe
+  changé) ; mode sombre ; build de production servi avec la CSP réelle : Turnstile chargé, aucune violation.
+- Constats en cours de route :
+  - Supabase exige le jeton Turnstile aussi sur la connexion → widget ajouté à la connexion (LLD §7.0 corrigé) ;
+  - Supabase exige `aal2` pour changer le mot de passe d'un compte avec TOTP → étape TOTP dans le mot de passe oublié ;
+  - guards : `inject()` après un `await` sort du contexte d'injection (navigation bloquée sans erreur visible) ;
+  - bug du sprint 0 corrigé : le build de production sans variables plantait (`supabaseUrl is required`) car
+    `environment.prod.ts` importait `./environment`, remplacé par lui-même au build → valeurs locales déplacées dans
+    `environment.local.ts` ;
+  - les outils d'écriture de Claude transforment les séquences d'échappement Unicode (antislash-u) en caractères
+    réels : des caractères bidirectionnels invisibles s'étaient glissés dans la migration du socle (déjà commitée,
+    jamais appliquée hors du local), le test d'isolation et `slug.ts` → remplacés par des échappements, 123 tests
+    pgTAP toujours verts.
+- Bundle initial : 584 kB bruts / 142 kB transférés (layouts chargés à la demande ; CDK Menu dans le chunk de
+  l'espace connecté). 119 tests unitaires (21 fichiers).
+- Docs : LLD §2 et §7.0, spec `authentification.md`, `docs/deploiement.md` (Turnstile §2.6, TOTP, codes, modèles,
+  CSP, variable `TURNSTILE_SITE_KEY`).
+- Audit `auditeur-securite` : 0 critique, 3 importants corrigés :
+  1. énumération de comptes à l'inscription (`user_already_exists` affichait une erreur) → même parcours qu'une
+     adresse libre ;
+  2. « Renvoyer le code » toujours refusé (Supabase exige Turnstile sur `resend`) → widget sur l'écran du code ;
+  3. quota Brevo épuisable depuis `daara-dev` avec les clés Turnstile de test → clés de test refusées sur tout
+     build Cloudflare, `daara-dev` limité à 5 e-mails / h, quotas Brevo séparés (`docs/deploiement.md` §2.4, §2.6).
+  Mineurs corrigés : toutes les clés de test Turnstile filtrées, jeton consommé jamais renvoyé, échec de chargement
+  de Turnstile non mis en cache. Reportés : voir « Problèmes ouverts ».
+
 ### 2026-10-03 — Sprint 1 : socle multi-tenant, partie base (S1.1, S1.2, S1.3, S1.6 côté base)
 - Migration `securite_socle` : `anon` sans aucun droit ; TRUNCATE / REFERENCES / TRIGGER / MAINTAIN et séquences
   retirés à `authenticated` ; `alter default privileges for role postgres revoke execute on functions from public`

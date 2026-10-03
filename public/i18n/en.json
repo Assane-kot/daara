@@ -13,14 +13,24 @@
             "autre_code": "FR",
             "changer": "Passer en français"
         },
-        "fil_ariane": "Breadcrumb"
+        "fil_ariane": "Breadcrumb",
+        "compte": {
+            "menu": "My account",
+            "deconnexion": "Sign out"
+        }
     },
     "menu": {
         "tableau_de_bord": "Dashboard"
     },
     "titres": {
         "tableau_de_bord": "Dashboard",
-        "charte": "Style guide"
+        "charte": "Style guide",
+        "connexion": "Sign in",
+        "inscription": "Sign up",
+        "confirmation": "Email confirmation",
+        "mot_de_passe_oublie": "Forgot password",
+        "mfa": "Two-factor authentication",
+        "onboarding": "Create my daara"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -42,7 +52,155 @@
             "min": "The minimum value is {{min}}.",
             "max": "The maximum value is {{max}}.",
             "motif": "Invalid format.",
-            "invalide": "Invalid value."
+            "invalide": "Invalid value.",
+            "mot_de_passe": "At least 8 characters, with at least one letter and one digit.",
+            "code": "Enter the 6 digits of the code.",
+            "different": "The two passwords do not match.",
+            "slug": "Lowercase letters, digits and hyphens only (3 to 50 characters)."
+        },
+        "code": {
+            "chiffre": "Digit {{n}} of 6"
+        }
+    },
+    "auth": {
+        "cour": {
+            "presentation": "About DAARA",
+            "titre_debut": "Your daara,",
+            "titre_accent": "in order",
+            "titre_fin": "every day.",
+            "texte": "Classes, attendance, report cards and Quran notebook in one place, for the staff and for families.",
+            "exemples": "Examples",
+            "fiche_cahier_titre": "Surah Al-Mulk · v. 1-15",
+            "fiche_cahier_texte": "Notebook",
+            "fiche_cahier_statut": "validated",
+            "fiche_appel_titre": "Morning roll call · Year 3",
+            "fiche_appel_texte": "27 present · 2 absent",
+            "fiche_bulletins_titre": "Report cards · Term 1",
+            "fiche_bulletins_texte": "Class average 13.4 / 20",
+            "pied_ue": "Data hosted in the European Union",
+            "pied_mfa": "Two-factor authentication for admins"
+        },
+        "champs": {
+            "email": "Email address",
+            "mot_de_passe": "Password",
+            "nouveau_mot_de_passe": "New password",
+            "confirmation_mot_de_passe": "Confirm password",
+            "prenom": "First name",
+            "nom": "Last name",
+            "code_email": "Code received by email",
+            "code_application": "Authenticator code",
+            "afficher_mot_de_passe": "Show password",
+            "masquer_mot_de_passe": "Hide password",
+            "aide_mot_de_passe": "At least 8 characters, with at least one letter and one digit."
+        },
+        "connexion": {
+            "surtitre": "Daara space",
+            "titre": "Welcome back",
+            "intro": "Sign in to get back to your daara.",
+            "oublie": "Forgot password?",
+            "bouton": "Sign in",
+            "nouveau": "New to DAARA?",
+            "creer_compte": "Create an account",
+            "confirmer_email": "Enter the confirmation code"
+        },
+        "inscription": {
+            "surtitre": "Free to get started",
+            "titre": "Create your account",
+            "intro": "You will then create your daara, or join the one that invites you.",
+            "bouton": "Create my account",
+            "deja_inscrit": "Already registered?",
+            "se_connecter": "Sign in"
+        },
+        "confirmation": {
+            "surtitre": "Confirmation",
+            "titre": "Check your inbox",
+            "intro": "If this address can be used, a 6-digit code has just been sent to it. It is valid for 30 minutes.",
+            "intro_email": "Enter your address and the 6-digit code received by email. It is valid for 30 minutes.",
+            "bouton": "Confirm",
+            "renvoyer": "Resend the code",
+            "renvoyer_dans": "Resend the code in {{secondes}} s",
+            "renvoye": "If the address is awaiting confirmation, a new code has just been sent.",
+            "indesirables": "Nothing received? Check your spam folder.",
+            "retour": "Back to sign in"
+        },
+        "oublie": {
+            "surtitre": "Account access",
+            "titre": "Forgot password",
+            "intro": "Enter your address: you will receive a code to choose a new password.",
+            "bouton_envoyer": "Get a code",
+            "envoye": "If an account exists for this address, a code has just been sent to it. It is valid for 30 minutes.",
+            "titre_code": "Choose a new password",
+            "bouton_valider": "Save the password",
+            "titre_mfa": "Confirm with your app",
+            "intro_mfa": "Your account is protected by two-factor authentication: enter the code from your app to finish.",
+            "autre_adresse": "Use another address",
+            "retour": "Back to sign in"
+        },
+        "mfa": {
+            "surtitre": "Account security",
+            "titre_enrolement": "Turn on two-factor authentication",
+            "intro_enrolement": "Required to manage a daara: it protects the data of students and families.",
+            "etape_application": "Open an authenticator app (Google Authenticator, Aegis, 2FAS…).",
+            "etape_scanner": "Scan this QR code, or enter the key below.",
+            "etape_code": "Enter the 6-digit code shown.",
+            "qr_alt": "QR code to scan with your authenticator app",
+            "cle": "Key to enter manually",
+            "copier": "Copy the key",
+            "copie": "Key copied",
+            "bouton_activer": "Turn on",
+            "titre_verification": "Two-factor authentication",
+            "intro_verification": "Enter the 6-digit code shown by your authenticator app.",
+            "bouton_verifier": "Verify",
+            "chargement": "Preparing two-factor authentication…",
+            "reessayer": "Try again",
+            "autre_compte": "Sign in with another account"
+        },
+        "erreurs": {
+            "identifiants": "Incorrect email address or password.",
+            "email_non_confirme": "Your email address is not confirmed yet.",
+            "code_invalide": "Incorrect or expired code.",
+            "mot_de_passe_faible": "Password too weak: at least 8 characters, with at least one letter and one digit.",
+            "meme_mot_de_passe": "Choose a password different from the old one.",
+            "captcha": "The anti-bot check failed. Try again.",
+            "captcha_requis": "Please wait for the anti-bot check.",
+            "captcha_chargement": "The anti-bot check could not load. Check your connection, then reload the page.",
+            "trop_de_tentatives": "Too many attempts. Wait a few minutes before trying again.",
+            "mfa_requise": "First confirm with your authenticator app.",
+            "session_expiree": "Your session has expired. Sign in again.",
+            "reseau": "Cannot reach the server. Check your Internet connection.",
+            "inattendue": "An unexpected error occurred. Try again."
+        }
+    },
+    "onboarding": {
+        "etape_securite": "Account secured",
+        "etape_securite_a_faire": "Secure the account",
+        "etape_daara": "Your daara",
+        "surtitre": "Welcome",
+        "titre": "Create your daara",
+        "intro": "You will be its administrator. Everything can be changed later in the settings.",
+        "intro_securite": "Before creating your daara, protect your account: two-factor authentication is required for administrators.",
+        "champs": {
+            "nom": "Daara name",
+            "slug": "Address of your space",
+            "aide_slug": "Lowercase letters, digits and hyphens.",
+            "ville": "City",
+            "telephone": "Phone",
+            "langue": "Default language",
+            "bareme": "Grading scale",
+            "sur_10": "out of 10",
+            "sur_20": "out of 20"
+        },
+        "langues": {
+            "fr": "Français",
+            "en": "English"
+        },
+        "bouton": "Create my daara",
+        "erreurs": {
+            "slug_pris": "This address is already taken: choose another one.",
+            "donnee_invalide": "Some information is invalid or reserved: check the name and the address.",
+            "limite": "You have reached the limit of 3 daaras created.",
+            "aal2": "Two-factor authentication is required to create a daara.",
+            "inattendue": "The daara could not be created. Try again."
         }
     }
 }

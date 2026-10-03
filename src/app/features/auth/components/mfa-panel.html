@@ -1,0 +1,73 @@
+@if (chargement()) {
+    <app-skeleton [lignes]="5" />
+} @else if (erreurChargement(); as erreurChargement) {
+    <div class="grid gap-4">
+        <div class="auth-erreur" role="alert">{{ erreurChargement | translate }}</div>
+        <button type="button" class="btn-auth-secondaire" (click)="preparer()">{{ 'auth.mfa.reessayer' | translate }}</button>
+    </div>
+} @else {
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="verifier()" novalidate>
+        @if (modeCourant() === 'enrolement' && enrolement(); as enrolement) {
+            <div
+                class="grid items-center gap-4 rounded-[14px] border border-white-light bg-white p-3.5 dark:border-night-border dark:bg-night min-[421px]:grid-cols-[132px_minmax(0,1fr)]"
+            >
+                <img
+                    class="mx-auto h-[132px] w-[132px] rounded-[10px] bg-white p-2 ring-1 ring-white-light dark:ring-night-border"
+                    [src]="enrolement.qrCode"
+                    [alt]="'auth.mfa.qr_alt' | translate"
+                    width="132"
+                    height="132"
+                />
+                <div class="min-w-0">
+                    <ol class="m-0 grid list-decimal gap-1 pl-[18px] text-[13.5px] text-muted dark:text-night-muted">
+                        <li>{{ 'auth.mfa.etape_application' | translate }}</li>
+                        <li>{{ 'auth.mfa.etape_scanner' | translate }}</li>
+                        <li>{{ 'auth.mfa.etape_code' | translate }}</li>
+                    </ol>
+                    <p class="mb-1 mt-3 text-xs font-bold text-muted dark:text-night-muted" [id]="id + '-cle'">{{ 'auth.mfa.cle' | translate }}</p>
+                    <div class="flex items-center gap-2">
+                        <code
+                            class="min-w-0 flex-1 select-all break-all rounded-lg border border-white-light bg-primary-50/50 px-2.5 py-2 font-mono text-[13px] font-bold tracking-wider text-black dark:border-night-border dark:bg-night-input dark:text-white-light"
+                            [attr.aria-labelledby]="id + '-cle'"
+                            >{{ enrolement.secret }}</code
+                        >
+                        <button
+                            type="button"
+                            class="icon-btn h-10 w-10 flex-none rounded-lg border border-white-light hover:border-primary hover:text-primary dark:border-night-border"
+                            [attr.aria-label]="(copie() ? 'auth.mfa.copie' : 'auth.mfa.copier') | translate"
+                            [attr.title]="(copie() ? 'auth.mfa.copie' : 'auth.mfa.copier') | translate"
+                            (click)="copier(enrolement.secret)"
+                        >
+                            <icon-copy class="h-[18px] w-[18px]" />
+                        </button>
+                    </div>
+                    <p class="sr-only" role="status">{{ copie() ? ('auth.mfa.copie' | translate) : '' }}</p>
+                </div>
+            </div>
+        }
+
+        <div>
+            <p [id]="id + '-libelle'" class="mb-1.5 text-[13.5px] font-extrabold">{{ 'auth.champs.code_application' | translate }}</p>
+            <app-code-otp
+                formControlName="code"
+                [libelleId]="id + '-libelle'"
+                [invalide]="form.controls.code.touched && form.controls.code.invalid"
+                [descriptionId]="form.controls.code.touched && form.controls.code.invalid ? id + '-erreur' : null"
+            />
+            @if (form.controls.code.touched && form.controls.code.invalid) {
+                <p [id]="id + '-erreur'" class="mt-1 text-danger-strong dark:text-danger-soft">{{ 'formulaire.erreurs.code' | translate }}</p>
+            }
+        </div>
+
+        @if (erreur(); as erreur) {
+            <div class="auth-erreur" role="alert">{{ erreur | translate }}</div>
+        }
+
+        <button class="btn-auth" type="submit" [disabled]="envoi()">
+            @if (envoi()) {
+                <span class="auth-spinner" aria-hidden="true"></span>
+            }
+            {{ (modeCourant() === 'enrolement' ? 'auth.mfa.bouton_activer' : 'auth.mfa.bouton_verifier') | translate }}
+        </button>
+    </form>
+}

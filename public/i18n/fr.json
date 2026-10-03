@@ -13,14 +13,24 @@
             "autre_code": "EN",
             "changer": "Switch to English"
         },
-        "fil_ariane": "Fil d’Ariane"
+        "fil_ariane": "Fil d’Ariane",
+        "compte": {
+            "menu": "Mon compte",
+            "deconnexion": "Se déconnecter"
+        }
     },
     "menu": {
         "tableau_de_bord": "Tableau de bord"
     },
     "titres": {
         "tableau_de_bord": "Tableau de bord",
-        "charte": "Charte"
+        "charte": "Charte",
+        "connexion": "Connexion",
+        "inscription": "Inscription",
+        "confirmation": "Confirmation de l’e-mail",
+        "mot_de_passe_oublie": "Mot de passe oublié",
+        "mfa": "Double authentification",
+        "onboarding": "Créer ma daara"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -42,7 +52,155 @@
             "min": "La valeur minimale est {{min}}.",
             "max": "La valeur maximale est {{max}}.",
             "motif": "Format invalide.",
-            "invalide": "Valeur invalide."
+            "invalide": "Valeur invalide.",
+            "mot_de_passe": "8 caractères minimum, avec au moins une lettre et un chiffre.",
+            "code": "Saisissez les 6 chiffres du code.",
+            "different": "Les deux mots de passe ne sont pas identiques.",
+            "slug": "Lettres minuscules, chiffres et tirets uniquement (3 à 50 caractères)."
+        },
+        "code": {
+            "chiffre": "Chiffre {{n}} sur 6"
+        }
+    },
+    "auth": {
+        "cour": {
+            "presentation": "Présentation de DAARA",
+            "titre_debut": "Votre daara,",
+            "titre_accent": "en ordre",
+            "titre_fin": "chaque jour.",
+            "texte": "Classes, absences, bulletins et cahier de Coran réunis dans un même espace, pour l’équipe et pour les familles.",
+            "exemples": "Exemples",
+            "fiche_cahier_titre": "Sourate Al-Mulk · v. 1-15",
+            "fiche_cahier_texte": "Cahier",
+            "fiche_cahier_statut": "validée",
+            "fiche_appel_titre": "Appel du matin · CE2",
+            "fiche_appel_texte": "27 présents · 2 absents",
+            "fiche_bulletins_titre": "Bulletins · 1er trimestre",
+            "fiche_bulletins_texte": "Moyenne de classe 13,4 / 20",
+            "pied_ue": "Données hébergées dans l’Union européenne",
+            "pied_mfa": "Double authentification pour les admins"
+        },
+        "champs": {
+            "email": "Adresse e-mail",
+            "mot_de_passe": "Mot de passe",
+            "nouveau_mot_de_passe": "Nouveau mot de passe",
+            "confirmation_mot_de_passe": "Confirmez le mot de passe",
+            "prenom": "Prénom",
+            "nom": "Nom",
+            "code_email": "Code reçu par e-mail",
+            "code_application": "Code de l’application",
+            "afficher_mot_de_passe": "Afficher le mot de passe",
+            "masquer_mot_de_passe": "Masquer le mot de passe",
+            "aide_mot_de_passe": "8 caractères minimum, avec au moins une lettre et un chiffre."
+        },
+        "connexion": {
+            "surtitre": "Espace daara",
+            "titre": "Bon retour parmi nous",
+            "intro": "Connectez-vous pour retrouver votre daara.",
+            "oublie": "Mot de passe oublié ?",
+            "bouton": "Se connecter",
+            "nouveau": "Nouveau sur DAARA ?",
+            "creer_compte": "Créer un compte",
+            "confirmer_email": "Saisir le code de confirmation"
+        },
+        "inscription": {
+            "surtitre": "Gratuit pour démarrer",
+            "titre": "Créez votre compte",
+            "intro": "Vous créerez ensuite votre daara, ou rejoindrez celle qui vous invite.",
+            "bouton": "Créer mon compte",
+            "deja_inscrit": "Déjà inscrit ?",
+            "se_connecter": "Se connecter"
+        },
+        "confirmation": {
+            "surtitre": "Confirmation",
+            "titre": "Vérifiez votre boîte mail",
+            "intro": "Si cette adresse peut être utilisée, un code à 6 chiffres vient d’y être envoyé. Il reste valable 30 minutes.",
+            "intro_email": "Saisissez votre adresse et le code à 6 chiffres reçu par e-mail. Il reste valable 30 minutes.",
+            "bouton": "Confirmer",
+            "renvoyer": "Renvoyer le code",
+            "renvoyer_dans": "Renvoyer le code dans {{secondes}} s",
+            "renvoye": "Si l’adresse est en attente de confirmation, un nouveau code vient d’être envoyé.",
+            "indesirables": "Pas reçu ? Vérifiez vos courriers indésirables.",
+            "retour": "Retour à la connexion"
+        },
+        "oublie": {
+            "surtitre": "Accès au compte",
+            "titre": "Mot de passe oublié",
+            "intro": "Indiquez votre adresse : vous recevrez un code pour choisir un nouveau mot de passe.",
+            "bouton_envoyer": "Recevoir un code",
+            "envoye": "Si un compte existe pour cette adresse, un code vient d’y être envoyé. Il reste valable 30 minutes.",
+            "titre_code": "Choisissez un nouveau mot de passe",
+            "bouton_valider": "Enregistrer le mot de passe",
+            "titre_mfa": "Confirmez avec votre application",
+            "intro_mfa": "Votre compte est protégé par la double authentification : saisissez le code de votre application pour terminer.",
+            "autre_adresse": "Utiliser une autre adresse",
+            "retour": "Retour à la connexion"
+        },
+        "mfa": {
+            "surtitre": "Sécurité du compte",
+            "titre_enrolement": "Activez la double authentification",
+            "intro_enrolement": "Obligatoire pour administrer une daara : elle protège les données des élèves et des familles.",
+            "etape_application": "Ouvrez une application d’authentification (Google Authenticator, Aegis, 2FAS…).",
+            "etape_scanner": "Scannez ce QR code, ou saisissez la clé ci-dessous.",
+            "etape_code": "Saisissez le code à 6 chiffres affiché.",
+            "qr_alt": "QR code à scanner avec votre application d’authentification",
+            "cle": "Clé à saisir à la main",
+            "copier": "Copier la clé",
+            "copie": "Clé copiée",
+            "bouton_activer": "Activer",
+            "titre_verification": "Double authentification",
+            "intro_verification": "Saisissez le code à 6 chiffres affiché par votre application d’authentification.",
+            "bouton_verifier": "Vérifier",
+            "chargement": "Préparation de la double authentification…",
+            "reessayer": "Réessayer",
+            "autre_compte": "Se connecter avec un autre compte"
+        },
+        "erreurs": {
+            "identifiants": "Adresse e-mail ou mot de passe incorrect.",
+            "email_non_confirme": "Votre adresse e-mail n’est pas encore confirmée.",
+            "code_invalide": "Code incorrect ou expiré.",
+            "mot_de_passe_faible": "Mot de passe trop faible : 8 caractères minimum, avec au moins une lettre et un chiffre.",
+            "meme_mot_de_passe": "Choisissez un mot de passe différent de l’ancien.",
+            "captcha": "La vérification anti-robot a échoué. Réessayez.",
+            "captcha_requis": "Patientez pendant la vérification anti-robot.",
+            "captcha_chargement": "La vérification anti-robot n’a pas pu se charger. Vérifiez votre connexion puis rechargez la page.",
+            "trop_de_tentatives": "Trop de tentatives. Patientez quelques minutes avant de réessayer.",
+            "mfa_requise": "Confirmez d’abord avec votre application d’authentification.",
+            "session_expiree": "Votre session a expiré. Reconnectez-vous.",
+            "reseau": "Connexion impossible au serveur. Vérifiez votre connexion Internet.",
+            "inattendue": "Une erreur inattendue est survenue. Réessayez."
+        }
+    },
+    "onboarding": {
+        "etape_securite": "Compte sécurisé",
+        "etape_securite_a_faire": "Sécuriser le compte",
+        "etape_daara": "Votre daara",
+        "surtitre": "Bienvenue",
+        "titre": "Créez votre daara",
+        "intro": "Vous en serez l’administrateur. Tout reste modifiable dans les paramètres.",
+        "intro_securite": "Avant de créer votre daara, protégez votre compte : la double authentification est obligatoire pour les administrateurs.",
+        "champs": {
+            "nom": "Nom de la daara",
+            "slug": "Adresse de votre espace",
+            "aide_slug": "Lettres minuscules, chiffres et tirets.",
+            "ville": "Ville",
+            "telephone": "Téléphone",
+            "langue": "Langue par défaut",
+            "bareme": "Barème des notes",
+            "sur_10": "sur 10",
+            "sur_20": "sur 20"
+        },
+        "langues": {
+            "fr": "Français",
+            "en": "English"
+        },
+        "bouton": "Créer ma daara",
+        "erreurs": {
+            "slug_pris": "Cette adresse est déjà prise : choisissez-en une autre.",
+            "donnee_invalide": "Une information est invalide ou réservée : vérifiez le nom et l’adresse.",
+            "limite": "Vous avez atteint la limite de 3 daaras créées.",
+            "aal2": "La double authentification est requise pour créer une daara.",
+            "inattendue": "La daara n’a pas pu être créée. Réessayez."
         }
     }
 }

@@ -10,7 +10,8 @@ import { Database } from './database.types';
 @Injectable({ providedIn: 'root' })
 export class SupabaseService {
     readonly client: SupabaseClient<Database> = createClient<Database>(environment.supabaseUrl, environment.supabaseAnonKey, {
-        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+        // Flux PKCE (ADR-006). Pas de session lue dans l'URL : les e-mails contiennent un code, jamais de lien.
+        auth: { flowType: 'pkce', persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
     });
 
     /** Vérifie que l'API Auth répond (diagnostic au démarrage en développement). */

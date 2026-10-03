@@ -64,10 +64,11 @@ src/app/
 ### Environnements
 | Fichier | Rôle |
 |---|---|
-| `src/environments/environment.ts` | Développement : Supabase local (`http://127.0.0.1:54321`, clé publishable locale) |
+| `src/environments/environment.local.ts` | Valeurs du Supabase local (`http://127.0.0.1:54321`, clé publishable locale, clé de site Turnstile de test) |
+| `src/environments/environment.ts` | Développement : reprend `environment.local.ts` |
 | `src/environments/environment.prod.ts` | Généré par `scripts/set-env.mjs` (prebuild), non versionné, remplace le précédent en production |
 
-`set-env.mjs` lit `SUPABASE_URL` et `SUPABASE_ANON_KEY` (variables Cloudflare Pages : production → `daara-prod`,
+`set-env.mjs` lit `SUPABASE_URL`, `SUPABASE_ANON_KEY` et `TURNSTILE_SITE_KEY` (clé de test refusée en production) (variables Cloudflare Pages : production → `daara-prod`,
 preview → `daara-dev`). Il échoue sur Cloudflare si elles manquent, refuse toute clé secrète (`service_role`,
 `sb_secret_`) et toute URL non https. Sans variables hors Cloudflare (poste, CI) : build branché sur le local.
 
@@ -305,21 +306,32 @@ Toutes vérifient le JWT, le membership et valident les entrées.
 Client Supabase en flux PKCE. Les e-mails d'Auth contiennent un **code à 6 chiffres** (`{{ .Token }}`), jamais de
 lien : un lien ouvert depuis une messagerie s'ouvre souvent dans un autre navigateur (session PKCE perdue).
 Codes valables 30 minutes (`otp_expiry = 1800`). Modèles bilingues dans `supabase/templates/`, langue choisie par
-`{{ .Data.langue }}`. Cloudflare Turnstile (gratuit) sur l'inscription et le mot de passe oublié, vérifié par
-Supabase Auth (`[auth.captcha]`) ; clés de test Cloudflare en local.
+`{{ .Data.langue }}`. Cloudflare Turnstile (gratuit) sur l'inscription, la **connexion** et le mot de passe oublié
+(Supabase Auth exige le jeton sur ces trois appels dès que `[auth.captcha]` est activé), vérifié par Supabase Auth ;
+clés de test Cloudflare en local. Un jeton ne sert qu'une fois : widget réinitialisé après chaque échec. Le renvoi
+du code de confirmation (`resend`) exige aussi un jeton.
+Énumération de comptes : l'inscription sur une adresse déjà inscrite (`user_already_exists`) suit le même parcours
+qu'une adresse libre (écran du code, message neutre). Risque résiduel, côté Supabase Auth : `recover` / `resend`
+répétés dans le délai `max_frequency` renvoient 429 pour un compte existant et 200 pour un inconnu (limité par
+Turnstile). Codes e-mail : 6 chiffres, 30 min, 30 vérifications / 5 min / IP, sans verrouillage par compte (offre
+Free, à revoir au sprint 12).
 
 | Flux | Étapes |
 |---|---|
 | Inscription `/auth/inscription` | nom, prénom, e-mail, mot de passe (≥ 8, lettres + chiffres), Turnstile → `signUp` (métadonnées nom, prenom, langue) → écran du code → `verifyOtp(type: 'email')` → session ouverte |
-| Connexion `/auth/connexion` | `signInWithPassword` → facteur TOTP vérifié et session `aal1` → `/auth/mfa` (code) ; admin d'une daara sans facteur → `/auth/mfa` (enrôlement imposé) ; puis routage (ci-dessous) |
-| Mot de passe oublié `/auth/mot-de-passe-oublie` | e-mail + Turnstile → `resetPasswordForEmail` → message neutre → code + nouveau mot de passe → `verifyOtp(type: 'recovery')` → `updateUser({ password })` |
-| Double authentification `/auth/mfa` | enrôlement : `mfa.enroll` (QR code + clé texte) → `challengeAndVerify` ; vérification : `challenge` + `verify` → session `aal2` ; second appareil proposé (pas de codes de secours si Supabase Auth n'en fournit pas) |
+| Connexion `/auth/connexion` | e-mail, mot de passe, Turnstile → `signInWithPassword` (adresse non confirmée → lien vers l'écran du code) → facteur TOTP vérifié et session `aal1` → `/auth/mfa` (code) ; admin d'une daara sans facteur → `/auth/mfa` (enrôlement imposé) ; puis routage (ci-dessous) |
+| Mot de passe oublié `/auth/mot-de-passe-oublie` | e-mail + Turnstile → `resetPasswordForEmail` → message neutre → code + nouveau mot de passe → `verifyOtp(type: 'recovery')` → `updateUser({ password })` ; compte avec TOTP : Supabase refuse (`insufficient_aal`, session de récupération `aal1`) → code TOTP (`challengeAndVerify`) → `updateUser` rejoué (vérifié le 2026-10-03) |
+| Double authentification `/auth/mfa` | enrôlement : `mfa.enroll` (QR code + clé texte) → `challengeAndVerify` ; vérification : `challengeAndVerify` → session `aal2` ; enrôlements abandonnés (facteurs non vérifiés) supprimés avant un nouvel enrôlement. Second appareil et codes de secours : **reportés au sprint 2** (codes de secours disponibles mais expérimentaux dans supabase-js 2.117 / Auth 2.197, à décider avec la procédure super-admin de retrait d'un facteur) |
 | Onboarding `/onboarding` | étape 1 : TOTP (si session pas encore `aal2`) ; étape 2 : nom, slug (proposé depuis le nom, modifiable), ville, téléphone, langue, barème → `rpc('creer_daara')` → tableau de bord |
 | Déconnexion | `signOut()` → `/auth/connexion` |
 
-Routage après connexion (sprint 1) : aucune daara → `/onboarding` ; sinon → `/dashboard` (provisoire ; `/d/:slug`,
-`/select-daara` au sprint 2). Guards : `authGuard` (session), `anonymeGuard` (pages `/auth` hors `mfa`, utilisateur non connecté),
-`mfaGuard` (admin ⇒ `aal2`). Le front n'est qu'un confort : la RLS exige `aal2` pour tout droit d'admin.
+Routage après connexion (sprint 1, `AuthService.destination()`) : facteur TOTP vérifié en session `aal1`, ou admin
+d'une daara sans facteur → `/auth/mfa` ; aucune daara → `/onboarding` ; sinon → `/` (tableau de bord provisoire ;
+`/d/:slug`, `/select-daara` au sprint 2). Guards : `authGuard` (session), `anonymeGuard` (pages `/auth` hors `mfa` :
+un utilisateur connecté est renvoyé à sa destination), `mfaGuard` (admin ⇒ `aal2`), `avecDaaraGuard` (espace : au moins
+une daara), `sansDaaraGuard` (onboarding). Rôles actifs lus dans `memberships` et mis en cache par utilisateur
+(invalidés à chaque changement de session et après `creer_daara`). Layouts chargés à la demande. Le front n'est qu'un
+confort : la RLS exige `aal2` pour tout droit d'admin.
 
 ### 7.1 Invitation d'un membre
 ```mermaid

@@ -6,8 +6,8 @@ comptes Cloudflare, Supabase ou GitHub). Aucune valeur secrète n'est écrite ic
 ## 1. Cloudflare Pages (S0.7)
 
 ### 1.1 Ordre recommandé
-Le build Cloudflare **échoue volontairement** tant que `SUPABASE_URL` et `SUPABASE_ANON_KEY` ne sont pas
-définies (`scripts/set-env.mjs`). Créer d'abord au moins le projet Supabase `daara-dev` (S0.8, section 2),
+Le build Cloudflare **échoue volontairement** tant que `SUPABASE_URL`, `SUPABASE_ANON_KEY` et `TURNSTILE_SITE_KEY`
+ne sont pas définies (`scripts/set-env.mjs`). Créer d'abord au moins le projet Supabase `daara-dev` (S0.8, section 2),
 puis brancher Cloudflare.
 
 ### 1.2 Création du projet (une fois)
@@ -32,6 +32,7 @@ puis brancher Cloudflare.
    | `NODE_VERSION` | `24` | `24` |
    | `SUPABASE_URL` | URL du projet `daara-prod` | URL du projet `daara-dev` |
    | `SUPABASE_ANON_KEY` | clé **publishable** de `daara-prod` | clé **publishable** de `daara-dev` |
+   | `TURNSTILE_SITE_KEY` | clé de site du widget Turnstile (§2.6) | même clé (**jamais** une clé de test : refusée par `set-env.mjs`) |
 
    La clé publishable (`sb_publishable_…`) est publique par conception (protégée par la RLS). **Jamais la
    clé secrète ni `service_role`** : `set-env.mjs` fait échouer le build si on s'en sert par erreur.
@@ -98,6 +99,10 @@ celui de la production.
 | Exigences du mot de passe | lettres et chiffres | lettres et chiffres |
 | Connexions anonymes | désactivées | désactivées |
 | Téléphone (SMS) | désactivé (ADR-003, décision OTP au sprint 2) | désactivé |
+| Email OTP Expiration (Authentication → Emails / Providers → Email) | 1800 s (30 min) | 1800 s |
+| Email OTP Length | 6 | 6 |
+| Multi-Factor → TOTP (App Authenticator) | **activé** (enrôlement et vérification) | **activé** |
+| Attack Protection → Captcha | Turnstile, clé secrète du §2.6 | Turnstile, clé secrète du §2.6 |
 
 **`daara-dev` ne contient jamais de données réelles**, même pour une démonstration à une daara pilote : ses
 redirections acceptent `localhost` et toutes les previews. Les démos se font avec des données fictives.
@@ -140,10 +145,21 @@ conformité CDP, à citer dans la politique de confidentialité).
    | Username | identifiant SMTP Brevo |
    | Password | clé SMTP Brevo |
 
-5. **Authentication → Rate Limits** : laisser les valeurs par défaut (protègent contre l'envoi massif).
+5. **Authentication → Rate Limits** : `daara-prod` garde les valeurs par défaut ; **`daara-dev` : e-mails limités à
+   5 par heure**. Les deux projets ne partagent jamais le même quota d'envoi : **deux comptes Brevo** (un par projet)
+   ou, à défaut, deux clés SMTP distinctes et une alerte de quota dans Brevo. Sinon un abus sur `daara-dev`
+   (inscriptions, mots de passe oubliés en boucle) épuise les 300 e-mails / jour et bloque les e-mails de production.
 
-Les modèles d'e-mails (confirmation, invitation, mot de passe oublié) seront traduits en français et en
-anglais au sprint 1, dans le dépôt (`supabase/templates/`) puis recopiés dans chaque projet.
+6. **Authentication → Emails → Templates** : recopier les modèles du dépôt (code à 6 chiffres, sans lien,
+   français / anglais selon la langue du compte) :
+
+   | Modèle Supabase | Sujet | Contenu |
+   |---|---|---|
+   | Confirm signup | `Votre code DAARA / Your DAARA code` | `supabase/templates/confirmation.html` |
+   | Reset password | `Réinitialisation DAARA / DAARA password reset` | `supabase/templates/recovery.html` |
+
+   Les modèles n'utilisent que `{{ .Token }}` et `{{ .Data.langue }}`, jamais le nom saisi par l'utilisateur.
+   Après chaque modification d'un modèle dans le dépôt, le recopier dans les deux projets.
 
 ### 2.5 Vérifications
 1. `daara-dev` → **Authentication → Users → Add user → Send invitation** vers votre propre adresse :
@@ -152,7 +168,23 @@ anglais au sprint 1, dans le dépôt (`supabase/templates/`) puis recopiés dans
 3. Supprimer l'utilisateur de test.
 4. Refaire le test 1 sur `daara-prod`, puis supprimer l'utilisateur.
 
-### 2.6 Migrations
+### 2.6 Cloudflare Turnstile (anti-robot, gratuit)
+Protège l'inscription, la connexion et le mot de passe oublié (quota Brevo, attaques par force brute) ;
+Supabase Auth vérifie le jeton côté serveur.
+1. Cloudflare → **Turnstile → Add widget** : nom `DAARA`, mode **Managed**, domaines `daara.pages.dev`
+   et `develop.daara.pages.dev` (puis le domaine de l'application quand il existera).
+2. Noter la **clé de site** (publique) → variable `TURNSTILE_SITE_KEY` de Cloudflare Pages (§1.2, étape 5).
+   `set-env.mjs` refuse les clés de test sur tout build Cloudflare (production et preview).
+3. La **clé secrète** → Supabase de **chaque** projet, **Authentication → Attack Protection → Captcha**
+   (fournisseur Turnstile). Jamais dans Git ni dans Cloudflare Pages ; rangée dans le gestionnaire de mots de passe.
+4. Vérifier : sur la preview, le widget s'affiche, la connexion fonctionne ; sans jeton (bloqueur de scripts),
+   Supabase refuse la connexion (`captcha_failed`).
+
+En local, `supabase/config.toml` utilise la clé secrète de test publiée par Cloudflare (toujours valide) et
+`environment.local.ts` la clé de site de test associée. **Les clés de test ne sont jamais utilisées dans un projet
+cloud** (`daara-dev` compris) : elles acceptent tout jeton, le captcha y serait inopérant.
+
+### 2.7 Migrations
 Aucune migration à appliquer en S0.8. À partir du sprint 1, le développeur applique les migrations
 lui-même (règle 7, jamais Claude) :
 ```powershell
@@ -177,7 +209,8 @@ Origines autorisées par la CSP :
 
 | Directive | Origines | Raison |
 |---|---|---|
-| `script-src` | `'self'` | Aucun script inline : l'inlining du CSS critique est désactivé (`angular.json`), car il injecte un script inline |
+| `script-src` | `'self'`, `https://challenges.cloudflare.com` | Aucun script inline : l'inlining du CSS critique est désactivé (`angular.json`), car il injecte un script inline. Script Turnstile (anti-robot), chargé à la demande sur les pages d'authentification |
+| `frame-src` | `https://challenges.cloudflare.com` | Iframe du widget Turnstile |
 | `style-src` | `'self' 'unsafe-inline'` | Angular et le CDK insèrent des balises `<style>` ; pas de nonce possible sur un hébergement statique |
 | `connect-src` | `'self'`, `https://*.supabase.co`, `wss://*.supabase.co`, `https://*.ingest.de.sentry.io` | API, Auth, Storage, Realtime (WebSocket) ; envoi des erreurs à Sentry (région UE uniquement) |
 | `img-src` | `'self' data: blob:`, `https://*.supabase.co` | Icônes CSS en `data:`, aperçus locaux, photos et logos du Storage |
