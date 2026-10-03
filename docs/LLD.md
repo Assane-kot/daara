@@ -42,7 +42,9 @@ src/app/
 
 ### Routage
 ```
-/auth/...                          public
+/auth/...                          public : connexion, inscription, mot de passe oublié (code e-mail),
+                                   code d'accès (niveau 2), invitation (ADR-006)
+/auth/mfa                          connecté : enrôlement / vérification TOTP (obligatoire pour les admins)
 /onboarding                        connecté, sans daara
 /select-daara                      connecté, plusieurs daaras
 /d/:slug                           DaaraResolver → vérifie le membership, charge CurrentDaara
@@ -72,7 +74,7 @@ preview → `daara-dev`). Il échoue sur Cloudflare si elles manquent, refuse to
 ### Services transverses
 | Service | Responsabilité |
 |---|---|
-| `SupabaseService` | Instance unique du client, configuration par environnement |
+| `SupabaseService` | Instance unique du client, configuration par environnement ; flux PKCE à partir du sprint 1 (ADR-006) |
 | `AuthService` | Session (signal `user`), connexion, déconnexion, écoute `onAuthStateChange` |
 | `CurrentDaaraService` | Signals `daara`, `roles`, `id` ; `hasRole(...)` ; mémorise le dernier slug utilisé |
 | `NotificationCenterService` | Abonnement Realtime à `notifications` de l'utilisateur, compteur non lus |
@@ -122,6 +124,7 @@ erDiagram
 | `invitations` | daara_id, email, telephone, role, token_hash, expires_at, accepted_at, invited_by | expire après 7 jours |
 | `audit_log` | id bigserial, daara_id, table_name, record_id, action, old_data, new_data, user_id, at | insert par trigger uniquement |
 | `platform_admins` | user_id | lecture via fonction `is_platform_admin()` |
+| `codes_acces` | daara_id, user_id, code_hash, expires_at, used_at, tentatives, cree_par | un code actif par utilisateur ; 24 h, usage unique, 5 essais (ADR-006, sprint 2) ; écrit uniquement par les Edge Functions |
 | `notifications` | daara_id, user_id, type, titre, message, ref_table, ref_id, lue | RLS : user_id = auth.uid() |
 
 ### 3.3 Structure scolaire (sprint 3)
@@ -173,6 +176,7 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 | daaras | L E | L | L | L |
 | memberships | L E S | L (sa daara) | L (soi) | L (soi) |
 | invitations | L E S | — | — | — |
+| codes_acces | L (métadonnées, sans `code_hash`) | — | — | — |
 | annees / periodes / classes / matieres | L E S | L | L | L |
 | classe_matieres | L E S | L | — | — |
 | apprenants | L E S | L (ses classes) | L (les siens) | L (soi) |
@@ -190,7 +194,7 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 | Fonction | Rôle |
 |---|---|
 | `is_member(daara_id)` | membre actif de la daara |
-| `has_role(daara_id, roles[])` | membre actif avec un des rôles |
+| `has_role(daara_id, roles[])` | membre actif avec un des rôles ; pour `admin`, exige aussi `auth.jwt() ->> 'aal' = 'aal2'` (double authentification, ADR-006) |
 | `is_parent_of(apprenant_id)` | lien dans `parent_links` |
 | `teaches_class(classe_id)` | enseignant affecté à la classe (titulaire ou classe_matieres) |
 | `is_platform_admin()` | super-admin |
@@ -229,6 +233,8 @@ Anti-pause : `anti-pause.yml`, rôle `keepalive` sans droits, tous les deux jour
 |---|---|---|---|
 | `invite-member` | daara_id, email/téléphone, rôle | invitation créée, email/SMS envoyé | admin de la daara |
 | `accept-invitation` | token | membership créé | utilisateur connecté, token valide non expiré |
+| `reset-access` | user_id du membre | code d'accès (affiché une fois à l'admin, lien `wa.me` pré-rempli) | admin de la daara en `aal2`, membre de la même daara, non admin (ADR-006) |
+| `use-access-code` | identifiant, code, nouveau mot de passe | mot de passe changé, sessions révoquées, audit, e-mail | public ; code haché, 24 h, usage unique, 5 essais |
 | `generate-bulletins` | periode_id, classe_id | bulletins calculés + PDF | admin |
 | `dispatch-notifications` | (planifiée / webhook DB) | push, SMS, WhatsApp | interne (service_role) |
 | `payment-webhook` | payload fournisseur | paiement + abonnement mis à jour | signature du fournisseur |

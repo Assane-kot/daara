@@ -87,7 +87,9 @@ traitements lourds si les Edge Functions deviennent insuffisantes.
 - **Isolation** : chaque ligne métier porte `daara_id`. Les politiques RLS autorisent l'accès uniquement aux
   membres actifs de la daara, selon leur rôle (`memberships`). Les parents ne voient que leurs enfants
   (`parent_links`).
-- **Authentification** : Supabase Auth (email + mot de passe ; OTP téléphone à évaluer, sprint 2).
+- **Authentification** : Supabase Auth (e-mail + mot de passe, flux PKCE), double authentification (TOTP)
+  obligatoire pour les admins, récupération d'accès par code e-mail ou assistée par l'admin de la daara
+  (ADR-006) ; OTP téléphone à évaluer au sprint 2.
 - **Autorisation** : RLS = source de vérité. Guards Angular = confort d'interface uniquement.
 - **Secrets** : clé `anon` seule côté front ; `service_role` uniquement dans les Edge Functions.
 - **Traçabilité** : journal d'audit sur les tables sensibles (notes, absences, bulletins, membres).

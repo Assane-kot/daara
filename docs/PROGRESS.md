@@ -4,9 +4,9 @@
 > Format : date, fait, décisions, problèmes ouverts, prochaine étape.
 
 ## État actuel
-- Sprint en cours : 0 — Installation (voir docs/SPRINTS.md)
-- Dernière tâche terminée : S0.10 — Sentry (région UE, sans données personnelles, chargé en différé).
-  Côté code, toutes les stories du sprint 0 sont faites ; restent les configurations manuelles ci-dessous.
+- Sprint en cours : 0 — Installation, **code terminé** (bilan ci-dessous, 2026-10-03) ; clôture effective
+  après les configurations manuelles du développeur. Sprint suivant : 1 — Socle multi-tenant.
+- Dernière tâche terminée : audit de sécurité du sprint 0 clos, ADR-006 (authentification et récupération d'accès).
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -32,18 +32,18 @@
       fonctions `security definer` sans `search_path`, tables sans `daara_id not null` + index (liste blanche :
       `daaras`, `profiles`, `platform_admins`) ;
     - `revoke execute on all functions in schema public from public, anon` + privilèges par défaut + test ;
-    - client Supabase en flux PKCE (`flowType: 'pkce'`), à consigner au LLD §2 ;
-    - ADR authentification : double authentification (TOTP) obligatoire pour les admins, réinitialisation du
-      mot de passe (proposition en attente de validation). Mot de passe : 8 caractères, lettres + chiffres
-      (décision du développeur, 2026-10-01).
+    - client Supabase en flux PKCE (`flowType: 'pkce'`), consigné au LLD §2 et dans l'ADR-006 ;
+    - mise en œuvre de l'ADR-006 : code de réinitialisation par e-mail et TOTP obligatoire pour les admins
+      (sprint 1), réinitialisation assistée par l'admin (sprint 2). À vérifier au sprint 1 : codes de secours
+      MFA dans la version de Supabase Auth.
 
 ## Prochaine étape
-Clôture du sprint 0 :
-1. Développeur : configurations manuelles dans l'ordre §2 (Supabase + Brevo) → §1 (Cloudflare) → §5 (Sentry)
-   → §4 (sauvegardes) de `docs/deploiement.md`, puis vérifier le premier run de la CI sur GitHub.
-2. Validation de la charte sur `/dev/charte` → retrait de la page.
-3. Audit de sécurité clos (contre-vérification : 0 critique, 0 important ouvert) → bilan du sprint 0 et tag.
-Ensuite : sprint 1 (socle multi-tenant), en commençant par détailler le LLD §3.2 / §4.
+1. Développeur, pour clore le sprint 0 : configurations de `docs/deploiement.md` dans l'ordre §2 (Supabase +
+   Brevo) → §1 (Cloudflare) → §5 (Sentry) → §4 (sauvegardes) ; premier run de la CI sur GitHub ; validation de
+   `/dev/charte` (puis retrait de la page) ; tag de sprint `s0` sur `develop`.
+2. Sprint 1 — jour 1 (planification, sans coder) : détailler le LLD §3.2 (daaras, profiles, memberships,
+   audit_log, platform_admins), §4 (helpers, `aal2` pour les admins, politiques) et §7 (inscription,
+   onboarding), et la première migration de sécurité (garde-fous pgTAP étendus, `revoke execute`).
 
 ### Plan du sprint 0 (validé le 2026-10-01)
 | Story | Contenu |
@@ -62,6 +62,51 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-03 — Bilan du sprint 0 (Installation)
+**Objectif** : un projet propre qui tourne, avec l'outillage en place. **Côté code : atteint.** Livrable « en
+ligne sur Cloudflare Pages » en attente des configurations manuelles (comptes Supabase, Cloudflare, Sentry, R2).
+
+| Story | État |
+|---|---|
+| S0.1 Socle Angular 22, nettoyage du starter | Fait |
+| S0.2 Identité DAARA (charte, mode sombre, logo, police) | Fait — `/dev/charte` à valider puis retirer |
+| S0.3 i18n fr/en | Fait |
+| S0.4 Composants `shared/ui` | Fait (+ squelette, form-field accessible) |
+| S0.5 Supabase local, `SupabaseService`, environnements | Fait |
+| S0.6 ESLint, Prettier, CI GitHub Actions | Fait — premier run GitHub à vérifier |
+| S0.7 Cloudflare Pages | Fichiers et procédure prêts — branchement par le développeur |
+| S0.8 Supabase cloud + Brevo | Procédure prête — création par le développeur |
+| S0.9 Sauvegarde chiffrée + anti-pause | Code testé en local de bout en bout — configuration et premier run à faire |
+| S0.10 Sentry | Code testé sur build de production — DSN à configurer |
+| Audit de sécurité | Clos : 0 critique, 0 important ouvert (4 importants corrigés et contre-vérifiés) |
+
+**Chiffres** : Angular 22.2 zoneless ; 13 dépendances, 18 de développement, 0 vulnérabilité (`npm audit`) ;
+55 tests unitaires (14 fichiers) + garde-fous pgTAP ; lint, format et scan de secrets verts ; chargement initial
+138 kB transférés (Sentry 28 kB en différé) ; 6 ADR (004 à 006 créés ce sprint).
+
+**Décisions** : projet Angular neuf plutôt que mise à niveau (ADR-004) ; interface fr/en sans RTL (ADR-005) ;
+Brevo pour les e-mails (ADR-003) ; authentification et récupération d'accès en trois niveaux, TOTP obligatoire
+pour les admins, mot de passe 8 caractères lettres + chiffres (ADR-006) ; tags de sprint `sN` sur `develop`,
+tags de release `rN` sur `main`.
+
+**Ce qui a bien marché** :
+- vérifier chaque choix en conditions réelles (build de production servi avec la CSP, restauration de
+  sauvegarde de bout en bout, fichiers piégés pour gitleaks) a fait remonter des problèmes invisibles en
+  lecture : script inline bloqué par la CSP, rôles et schéma `storage` non restaurables, règles gitleaks
+  absentes pour `sb_secret_`, Sentry v11 collectant tout par défaut, attributs envoyés dans le fil d'actions ;
+- les mesures (contrastes AA, poids du bundle) ont guidé les choix plutôt que les impressions.
+
+**À améliorer** :
+- lancer l'audit de sécurité plus tôt (à chaque story qui touche aux secrets ou aux données) : ses 4 constats
+  importants auraient été évités au moment de l'écriture ;
+- vérifier l'affichage en 375 px reste manuel (redimensionnement impossible dans le navigateur piloté) : à
+  prévoir dans les tests e2e Playwright (sprint 5) ;
+- ne jamais glisser de commande `git` dans une vérification (bloquée à juste titre une fois).
+
+**Pièges à retenir** : Node 24 requis ; supprimer `node_modules` après une montée de version majeure ;
+npm 11 bloque les scripts d'installation (sans impact) ; PowerShell 5.1 (BOM UTF-8, sortie d'erreur des
+commandes natives) ; R2 et sommes de contrôle de l'AWS CLI ; Session pooler (IPv4) obligatoire depuis GitHub.
+
 ### 2026-10-01 — Audit de sécurité du sprint 0 (agent `auditeur-securite`)
 - Résultat : 0 critique, 4 importants, 9 mineurs, 3 informations ; `npm audit` : 0 vulnérabilité.
 - Importants corrigés :

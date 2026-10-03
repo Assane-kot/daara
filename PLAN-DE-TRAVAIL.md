@@ -128,7 +128,7 @@ Une session et un commit sur `develop` par story, dans cet ordre :
 4. Composants `shared/ui` de base
 5. CI GitHub Actions + Cloudflare Pages
 6. Workflows planifiés (sauvegarde → R2, anti-pause) + Sentry
-Fin de sprint : tag `r0-s0`, application vide en ligne.
+Fin de sprint : tag de sprint `s0` sur `develop` (les tags `r0`, `r1`… sont réservés aux releases sur `main`), application vide en ligne.
 
 ---
 

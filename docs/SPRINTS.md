@@ -33,10 +33,10 @@ Objectif : un projet propre qui tourne, avec l'outillage en place.
 - [x] i18n fr/en (ADR-005)
 - [x] Composants `shared/ui` de base : page-header, empty-state, badge, confirm-dialog
 - [x] CI GitHub Actions (lint, tests, build, pgTAP, scan secrets)
-- [ ] Cloudflare Pages branché sur le dépôt (production `main`, preview `develop`)
-- [ ] Projets Supabase Free `daara-dev` et `daara-prod`, SMTP Brevo
-- [ ] Workflows planifiés : sauvegarde `pg_dump` → R2, anti-pause
-- [ ] Sentry branché sur Angular
+- [ ] Cloudflare Pages branché sur le dépôt (production `main`, preview `develop`) — fichiers prêts, branchement par le développeur
+- [ ] Projets Supabase Free `daara-dev` et `daara-prod`, SMTP Brevo — procédure prête, création par le développeur
+- [ ] Workflows planifiés : sauvegarde `pg_dump` → R2, anti-pause — code testé en local, configuration et premier run à faire
+- [ ] Sentry branché sur Angular — code testé, DSN à configurer
 Livrable : application vide aux couleurs DAARA, en ligne sur Cloudflare Pages, CI verte. Coût : 0.
 
 ## Sprint 1 — Socle multi-tenant
@@ -44,13 +44,15 @@ Objectif : isolation des daaras prouvée par les tests.
 - [ ] Tables `daaras`, `profiles`, `memberships`, `audit_log`, `platform_admins`
 - [ ] Helpers RLS + triggers `handle_new_user`, `audit_trigger`
 - [ ] Tests pgTAP d'isolation (2 daaras, 4 rôles)
-- [ ] Inscription, connexion, déconnexion, mot de passe oublié
+- [ ] Inscription, connexion, déconnexion (flux PKCE) ; mot de passe oublié par code à 6 chiffres (ADR-006 niveau 1)
+- [ ] Double authentification TOTP obligatoire pour les admins, `aal2` exigé dans `has_role` (ADR-006 niveau 3)
 - [ ] Onboarding : création d'une daara (le créateur devient admin)
 Livrable : un utilisateur crée sa daara ; une autre daara est invisible.
 
 ## Sprint 2 — Membres et navigation
 Objectif : chaque profil accède à son espace.
 - [ ] Invitations (`invite-member`, `accept-invitation`), email
+- [ ] Réinitialisation d'accès assistée par l'admin (`reset-access`, `use-access-code`, lien `wa.me`) (ADR-006 niveau 2)
 - [ ] Gestion des membres (liste, rôle, désactivation)
 - [ ] Routage `/d/:slug`, `DaaraResolver`, `CurrentDaaraService`, sélecteur multi-daaras
 - [ ] Layout et menus par rôle, `roleGuard`
