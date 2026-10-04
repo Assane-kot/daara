@@ -1,39 +1,53 @@
 /*
- * Layout « cover » (maquette validée). Couleurs : jetons de la charte (tailwind.config.js), jamais en dur.
- * Mode sombre : `:host-context(.dark)` (la classe `dark` est sur <body>, hors du composant encapsulé ; la variante
- * `dark:` de Tailwind ne fonctionne pas dans un style de composant).
+ * Layout « cover » (maquette validée). Couleurs : variables du thème (`styles.css`, @theme), jamais en dur.
+ * CSS standard plutôt que @apply : en Tailwind 4, @apply dans un style de composant exige @reference et développe
+ * chaque utilitaire avec des valeurs de repli (budget de 4 kB dépassé, ADR-007).
+ * Mode sombre : `:host-context(.dark)` (la classe `dark` est sur <body>, hors du composant encapsulé : la variante
+ * `dark:`, réécrite par l'encapsulation d'Angular, ne l'atteindrait pas).
  */
 .ecran {
-    @apply grid min-h-screen bg-page text-black;
+    display: grid;
+    min-height: 100vh;
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    background-color: var(--color-page);
+    color: var(--color-black);
 }
 
 /* Panneau de présentation : cour de la daara */
 .cour {
-    @apply relative flex flex-col justify-between gap-10 overflow-hidden;
-    color: theme('colors.secondary.50');
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2.5rem;
+    overflow: hidden;
+    color: var(--color-secondary-50);
     padding: 40px clamp(24px, 5vw, 64px);
     background:
         radial-gradient(120% 80% at 15% 0%, rgb(201 168 76 / 0.2), transparent 55%),
         radial-gradient(90% 70% at 100% 100%, rgb(42 145 92 / 0.35), transparent 60%),
-        linear-gradient(160deg, theme('colors.primary.900'), theme('colors.primary.950') 70%);
+        linear-gradient(160deg, var(--color-primary-900), var(--color-primary-950) 70%);
 }
 .cour::after {
     /* voile : lisibilité du texte posé sur le motif */
     content: '';
-    @apply pointer-events-none absolute inset-0;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
     background: linear-gradient(90deg, rgb(10 38 22 / 0.78), rgb(10 38 22 / 0.25) 70%, transparent);
 }
 .cour > :not(.zellige) {
-    @apply relative z-[1];
+    position: relative;
+    z-index: 1;
 }
 .zellige {
-    @apply pointer-events-none absolute;
+    position: absolute;
     inset: -80px;
     width: calc(100% + 160px);
     height: calc(100% + 160px);
+    pointer-events: none;
     opacity: 0.55;
-    color: theme('colors.secondary.DEFAULT');
+    color: var(--color-secondary);
 }
 .zellige .derive {
     animation: derive 60s linear infinite;
@@ -45,83 +59,137 @@
 }
 
 .marque {
-    @apply flex items-center gap-3 text-[15px] font-black tracking-[0.14em] text-white;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    color: var(--color-white);
 }
 .marque img {
-    @apply h-11 w-11 rounded-xl;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.75rem;
     box-shadow: 0 0 0 1px rgb(201 168 76 / 0.5);
 }
 
 .these-titre {
-    @apply m-0 font-black text-white;
+    margin: 0;
+    max-width: 13ch;
     font-size: clamp(34px, 4.4vw, 58px);
+    font-weight: 900;
     line-height: 1.04;
     letter-spacing: -0.02em;
     text-wrap: balance;
-    max-width: 13ch;
+    color: var(--color-white);
 }
 .these-titre em {
-    @apply not-italic text-secondary;
+    font-style: normal;
+    color: var(--color-secondary);
 }
 .these-texte {
-    @apply mb-0 mt-[18px] text-base;
+    margin: 18px 0 0;
     max-width: 42ch;
-    color: theme('colors.primary.100');
+    font-size: 1rem;
+    line-height: 1.5rem;
+    color: var(--color-primary-100);
 }
 
 .fiches {
-    @apply m-0 flex list-none flex-wrap gap-3 p-0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 .fiche {
-    @apply flex min-w-0 items-center gap-3 rounded-[14px] px-3.5 py-3;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    padding: 0.75rem 0.875rem;
+    border-radius: 14px;
     background: rgb(255 255 255 / 0.07);
     border: 1px solid rgb(201 168 76 / 0.28);
     backdrop-filter: blur(8px);
 }
 .fiche .pastille {
-    @apply grid h-9 w-9 flex-none place-items-center rounded-[10px] text-secondary;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 10px;
+    color: var(--color-secondary);
     background: rgb(201 168 76 / 0.16);
 }
 .fiche b {
-    @apply block text-sm font-extrabold text-white;
+    display: block;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 800;
+    color: var(--color-white);
 }
 .fiche > span > span {
-    @apply text-[12.5px];
-    color: theme('colors.primary.200');
+    font-size: 12.5px;
+    color: var(--color-primary-200);
 }
 .fiche .ok {
-    @apply font-extrabold;
-    color: theme('colors.primary.300');
+    font-weight: 800;
+    color: var(--color-primary-300);
 }
 .pied-cour {
-    @apply m-0 flex flex-wrap gap-[18px] text-[12.5px];
-    color: theme('colors.primary.300');
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--color-primary-300);
 }
 
 /* Panneau du formulaire */
 .cote {
-    @apply flex min-w-0 flex-col;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
     padding: 24px clamp(16px, 5vw, 72px) 32px;
 }
 .outils {
-    @apply flex items-center justify-end gap-2;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
 }
 .marque-mobile {
-    @apply mr-auto hidden items-center gap-2.5 font-black tracking-[0.12em] text-black;
+    display: none;
+    align-items: center;
+    gap: 0.625rem;
+    margin-right: auto;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    color: var(--color-black);
 }
 .marque-mobile img {
-    @apply h-9 w-9 rounded-[10px];
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 10px;
 }
 .contenu {
-    @apply grid flex-1 place-items-center py-6;
+    display: grid;
+    flex: 1;
+    place-items: center;
+    padding-block: 1.5rem;
 }
 
 /* Mode sombre */
 :host-context(.dark) .ecran {
-    @apply bg-night-deep text-white-dark;
+    background-color: var(--color-night-deep);
+    color: var(--color-white-dark);
 }
 :host-context(.dark) .marque-mobile {
-    @apply text-white-light;
+    color: var(--color-white-light);
 }
 
 @media (max-width: 900px) {
@@ -130,26 +198,27 @@
         grid-template-rows: auto 1fr;
     }
     .cour {
-        @apply gap-4;
+        gap: 1rem;
         padding: 28px 16px 24px;
     }
     .cour .marque,
     .cour .fiches,
     .pied-cour {
-        @apply hidden;
+        display: none;
     }
     .these-titre {
         font-size: 30px;
         max-width: 18ch;
     }
     .these-texte {
-        @apply mt-2 text-[14.5px];
+        margin-top: 0.5rem;
+        font-size: 14.5px;
     }
     .cote {
-        @apply px-4;
+        padding-inline: 1rem;
     }
     .marque-mobile {
-        @apply inline-flex;
+        display: inline-flex;
     }
 }
 

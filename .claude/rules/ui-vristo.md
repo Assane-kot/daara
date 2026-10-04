@@ -3,7 +3,7 @@ paths:
   - "src/**/*.html"
   - "src/**/*.scss"
   - "src/**/*.css"
-  - "tailwind.config.*"
+  - "src/styles.css"
 ---
 # Règles UI (thème Vristo)
 
@@ -13,7 +13,25 @@ paths:
   son markup et ses classes Tailwind. N'en copier que les éléments nécessaires, au cas par cas.
   Ne pas inventer un style différent du thème.
 - Charte DAARA : couleur primaire `#1a6b3c` (vert), secondaire / accent `#C9A84C` (or). Configurées une seule fois
-  dans la config Tailwind / variables du thème, jamais en dur dans les templates.
+  dans le thème Tailwind 4 (`@theme` de `src/styles.css`, ADR-007), jamais en dur dans les templates.
+- Tailwind 4 (ADR-007) ; la référence Vristo est en Tailwind 3. Tout markup copié passe par cette table :
+
+  | Vristo (v3) | DAARA (v4) |
+  |---|---|
+  | `shadow-sm` / `shadow` | `shadow-xs` / `shadow-sm` |
+  | `rounded-sm` / `rounded` | `rounded-xs` / `rounded-sm` |
+  | `outline-none` | `outline-hidden` |
+  | `ring` | `ring-3` |
+  | `flex-shrink-0` / `flex-grow` | `shrink-0` / `grow` |
+  | `bg-opacity-50` (et `text-`, `border-`…) | `bg-black/50` (modificateur d'opacité) |
+  | `!mb-0`, `dark:!bg-x` | `mb-0!`, `dark:bg-x!` (important en suffixe) |
+  | `theme('colors.primary.900')` | `var(--color-primary-900)` |
+  | `@apply` dans un style de composant | CSS standard avec `var(--color-…)` (sinon `@reference` obligatoire) |
+  | variante `dark:` dans un style de composant | `:host-context(.dark)` (classe sur `<body>`) |
+- Classes maison réutilisables (`.btn`, `.form-input`, `.auth-…`) : dans `@layer components` de `src/styles.css`.
+  Pour qu'une classe maison accepte des variantes (`hover:`, `md:`…), la déclarer avec `@utility`.
+- Nouvelle couleur : variable `--color-<nom>` dans `@theme` ; jamais de variable runtime nommée `--color-*`
+  (espace de noms du thème Tailwind) : préfixe `--daara-`.
 - Or : jamais en couleur de texte sur fond clair (contraste 2,3). Sur fond clair : `text-secondary-700` ;
   texte posé sur un fond or : `text-primary-950`. Boutons pleins primaires : `text-on-primary` (pas `text-white`).
 - Markup copié de la référence : remplacer les couleurs codées en dur par les jetons DAARA :

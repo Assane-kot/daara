@@ -17,7 +17,9 @@ export const routes: Routes = [
             },
             // Page de référence de la charte (S0.2) : développement uniquement (`ngDevMode` vaut false en build de
             // production, la route et son chunk sont alors supprimés). À retirer après validation.
-            ...(ngDevMode
+            // Forme `typeof … || ngDevMode` : la variable n'est définie qu'à la première définition de composant, après
+            // l'évaluation de ce fichier quand les layouts sont chargés à la demande.
+            ...(typeof ngDevMode === 'undefined' || ngDevMode
                 ? [
                       {
                           path: 'dev/charte',

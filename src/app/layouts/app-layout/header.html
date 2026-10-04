@@ -2,14 +2,14 @@
     <div class="horizontal-logo flex items-center justify-between lg:hidden ltr:mr-2 rtl:ml-2">
         <a routerLink="/" class="main-logo flex shrink-0 items-center">
             <img class="inline w-8 ltr:-ml-1 rtl:-mr-1" src="/images/logo.svg" alt="" />
-            <span class="hidden align-middle text-2xl font-semibold transition-all duration-300 dark:text-white-light md:inline ltr:ml-1.5 rtl:mr-1.5">
+            <span class="hidden align-middle text-2xl font-semibold transition-all duration-300 md:inline ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light">
                 DAARA
             </span>
         </a>
 
         <button
             type="button"
-            class="icon-btn collapse-icon flex-none dark:text-white-light lg:hidden ltr:ml-2 rtl:mr-2"
+            class="icon-btn collapse-icon flex-none lg:hidden ltr:ml-2 rtl:mr-2 dark:text-white-light"
             [attr.aria-label]="'layout.afficher_menu' | translate"
             (click)="layout.toggleSidebar()"
         >
@@ -17,7 +17,7 @@
         </button>
     </div>
 
-    <div class="flex items-center space-x-1.5 dark:text-white-light lg:space-x-2 ltr:ml-auto rtl:mr-auto rtl:space-x-reverse">
+    <div class="flex items-center space-x-1.5 lg:space-x-2 ltr:ml-auto rtl:mr-auto rtl:space-x-reverse dark:text-white-light">
         <!-- Libellé écrit dans la langue proposée (attribut lang), pratique d'accessibilité courante. -->
         <button
             type="button"
@@ -53,7 +53,7 @@
         <!-- Menu du compte (CDK Menu : clavier, Échap, focus restauré). -->
         <button
             type="button"
-            class="icon-btn h-9 w-9 rounded-full bg-primary/10 font-extrabold uppercase text-primary"
+            class="icon-btn h-9 w-9 rounded-full bg-primary/10 font-extrabold text-primary uppercase"
             [cdkMenuTriggerFor]="menuCompte"
             [attr.aria-label]="'layout.compte.menu' | translate"
             [attr.title]="'layout.compte.menu' | translate"

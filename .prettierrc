@@ -10,5 +10,6 @@
                 "parser": "angular"
             }
         }
-    ]
+    ],
+    "tailwindStylesheet": "./src/styles.css"
 }

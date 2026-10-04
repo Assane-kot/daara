@@ -15,11 +15,11 @@ const LARGEURS = ['w-full', 'w-11/12', 'w-4/5', 'w-2/3'] as const;
         <div class="motion-safe:animate-pulse" role="status" aria-live="polite">
             <span class="sr-only">{{ 'commun.chargement' | translate }}</span>
             @if (avecTitre()) {
-                <div class="mb-4 h-5 w-1/3 rounded bg-white-light dark:bg-night-raised"></div>
+                <div class="mb-4 h-5 w-1/3 rounded-sm bg-white-light dark:bg-night-raised"></div>
             }
             <div class="space-y-3">
                 @for (largeur of largeurs(); track $index) {
-                    <div class="h-3.5 rounded bg-white-light dark:bg-night-raised" [class]="largeur"></div>
+                    <div class="h-3.5 rounded-sm bg-white-light dark:bg-night-raised" [class]="largeur"></div>
                 }
             </div>
         </div>

@@ -44,13 +44,13 @@
                         class="flex items-stretch overflow-hidden rounded-xl border-[1.5px] border-white-light bg-primary-50/50 focus-within:border-primary dark:border-night-border dark:bg-night-input"
                     >
                         <span
-                            class="flex items-center whitespace-nowrap border-r border-white-light px-2.5 text-[13.5px] text-muted dark:border-night-border dark:text-night-muted"
+                            class="flex items-center border-r border-white-light px-2.5 text-[13.5px] whitespace-nowrap text-muted dark:border-night-border dark:text-night-muted"
                             aria-hidden="true"
                             >/d/</span
                         >
                         <input
                             appFormControl
-                            class="form-input min-w-0 !rounded-none !border-0 !bg-transparent !shadow-none"
+                            class="form-input min-w-0 rounded-none! border-0! bg-transparent! shadow-none!"
                             type="text"
                             formControlName="slug"
                             [attr.maxlength]="slugMax"
@@ -83,7 +83,7 @@
                         <div class="grid grid-cols-2 gap-2">
                             @for (bareme of [10, 20]; track bareme) {
                                 <label
-                                    class="!mb-0 flex min-h-12 cursor-pointer items-center justify-center rounded-xl border-[1.5px] border-white-light font-extrabold has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:text-primary has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary dark:border-night-border"
+                                    class="mb-0! flex min-h-12 cursor-pointer items-center justify-center rounded-xl border-[1.5px] border-white-light font-extrabold has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:text-primary has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary dark:border-night-border"
                                 >
                                     <input class="sr-only" type="radio" formControlName="bareme" [value]="bareme" />
                                     {{ (bareme === 10 ? 'onboarding.champs.sur_10' : 'onboarding.champs.sur_20') | translate }}

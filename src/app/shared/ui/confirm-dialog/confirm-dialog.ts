@@ -26,12 +26,12 @@ export interface ConfirmDialogData extends ConfirmationOptions {
     selector: 'app-confirm-dialog',
     imports: [TranslatePipe],
     template: `
-        <div class="relative overflow-hidden rounded-lg bg-white text-base text-black shadow dark:bg-night dark:text-white-dark">
+        <div class="relative overflow-hidden rounded-lg bg-white text-base text-black shadow-sm dark:bg-night dark:text-white-dark">
             <div class="flex items-center justify-between gap-4 bg-gray-50 px-5 py-3 dark:bg-night-hover">
                 <h2 class="text-lg font-bold dark:text-white-light" [id]="data.titreId">{{ data.titre }}</h2>
                 <button
                     type="button"
-                    class="shrink-0 text-3xl font-normal leading-7 text-muted hover:text-black dark:text-night-muted dark:hover:text-white-light"
+                    class="shrink-0 text-3xl leading-7 font-normal text-muted hover:text-black dark:text-night-muted dark:hover:text-white-light"
                     [attr.aria-label]="'commun.fermer' | translate"
                     (click)="fermer(false)"
                 >

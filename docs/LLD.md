@@ -47,7 +47,8 @@ src/app/
 /auth/mfa                          connecté : enrôlement / vérification TOTP (obligatoire pour les admins)
 /onboarding                        connecté, sans daara
 /select-daara                      connecté, plusieurs daaras
-/d/:slug                           DaaraResolver → vérifie le membership, charge CurrentDaara
+/d/:slug                           DaaraResolver → vérifie le membership, charge CurrentDaara (rôles, modules)
+                                   chaque route de module : moduleGuard('<module>') (ADR-008)
   ├── dashboard                    tous
   ├── membres                      admin
   ├── structure/...                admin
@@ -57,7 +58,7 @@ src/app/
   ├── bulletins/...                admin (gestion), parent/apprenant (consultation)
   ├── enfants/:apprenantId/...     parent
   ├── coran/...                    admin, enseignant, apprenant
-  └── parametres                   admin
+  └── parametres                   admin (dont « Modules », ADR-008)
 /plateforme/...                    super-admin
 ```
 
@@ -77,7 +78,7 @@ preview → `daara-dev`). Il échoue sur Cloudflare si elles manquent, refuse to
 |---|---|
 | `SupabaseService` | Instance unique du client, configuration par environnement ; flux PKCE à partir du sprint 1 (ADR-006) |
 | `AuthService` | Session (signals `user`, `aal`), inscription, connexion, codes e-mail, mot de passe, MFA, déconnexion, écoute `onAuthStateChange` (§7.0) |
-| `CurrentDaaraService` | Signals `daara`, `roles`, `id` ; `hasRole(...)` ; mémorise le dernier slug utilisé |
+| `CurrentDaaraService` | Signals `daara`, `roles`, `id`, `modules` (ADR-008) ; `hasRole(...)`, `moduleActif(...)` ; mémorise le dernier slug utilisé |
 | `NotificationCenterService` | Abonnement Realtime à `notifications` de l'utilisateur, compteur non lus |
 | `PushService` | Inscription Web Push (sprint 8) |
 | `ThemeService` | Signal `mode` (clair / sombre / système), classe `dark` sur `<body>`, mémorisé dans `localStorage` |
@@ -85,6 +86,8 @@ preview → `daara-dev`). Il échoue sur Cloudflare si elles manquent, refuse to
 
 État : signals dans les services de feature ; pas de store global (NgRx) en V1. Application zoneless,
 composants standalone OnPush, primitives @angular/cdk (Dialog, Menu, Overlay) : voir ADR-004.
+Styles : Tailwind 4, thème en CSS (`@theme` de `src/styles.css`), styles de composant en CSS standard avec les
+variables du thème (ADR-007).
 
 ## 3. Modèle de données
 
@@ -144,6 +147,12 @@ Lignes du sprint 2 (à détailler) :
 | `invitations` | daara_id, email, telephone, role, token_hash, expires_at, accepted_at, invited_by | expire après 7 jours |
 | `codes_acces` | daara_id, user_id, code_hash, expires_at, used_at, tentatives, cree_par | un code actif par utilisateur ; 24 h, usage unique, 5 essais (ADR-006, sprint 2) ; écrit uniquement par les Edge Functions |
 | `notifications` | daara_id, user_id, type, titre, message, ref_table, ref_id, lue | RLS : user_id = auth.uid() |
+| `daara_modules` (ADR-008) | daara_id (fk cascade), module `module_daara`, actif bool, updated_at, updated_by | pk (daara_id, module) ; écrite uniquement par `definir_modules` et `creer_daara` ; journalisée |
+
+Type `public.module_daara` = enum (`structure`, `absences`, `notes`, `bulletins`, `coran_cahier`,
+`coran_recitations`, `coran_nafar`, `notifications`). Prérequis : `absences`, `notes` → `structure` ;
+`bulletins` → `notes` ; `coran_recitations`, `coran_nafar` → `coran_cahier`. Le socle (membres, paramètres,
+apprenants, liens parents, tableau de bord) n'est pas un module : toujours actif.
 
 ### 3.3 Structure scolaire (sprint 3)
 | Table | Colonnes principales | Contraintes |
@@ -218,9 +227,16 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 | `teaches_class(classe_id)` | enseignant affecté à la classe (titulaire ou classe_matieres) |
 | `membres_administres()` → setof uuid | membres **actifs** des daaras dont l'appelant est admin actif (`aal2`) ; lecture des profils via `id in (select membres_administres())`, évalué une fois par requête. Un membre désactivé n'est plus lisible (minimisation) |
 | `is_platform_admin()` | présent dans `platform_admins` **et** session en `aal2` (ADR-006) |
+| `module_actif(daara_id, module)` | module activé pour la daara (ADR-008) ; à partir du sprint 11, et permis par son offre |
 Toutes : `security definer`, `stable`, `search_path = ''`, appelées via `(select ...)`.
 Un utilisateur admin + enseignant en `aal1` garde ses droits d'enseignant (le rôle admin seul est ignoré).
 La suspension d'une daara (`statut`) n'est pas vérifiée par les helpers en V1 : traitée au sprint 11.
+
+### Modules activables (ADR-008, à partir du sprint 2)
+Toute table d'un module ajoute `(select public.module_actif(daara_id, '<module>'))` à **toutes** ses politiques,
+lecture comprise, pour tous les rôles (admin compris) : un module désactivé est invisible et inutilisable, ses
+données sont conservées. Les Edge Functions d'un module le vérifient aussi. `daara_modules` : lecture par
+`is_member(daara_id)` ou `is_platform_admin()` ; aucune écriture directe.
 
 ### Socle (sprint 1) : politiques détaillées
 Toutes les politiques visent `authenticated` ; aucune ne vise `anon`.
@@ -255,7 +271,8 @@ acceptation d'invitation). Au sprint 2 : modification du rôle / désactivation 
 ### Fonctions RPC
 | Fonction | Rôle | Sécurité |
 |---|---|---|
-| `creer_daara(p_nom, p_slug, p_ville, p_telephone, p_langue_defaut, p_bareme)` → slug | crée la daara et le membership admin du créateur, dans la même transaction | `security definer`, `search_path = ''` ; `auth.uid()` non nul, session `aal2`, au plus 3 daaras créées par utilisateur (`created_by`), entrées validées par la fonction (paramètre nul, langue, barème) et par les contraintes ; erreurs traduites côté front : `42501` (non authentifié, `aal2` requis), `P0001` (limite), `23505` (slug déjà pris), `23514` (donnée invalide, slug réservé) |
+| `definir_modules(p_daara, p_modules module_daara[])` → `module_daara[]` (sprint 2, ADR-008) | fixe les modules actifs de la daara | `security definer` ; `has_role(p_daara, admin)` en `aal2` ; prérequis ajoutés ; refus (`23514`, `module_requis`) de désactiver un prérequis d'un module actif ; journalisé |
+| `creer_daara(p_nom, p_slug, p_ville, p_telephone, p_langue_defaut, p_bareme[, p_modules])` → slug | crée la daara et le membership admin du créateur, dans la même transaction | `security definer`, `search_path = ''` ; `auth.uid()` non nul, session `aal2`, au plus 3 daaras créées par utilisateur (`created_by`), entrées validées par la fonction (paramètre nul, langue, barème) et par les contraintes ; erreurs traduites côté front : `42501` (non authentifié, `aal2` requis), `P0001` (limite), `23505` (slug déjà pris), `23514` (donnée invalide, slug réservé) |
 
 ### Triggers
 | Trigger | Tables | Rôle |
@@ -322,7 +339,7 @@ Free, à revoir au sprint 12).
 | Connexion `/auth/connexion` | e-mail, mot de passe, Turnstile → `signInWithPassword` (adresse non confirmée → lien vers l'écran du code) → facteur TOTP vérifié et session `aal1` → `/auth/mfa` (code) ; admin d'une daara sans facteur → `/auth/mfa` (enrôlement imposé) ; puis routage (ci-dessous) |
 | Mot de passe oublié `/auth/mot-de-passe-oublie` | e-mail + Turnstile → `resetPasswordForEmail` → message neutre → code + nouveau mot de passe → `verifyOtp(type: 'recovery')` → `updateUser({ password })` ; compte avec TOTP : Supabase refuse (`insufficient_aal`, session de récupération `aal1`) → code TOTP (`challengeAndVerify`) → `updateUser` rejoué (vérifié le 2026-10-03) |
 | Double authentification `/auth/mfa` | enrôlement : `mfa.enroll` (QR code + clé texte) → `challengeAndVerify` ; vérification : `challengeAndVerify` → session `aal2` ; enrôlements abandonnés (facteurs non vérifiés) supprimés avant un nouvel enrôlement. Second appareil et codes de secours : **reportés au sprint 2** (codes de secours disponibles mais expérimentaux dans supabase-js 2.117 / Auth 2.197, à décider avec la procédure super-admin de retrait d'un facteur) |
-| Onboarding `/onboarding` | étape 1 : TOTP (si session pas encore `aal2`) ; étape 2 : nom, slug (proposé depuis le nom, modifiable), ville, téléphone, langue, barème → `rpc('creer_daara')` → tableau de bord |
+| Onboarding `/onboarding` | étape 1 : TOTP (si session pas encore `aal2`) ; étape 2 (sprint 2, ADR-008) : profil « Daara coranique », « École franco-arabe » ou « Personnalisé » → modules pré-cochés (`p_modules` de `creer_daara`) ; puis nom, slug (proposé depuis le nom, modifiable), ville, téléphone, langue, barème → `rpc('creer_daara')` → tableau de bord |
 | Déconnexion | `signOut()` → `/auth/connexion` |
 
 Routage après connexion (sprint 1, `AuthService.destination()`) : facteur TOTP vérifié en session `aal1`, ou admin

@@ -18,7 +18,7 @@ import { LayoutService } from '../layout.service';
     selector: 'header[appHeader]',
     imports: [RouterLink, TranslatePipe, CdkMenuTrigger, CdkMenu, CdkMenuItem, IconMenu, IconSun, IconMoon, IconLaptop, IconLogout],
     templateUrl: './header.html',
-    host: { class: 'z-40 shadow-sm' },
+    host: { class: 'z-40 shadow-xs' },
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Header {

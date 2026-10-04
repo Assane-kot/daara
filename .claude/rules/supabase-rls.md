@@ -24,4 +24,7 @@ paths:
 - Extensions : `create extension ... with schema extensions`, jamais dans `public`.
 - Textes affichés (noms, libellés) : reprendre la contrainte « caractères interdits » du socle (LLD §3.2).
   Chemins Storage stockés en base : contrainte `check` sur le préfixe attendu.
+- Table d'un module (ADR-008 : structure, absences, notes, bulletins, coran_*, notifications) : ajouter
+  `(select public.module_actif(daara_id, '<module>'))` à TOUTES ses politiques, lecture comprise, et un test
+  pgTAP « module désactivé » (lecture et écriture refusées, même pour l'admin ; données retrouvées après réactivation).
 - Calculs (moyennes, rangs) : vues `security_invoker = true` ou fonctions SQL, jamais dupliqués côté front.

@@ -6,9 +6,10 @@
 ## État actuel
 - Sprint en cours : 0 — Installation, **code terminé** (bilan ci-dessous, 2026-10-03) ; clôture effective
   après les configurations manuelles du développeur. Sprint suivant : 1 — Socle multi-tenant.
-- Sprint 1 : **code terminé** (S1.1 à S1.6) : socle multi-tenant (base) puis authentification et onboarding (front).
-- Dernière tâche terminée : authentification (inscription, connexion, code e-mail, mot de passe oublié, TOTP,
-  onboarding) avec le design « cover » validé, parcours complet vérifié dans le navigateur (2026-10-03).
+- Sprint 1 — Socle multi-tenant : **code terminé** (bilan ci-dessous, 2026-10-03) ; clôture effective après la
+  vérification en 375 px et les configurations Auth / Turnstile du développeur. Sprint suivant : 2 — Membres et
+  navigation (planification à faire).
+- Dernière tâche terminée : modules activables par daara décidés (ADR-008) et intégrés au sprint 2 (2026-10-04).
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -35,6 +36,7 @@
   - À faire par le développeur avant la preview : widget Turnstile, variable `TURNSTILE_SITE_KEY` dans Cloudflare,
     clé secrète Turnstile, TOTP, expiration des codes à 30 min et modèles d'e-mail dans les deux projets Supabase
     (`docs/deploiement.md` §1.2, §2.2, §2.4 étape 6, §2.6).
+  - Navigateurs : Angular 22 n'assure plus iOS 16 (iPhone 8, iPhone X) ; à vérifier avec les daaras pilotes (ADR-007).
   - Audit de l'authentification (2026-10-03), points reportés :
     - AVANT le sprint 2 (invitations, changement d'e-mail) : modèles `magic_link`, `email_change`, `invite`,
       `reauthentication` encore ceux de Supabase (avec lien) → modèles code seul fr / en ;
@@ -58,8 +60,20 @@
 1. Développeur, pour clore le sprint 0 : configurations de `docs/deploiement.md` dans l'ordre §2 (Supabase +
    Brevo) → §1 (Cloudflare) → §5 (Sentry) → §4 (sauvegardes) ; premier run de la CI sur GitHub ; validation de
    `/dev/charte` (puis retrait de la page) ; tag de sprint `s0` sur `develop`.
-2. Sprint 1 : code terminé (commit de l'authentification à faire par le développeur). Clôture : bilan du sprint,
-   vérification en 375 px par le développeur, tag `s1`. Puis sprint 2 (membres et navigation) : planification.
+2. Sprint 1, pour le clore : vérification en 375 px (connexion, inscription, code, mfa, onboarding, tableau de bord) ;
+   tag `s1` sur `develop`.
+3. Sprint 2 (membres et navigation) : planification (LLD §3.2 lignes du sprint 2, §6 Edge Functions, §7.1 à
+   détailler ; specs). À trancher pendant la planification : `is_member` et `aal2` ; modèles d'e-mail restants ;
+   second facteur TOTP et codes de secours ; décision OTP téléphone (ADR).
+
+### Modules activables par daara (ADR-008, validé le 2026-10-04)
+- Chaque daara active ses modules (structure, absences, notes, bulletins, coran_cahier, coran_recitations,
+  coran_nafar, notifications) ; le socle reste toujours actif. Ce que l'admin active est ce que tous voient.
+- L'admin active librement (`aal2`) ; l'offre fixera le plafond au sprint 11.
+- Profils proposés à l'onboarding (« Daara coranique », « École franco-arabe », « Personnalisé »).
+- Désactivation = masquage, données conservées ; protection par la RLS (lecture et écriture), pas seulement à l'écran.
+- Story ajoutée au sprint 2 ; Definition of Done et règles RLS complétées pour toutes les stories de module.
+- Spec : `docs/features/modules.md`.
 
 ### Décisions de planification du sprint 1 (validées le 2026-10-03)
 - Confirmation d'e-mail par code à 6 chiffres (pas de lien), comme la réinitialisation ; codes valables 30 min.
@@ -86,6 +100,85 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-04 — Passage à Tailwind 4 (ADR-007)
+- Tailwind 4.3 via `@tailwindcss/postcss` ; thème en CSS (`@theme` dans `src/styles.css`), `tailwind.config.js`
+  supprimé ; mode sombre `@custom-variant dark` ; couche de compatibilité du préflight v3 (bordures, placeholders,
+  curseur des boutons) ; gris de Tailwind 3 conservés.
+- Variables runtime renommées `--daara-primaire` / `--daara-sur-primaire` (`--color-*` est l'espace du thème v4),
+  branchées par `@theme inline` pour que le vert du mode sombre s'applique.
+- `@tailwindcss/forms` retiré (en v4 ses styles passaient devant les surcharges Vristo) : ses règles de base sont
+  reprises dans `@layer components` ; `@tailwindcss/typography` retiré (inutilisé). 2 dépendances en moins.
+- Classes renommées (`shadow`, `rounded`, `outline-none`, `!` en suffixe) par un script limité aux attributs `class`
+  et aux `@apply` ; `auth-layout.css` réécrit en CSS standard (budget de 4 kB tenu). Table v3 → v4 dans
+  `.claude/rules/ui-vristo.md` pour le markup repris de Vristo.
+- Vérification : styles calculés de 11 pages (clair et sombre) relevés avant / après et comparés propriété par
+  propriété : rendu identique (écarts de notation seulement, détail dans l'ADR-007) ; focus clavier contrôlé.
+- 2 bugs trouvés pendant les relevés, corrigés :
+  - lien direct vers une page de l'espace renvoyé au tableau de bord : au chargement, les guards démarrent en
+    parallèle et `rolesActifs()` lisait les rôles avant la restauration de la session (« aucune daara » →
+    onboarding → `/`). Corrigé (attente de la session) et testé ; aurait cassé `/d/:slug` au sprint 2 ;
+  - `/dev/charte` absente en développement depuis le chargement à la demande des layouts : `ngDevMode` n'était pas
+    encore défini à l'évaluation des routes → forme `typeof ngDevMode === 'undefined' || ngDevMode`.
+- Navigateurs : Tailwind 4 (Chrome 111, Safari 16.4, Firefox 128) ne restreint presque rien de plus qu'Angular 22
+  (Chrome 119, Safari / iOS 17, Firefox 119).
+- Chiffres : 123 tests unitaires ; `npm audit` 0 vulnérabilité (développement compris) ; chargement initial 614 kB
+  bruts / 144,7 kB transférés (584 / 142 avant).
+- Piège : `@tailwindcss/upgrade` exécute des commandes git → non utilisé (règle du projet), migration manuelle.
+
+### 2026-10-03 — Bilan du sprint 1 (Socle multi-tenant)
+**Objectif** : isolation des daaras prouvée par les tests. **Atteint.** Livrable « un utilisateur crée sa daara ;
+une autre daara est invisible » : atteint et vérifié en local (navigateur + pgTAP). La mise en ligne attend les
+configurations du sprint 0 et celles de l'Auth (Turnstile, TOTP, modèles d'e-mail).
+
+| Story | État |
+|---|---|
+| S1.1 Tables `daaras`, `profiles`, `memberships`, `audit_log`, `platform_admins` | Fait |
+| S1.2 Helpers RLS, triggers `handle_new_user`, `audit_trigger` | Fait (`membres_administres()` remplace `est_admin_de_membre`) |
+| S1.3 Tests pgTAP d'isolation (2 daaras, 4 rôles) | Fait : 108 tests + 15 garde-fous |
+| S1.4 Inscription, connexion, déconnexion PKCE, mot de passe oublié par code | Fait — 375 px à vérifier |
+| S1.5 TOTP obligatoire pour les admins (`aal2` dans `has_role`) | Fait — second facteur et codes de secours reportés (sprint 2) |
+| S1.6 Onboarding : création d'une daara | Fait |
+| Audits | 3 audits (RLS, sécurité base, sécurité auth) : 0 critique ; 3 importants corrigés et contre-vérifiés |
+
+**Chiffres** : 123 tests pgTAP (75 au premier jet) ; 122 tests unitaires en 21 fichiers (55 au sprint 0) ; chargement
+initial 142 kB transférés (138 au sprint 0, layouts chargés à la demande) ; 13 dépendances, 18 de développement,
+aucun paquet ajouté ; `npm audit` : 0 vulnérabilité en production, 5 « high » en développement (avis publié pendant
+le sprint, voir décision ci-dessous) ; 6 ADR (aucun nouveau : les décisions sont dans le LLD et ADR-006).
+
+**Décisions** (validées) : rôle en enum `role_membre` ; aucune écriture client sur `memberships` ; enseignant limité
+aux memberships des enseignants ; profil d'un membre désactivé illisible pour l'admin ; confirmation et
+réinitialisation par code à 6 chiffres (30 min) ; TOTP avant la création de la daara, 3 daaras par utilisateur ;
+Turnstile sur inscription, connexion, renvoi du code et mot de passe oublié ; design « cover » validé sur maquette.
+
+**Ce qui a bien marché** :
+- la maquette avant le code : design validé en un échange, puis reproduit sans aller-retour ;
+- le parcours complet dans le navigateur (Mailpit, TOTP calculé) a révélé ce que la lecture ne montrait pas :
+  `inject()` après `await` dans les guards (navigation bloquée sans erreur), Turnstile exigé sur la connexion,
+  `aal2` exigé pour changer le mot de passe, build de production sans variables cassé depuis le sprint 0 ;
+- l'audit avant le commit, appliqué dès ce sprint (point « à améliorer » du sprint 0) : énumération de comptes et
+  renvoi du code cassé trouvés avant toute mise en ligne ; contre-épreuves pgTAP (fonction piégée) sur les garde-fous.
+
+**À améliorer** :
+- tester dans le navigateur les chemins secondaires, pas seulement le parcours nominal : « Renvoyer le code »
+  n'était pas testé et ne pouvait jamais fonctionner (trouvé par l'audit) ;
+- vérifier l'absence de caractères invisibles **avant** de donner un commit (`grep -P`, voir la mémoire de Claude) :
+  une migration commitée a dû être corrigée après coup ;
+- la story authentification était grosse (un commit, ~60 fichiers) : au sprint 2, découper en stories plus petites
+  (une par Edge Function ou par écran) pour des commits relisibles ;
+- vélocité : le code d'un sprint de 2 semaines a tenu en une journée de session ; le goulot est désormais côté
+  développeur (configurations manuelles, validations, vérification en 375 px). Ajuster le plan après le sprint 2.
+
+**Pièges à retenir** : `inject()` toujours avant le premier `await` dans un guard ; supabase-js : aucun appel Supabase
+dans le rappel de `onAuthStateChange` ; Supabase Auth exige le captcha sur `signup`, `token` (mot de passe),
+`recover`, `resend` ; `aal2` exigé pour changer e-mail / mot de passe d'un compte avec TOTP ; Angular ne lit pas la
+variante `dark:` de Tailwind dans un style de composant (classe sur `<body>`) → `:host-context(.dark)` ou styles
+globaux ; l'encapsulation renforce la spécificité (`.cour > *` écrasait `.zellige`) ; `fileReplacements` : un
+fichier de remplacement ne peut pas importer le fichier qu'il remplace ; Prettier ne lit pas les modèles Go.
+
+**Décision (CI)** : l'audit npm échouait sur `braces` (Tailwind 3, aucune version corrigée). Choix du développeur
+(2026-10-04) : passer à Tailwind 4 tout de suite plutôt qu'assouplir l'audit, pour la durabilité, le projet n'en étant
+qu'à l'authentification (ADR-007). L'étape d'audit de la CI reste bloquante.
+
 ### 2026-10-03 — Sprint 1 : authentification et onboarding (S1.4, S1.5, S1.6)
 - Design « cover » validé sur maquette : panneau vert profond, motif géométrique or animé (étoile à 8 branches du
   logo, mouvement coupé si réduction des animations), exemples de la vie d'une daara ; formulaire à droite ; mobile :

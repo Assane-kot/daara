@@ -1,21 +1,298 @@
 /*
- * Styles globaux DAARA — repris du thème Vristo (assets/css/tailwind.css).
+ * Styles globaux DAARA — repris du thème Vristo (assets/css/tailwind.css), Tailwind 4 (ADR-007).
  * Retirés : menus horizontal et repliable, layout boxed, animate.css, ngx-scrollbar,
  * sweetalert2, apexcharts, highlight.js (librairies non utilisées, voir ADR-004).
+ * Les styles de composant qui utilisent @apply font `@reference` vers ce fichier.
  */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-/* Couleur primaire et texte posé dessus : le vert s'éclaircit en mode sombre (contraste AA). */
+/* Mode sombre par classe : `dark` sur <body> (ThemeService). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Couleur primaire et texte posé dessus : le vert s'éclaircit en mode sombre (contraste AA). Triplets RGB
+ * redéfinis par `.dark`, lus au point d'usage grâce à `@theme inline` (un `@theme` simple figerait la valeur de :root).
+ */
 :root {
-    --color-primary: 26 107 60; /* #1a6b3c */
-    --color-on-primary: 255 255 255;
+    --daara-primaire: 26 107 60; /* #1a6b3c */
+    --daara-sur-primaire: 255 255 255;
 }
 
 .dark {
-    --color-primary: 76 175 122; /* #4caf7a */
-    --color-on-primary: 11 18 14; /* #0b120e */
+    --daara-primaire: 76 175 122; /* #4caf7a */
+    --daara-sur-primaire: 11 18 14; /* #0b120e */
+}
+
+@theme inline {
+    --color-primary: rgb(var(--daara-primaire));
+    --color-primary-dark-light: rgb(var(--daara-primaire) / 0.15);
+    --color-on-primary: rgb(var(--daara-sur-primaire));
+}
+
+/*
+ * Charte DAARA (ADR-004, règles ui-vristo) : primaire vert #1a6b3c, secondaire or #C9A84C (alias `accent`).
+ * L'or ne sert jamais de couleur de texte sur fond clair (contraste 2,3) : fonds, bordures, accents.
+ */
+@theme {
+    --font-nunito: 'Nunito Variable', Nunito, sans-serif;
+
+    /* Taille de base DAARA : 15 px (Vristo : 14 px), pour la lecture sur téléphone. */
+    --text-body: 0.9375rem;
+    --text-body--line-height: 1.5rem;
+
+    --shadow-3xl: 0 2px 2px rgb(224 230 226 / 46%), 1px 6px 7px rgb(224 230 226 / 46%);
+
+    --color-primary-light: #e3f3e9;
+    --color-primary-50: #effaf3;
+    --color-primary-100: #d8f2e1;
+    --color-primary-200: #b3e3c6;
+    --color-primary-300: #80cda2;
+    --color-primary-400: #4caf7a;
+    --color-primary-500: #2a915c;
+    --color-primary-600: #1d7848;
+    --color-primary-700: #1a6b3c;
+    --color-primary-800: #17532f;
+    --color-primary-900: #134428;
+    --color-primary-950: #0a2616;
+
+    --color-secondary: #c9a84c;
+    --color-secondary-light: #f7f0dc;
+    --color-secondary-dark-light: rgb(201 168 76 / 0.15);
+    --color-secondary-50: #fbf8ee;
+    --color-secondary-100: #f5edd2;
+    --color-secondary-200: #ebdaa5;
+    --color-secondary-300: #dfc375;
+    --color-secondary-400: #d4b25b;
+    --color-secondary-500: #c9a84c;
+    --color-secondary-600: #b08a35;
+    --color-secondary-700: #8d6a2b;
+    --color-secondary-800: #745628;
+    --color-secondary-900: #614824;
+    --color-secondary-950: #382711;
+
+    --color-accent: #c9a84c;
+    --color-accent-light: #f7f0dc;
+    --color-accent-dark-light: rgb(201 168 76 / 0.15);
+    --color-accent-50: #fbf8ee;
+    --color-accent-100: #f5edd2;
+    --color-accent-200: #ebdaa5;
+    --color-accent-300: #dfc375;
+    --color-accent-400: #d4b25b;
+    --color-accent-500: #c9a84c;
+    --color-accent-600: #b08a35;
+    --color-accent-700: #8d6a2b;
+    --color-accent-800: #745628;
+    --color-accent-900: #614824;
+    --color-accent-950: #382711;
+
+    /* États. `strong` : texte sur fond clair (AA) ; `soft` : texte sur fond sombre (AA). */
+    --color-success: #00ab55;
+    --color-success-strong: #007a3d;
+    --color-success-light: #ddf5f0;
+    --color-success-dark-light: rgba(0, 171, 85, 0.15);
+    --color-danger: #e7515a;
+    --color-danger-strong: #b42f37;
+    --color-danger-soft: #ef7a81;
+    --color-danger-light: #fff5f5;
+    --color-danger-dark-light: rgba(231, 81, 90, 0.15);
+    --color-warning: #e2a03f;
+    --color-warning-strong: #8a5a12;
+    --color-warning-light: #fff9ed;
+    --color-warning-dark-light: rgba(226, 160, 63, 0.15);
+    --color-info: #2196f3;
+    --color-info-strong: #0b62a8;
+    --color-info-light: #e7f7ff;
+    --color-info-dark-light: rgba(33, 150, 243, 0.15);
+
+    --color-dark: #334039;
+    --color-dark-soft: #b8c2bc;
+    --color-dark-light: #eaeceb;
+    --color-dark-dark-light: rgba(51, 64, 57, 0.15);
+    --color-black: #0e1a14;
+    --color-black-light: #e3e6e4;
+    --color-black-dark-light: rgba(14, 26, 20, 0.15);
+    --color-white: #ffffff;
+    --color-white-light: #e0e6e2;
+    --color-white-dark: #8a978f;
+
+    /* Fond de page clair et texte secondaire (remplacent #fafafa et #506690 de Vristo). */
+    --color-page: #fafafa;
+    --color-muted: #5f6f66;
+
+    /* Mode sombre neutre teinté vert (remplace le bleu nuit de Vristo, voir ui-vristo.md). */
+    --color-night: #121c16;
+    --color-night-deep: #0b120e;
+    --color-night-input: #16221b;
+    --color-night-hover: #1a261f;
+    --color-night-raised: #1d2a23;
+    --color-night-border: #22302a;
+    --color-night-border-strong: #2c3d34;
+    --color-night-muted: #7d9488;
+
+    /* Gris de Tailwind 3 conservés (la v4 les a recolorés en oklch) : rendu inchangé. */
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+    --color-gray-950: #030712;
+}
+
+/*
+ * Compatibilité avec le rendu Tailwind 3 (préflight v4 modifié) : bordure par défaut gris 200, placeholder
+ * gris 400, curseur main sur les boutons.
+ */
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: var(--color-gray-400);
+    }
+
+    button:not(:disabled),
+    [role='button']:not(:disabled) {
+        cursor: pointer;
+    }
+}
+
+/*
+ * Styles de base des champs (`form-input`, `form-select`, `form-checkbox`…), repris de @tailwindcss/forms 0.5
+ * (stratégie « class », licence MIT). En Tailwind 4, le plugin les placerait dans la couche `utilities`, où ils
+ * écraseraient les surcharges Vristo ci-dessous : ils sont donc ici, dans `components`, avant elles (ADR-007).
+ */
+@layer components {
+    .form-input {
+        appearance: none;
+        background-color: #fff;
+        border-color: #6b7280;
+        border-width: 1px;
+        border-radius: 0px;
+        padding-top: 0.5rem;
+        padding-right: 0.75rem;
+        padding-bottom: 0.5rem;
+        padding-left: 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        --tw-shadow: 0 0 #0000;
+    }
+    .form-input:focus {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        --tw-ring-inset: var(--tw-empty,);
+        --tw-ring-offset-width: 0px;
+        --tw-ring-offset-color: #fff;
+        --tw-ring-color: #2563eb;
+        --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+        --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+        box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+        border-color: #2563eb;
+    }
+    .form-input::placeholder {
+        color: #6b7280;
+        opacity: 1;
+    }
+    .form-input::-webkit-datetime-edit-fields-wrapper {
+        padding: 0;
+    }
+    .form-input::-webkit-date-and-time-value {
+        min-height: 1.5em;
+    }
+    .form-input::-webkit-date-and-time-value {
+        text-align: inherit;
+    }
+    .form-input::-webkit-datetime-edit {
+        display: inline-flex;
+    }
+    .form-input::-webkit-datetime-edit {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .form-input::-webkit-datetime-edit-year-field {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .form-input::-webkit-datetime-edit-month-field {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .form-input::-webkit-datetime-edit-day-field {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .form-input::-webkit-datetime-edit-hour-field {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .form-input::-webkit-datetime-edit-minute-field {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .form-input::-webkit-datetime-edit-second-field {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .form-input::-webkit-datetime-edit-millisecond-field {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .form-input::-webkit-datetime-edit-meridiem-field {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .form-select {
+        appearance: none;
+        background-color: #fff;
+        border-color: #6b7280;
+        border-width: 1px;
+        border-radius: 0px;
+        padding-top: 0.5rem;
+        padding-right: 0.75rem;
+        padding-bottom: 0.5rem;
+        padding-left: 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        --tw-shadow: 0 0 #0000;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .form-select:focus {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        --tw-ring-inset: var(--tw-empty,);
+        --tw-ring-offset-width: 0px;
+        --tw-ring-offset-color: #fff;
+        --tw-ring-color: #2563eb;
+        --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+        --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+        box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+        border-color: #2563eb;
+    }
+    .form-select:where([size]:not([size='1'])) {
+        background-image: initial;
+        background-position: initial;
+        background-repeat: unset;
+        background-size: initial;
+        padding-right: 0.75rem;
+        -webkit-print-color-adjust: unset;
+        print-color-adjust: unset;
+    }
 }
 
 @layer components {
@@ -33,7 +310,7 @@
 
     /* Panel */
     .panel {
-        @apply relative rounded-md bg-white p-5 shadow dark:bg-night;
+        @apply relative rounded-md bg-white p-5 shadow-sm dark:bg-night;
     }
 
     /* Navbar */
@@ -48,23 +325,23 @@
 
     .sidebar .nav-item > button,
     .sidebar .nav-item > a {
-        @apply relative mb-1 flex w-full items-center justify-between overflow-hidden whitespace-nowrap rounded-md p-2.5 text-muted hover:bg-black/[0.06] hover:text-black dark:text-night-muted dark:hover:bg-night-hover dark:hover:text-white-dark max-lg:py-3;
+        @apply relative mb-1 flex w-full items-center justify-between overflow-hidden rounded-md p-2.5 whitespace-nowrap text-muted hover:bg-black/[0.06] hover:text-black max-lg:py-3 dark:text-night-muted dark:hover:bg-night-hover dark:hover:text-white-dark;
     }
     /* Élément actif DAARA : fond vert clair et barre or sur le bord intérieur. */
     .sidebar .nav-item > button.active,
     .sidebar .nav-item > a.active {
-        @apply bg-primary-light text-primary before:absolute before:inset-y-2 before:w-1 before:rounded-full before:bg-secondary dark:bg-primary-dark-light ltr:before:left-0 rtl:before:right-0;
+        @apply bg-primary-light text-primary before:absolute before:inset-y-2 before:w-1 before:rounded-full before:bg-secondary ltr:before:left-0 rtl:before:right-0 dark:bg-primary-dark-light;
     }
 
     .sidebar .nav-item > button.active > div > span,
     .sidebar .nav-item > a.active > div > span,
     .sidebar .nav-item > a.active div:first-child svg {
-        @apply !text-primary;
+        @apply text-primary!;
     }
 
     .sidebar ul.sub-menu li button,
     .sidebar ul.sub-menu li a {
-        @apply flex w-full items-center px-9 py-2.5 before:h-0.5 before:w-2 before:rounded before:bg-gray-300 hover:bg-gray-100 hover:text-primary hover:before:!bg-primary dark:before:bg-gray-500 dark:hover:bg-gray-900 dark:hover:text-primary ltr:before:mr-2 rtl:before:ml-2;
+        @apply flex w-full items-center px-9 py-2.5 before:h-0.5 before:w-2 before:rounded-sm before:bg-gray-300 hover:bg-gray-100 hover:text-primary hover:before:bg-primary! ltr:before:mr-2 rtl:before:ml-2 dark:before:bg-gray-500 dark:hover:bg-gray-900 dark:hover:text-primary;
     }
     .sidebar ul.sub-menu li button.active,
     .sidebar ul.sub-menu li a.active {
@@ -97,11 +374,11 @@
 
     /* Buttons */
     .btn {
-        @apply relative flex items-center justify-center rounded-md border px-5 py-2 text-sm font-semibold shadow-[0_10px_20px_-10px] outline-none transition duration-300 hover:shadow-none max-sm:min-h-11;
+        @apply relative flex items-center justify-center rounded-md border px-5 py-2 text-sm font-semibold shadow-[0_10px_20px_-10px] outline-hidden transition duration-300 hover:shadow-none max-sm:min-h-11;
     }
     /* Bouton rond à icône (header) : zone tactile de 44 px en mobile. */
     .icon-btn {
-        @apply flex items-center justify-center rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary dark:bg-dark/40 dark:hover:bg-dark/60 max-sm:h-11 max-sm:w-11;
+        @apply flex items-center justify-center rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary max-sm:h-11 max-sm:w-11 dark:bg-dark/40 dark:hover:bg-dark/60;
     }
     .btn-lg {
         @apply px-7 py-2.5 text-base;
@@ -166,7 +443,7 @@
 
     /* Badge */
     .badge {
-        @apply relative my-1 rounded border border-transparent px-2 py-0.5 text-xs font-semibold text-white;
+        @apply relative my-1 rounded-sm border border-transparent px-2 py-0.5 text-xs font-semibold text-white;
     }
     .badge-outline-primary {
         @apply border-primary text-primary hover:bg-primary-light dark:hover:bg-primary dark:hover:text-on-primary;
@@ -195,7 +472,7 @@
     .form-textarea,
     .form-select,
     .form-multiselect {
-        @apply w-full rounded-md border border-white-light bg-white px-4 py-2 text-base font-semibold text-black !outline-none focus:border-primary focus:ring-transparent dark:border-night-border dark:bg-night-input dark:text-white-dark dark:focus:border-primary max-sm:min-h-11 sm:text-body;
+        @apply w-full rounded-md border border-white-light bg-white px-4 py-2 text-base font-semibold text-black outline-hidden! focus:border-primary focus:ring-transparent max-sm:min-h-11 sm:text-body dark:border-night-border dark:bg-night-input dark:text-white-dark dark:focus:border-primary;
     }
 
     .form-input-lg,
@@ -231,7 +508,7 @@
         @apply text-danger;
     }
     .has-error .multiselect__input {
-        @apply bg-danger-light !placeholder-danger/70;
+        @apply bg-danger-light placeholder-danger/70!;
     }
     .has-error .multiselect__tags:hover,
     .has-error .form-checkbox {
@@ -252,7 +529,7 @@
         @apply text-success;
     }
     .has-success .multiselect__input {
-        @apply bg-success-light !placeholder-success/70;
+        @apply bg-success-light placeholder-success/70!;
     }
     .has-success .multiselect__tags:hover {
         @apply border-success;
@@ -261,7 +538,7 @@
     /* checkbox & radio */
     .form-radio,
     .form-checkbox {
-        @apply h-5 w-5 cursor-pointer rounded border-2 border-white-light bg-transparent text-primary !shadow-none !outline-none !ring-0 !ring-offset-0 checked:bg-[length:90%_90%] disabled:cursor-not-allowed disabled:bg-gray-100 dark:border-night-border-strong dark:checked:border-transparent dark:disabled:bg-night-raised ltr:mr-1.5 rtl:ml-1.5;
+        @apply h-5 w-5 cursor-pointer rounded-sm border-2 border-white-light bg-transparent text-primary shadow-none! ring-0! ring-offset-0! outline-hidden! checked:bg-[length:90%_90%] disabled:cursor-not-allowed disabled:bg-gray-100 ltr:mr-1.5 rtl:ml-1.5 dark:border-night-border-strong dark:checked:border-transparent dark:disabled:bg-night-raised;
     }
 
     .form-checkbox.outline-primary:checked {
@@ -327,7 +604,7 @@
         @apply flex;
     }
     .dropdown ul {
-        @apply absolute z-10 mt-1 min-w-[120px] rounded bg-white p-0 py-2 text-black shadow dark:bg-night-raised dark:text-white-dark;
+        @apply absolute z-10 mt-1 min-w-[120px] rounded-sm bg-white p-0 py-2 text-black shadow-sm dark:bg-night-raised dark:text-white-dark;
     }
     .dropdown ul li > a,
     .dropdown ul li > button {
@@ -343,11 +620,11 @@
         @apply overflow-auto;
     }
     table {
-        @apply w-full !border-collapse;
+        @apply w-full border-collapse!;
     }
     table thead tr,
     table tfoot tr {
-        @apply border-b-0 !bg-gray-50 dark:!bg-night-raised;
+        @apply border-b-0 bg-gray-50! dark:bg-night-raised!;
     }
     table thead tr th,
     table tfoot tr th,
@@ -359,18 +636,18 @@
         @apply font-semibold;
     }
     table tbody tr {
-        @apply border-b !border-white-light/40 dark:!border-night-border;
+        @apply border-b border-white-light/40! dark:border-night-border!;
     }
     table.table-hover tbody tr {
-        @apply hover:!bg-white-light/20 dark:hover:!bg-night-raised/40;
+        @apply hover:bg-white-light/20! dark:hover:bg-night-raised/40!;
     }
     table.table-striped tbody tr:nth-child(odd) {
-        @apply !bg-white-light/20 dark:!bg-night-raised/40;
+        @apply bg-white-light/20! dark:bg-night-raised/40!;
     }
 
     table.dataTable-table tbody tr th,
     table.dataTable-table tbody tr td {
-        @apply border-b border-gray-200 px-4 py-3 dark:border-night-border ltr:text-left rtl:text-right;
+        @apply border-b border-gray-200 px-4 py-3 ltr:text-left rtl:text-right dark:border-night-border;
     }
     table.dataTable-table tbody tr:last-child td {
         @apply border-b-0;
@@ -392,18 +669,18 @@
 /* Barre de défilement native de la sidebar (remplace ngx-scrollbar) */
 .sidebar-scroll {
     scrollbar-width: thin;
-    scrollbar-color: theme('colors.gray.300') transparent;
+    scrollbar-color: var(--color-gray-300) transparent;
 }
 
 .dark .sidebar-scroll {
-    scrollbar-color: theme('colors.night.border-strong') transparent;
+    scrollbar-color: var(--color-night-border-strong) transparent;
 }
 
 /* Focus clavier visible (accessibilité) : placé hors des couches pour primer sur `outline-none` de Vristo. */
 a:focus-visible,
 button:focus-visible,
 [tabindex]:focus-visible {
-    outline: 2px solid rgb(var(--color-primary));
+    outline: 2px solid rgb(var(--daara-primaire));
     outline-offset: 2px;
 }
 
@@ -424,10 +701,10 @@ button:focus-visible,
         animation: auth-entree 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
     }
     .auth-surtitre {
-        @apply text-[11.5px] font-extrabold uppercase tracking-[0.12em] text-secondary-700 dark:text-secondary-400;
+        @apply text-[11.5px] font-extrabold tracking-[0.12em] text-secondary-700 uppercase dark:text-secondary-400;
     }
     .auth-titre {
-        @apply mb-1.5 mt-1.5 text-[30px] font-black leading-tight tracking-[-0.015em] text-black dark:text-white-light;
+        @apply mt-1.5 mb-1.5 text-[30px] leading-tight font-black tracking-[-0.015em] text-black dark:text-white-light;
         text-wrap: balance;
     }
     .auth-intro {
@@ -442,7 +719,7 @@ button:focus-visible,
     }
     .auth-form .form-input:focus,
     .auth-form .form-select:focus {
-        box-shadow: 0 0 0 4px rgb(var(--color-primary) / 0.25);
+        box-shadow: 0 0 0 4px rgb(var(--daara-primaire) / 0.25);
     }
     .auth-form label {
         @apply mb-1.5 text-[13.5px] font-extrabold;
@@ -451,13 +728,13 @@ button:focus-visible,
         @apply relative;
     }
     .auth-champ-icone > svg {
-        @apply pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted dark:text-night-muted;
+        @apply pointer-events-none absolute top-1/2 left-3.5 h-[18px] w-[18px] -translate-y-1/2 text-muted dark:text-night-muted;
     }
     .auth-champ-icone > .form-input {
         @apply pl-11;
     }
     .auth-voir {
-        @apply absolute right-1.5 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-lg text-muted hover:text-primary dark:text-night-muted;
+        @apply absolute top-1/2 right-1.5 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-lg text-muted hover:text-primary dark:text-night-muted;
     }
     .auth-lien {
         @apply text-[13.5px] font-extrabold text-primary no-underline hover:underline;
@@ -476,15 +753,15 @@ button:focus-visible,
     /* Bouton principal : dégradé vert, filet or */
     .btn-auth {
         @apply relative inline-flex min-h-[50px] w-full items-center justify-center gap-2 overflow-hidden rounded-xl border-0 text-[15.5px] font-black text-on-primary transition disabled:cursor-not-allowed disabled:opacity-60;
-        background: linear-gradient(180deg, rgb(var(--color-primary) / 0.88), rgb(var(--color-primary)));
+        background: linear-gradient(180deg, rgb(var(--daara-primaire) / 0.88), rgb(var(--daara-primaire)));
         box-shadow:
-            0 10px 22px -10px rgb(var(--color-primary) / 0.7),
+            0 10px 22px -10px rgb(var(--daara-primaire) / 0.7),
             inset 0 -2px 0 rgb(0 0 0 / 0.12);
     }
     .btn-auth::after {
         content: '';
-        @apply absolute bottom-0 left-[18%] right-[18%] h-0.5 rounded-sm;
-        background: linear-gradient(90deg, transparent, theme('colors.secondary.DEFAULT'), transparent);
+        @apply absolute right-[18%] bottom-0 left-[18%] h-0.5 rounded-xs;
+        background: linear-gradient(90deg, transparent, var(--color-secondary), transparent);
     }
     .btn-auth:not(:disabled):hover {
         filter: brightness(1.06);
@@ -502,11 +779,11 @@ button:focus-visible,
         grid-template-columns: repeat(6, minmax(0, 1fr));
     }
     .code-otp-case {
-        @apply min-h-[58px] w-full rounded-xl border-[1.5px] border-white-light bg-primary-50/50 p-0 text-center text-2xl font-black text-black outline-none focus:border-primary focus:bg-white dark:border-night-border dark:bg-night-input dark:text-white-light dark:focus:bg-night;
+        @apply min-h-[58px] w-full rounded-xl border-[1.5px] border-white-light bg-primary-50/50 p-0 text-center text-2xl font-black text-black outline-hidden focus:border-primary focus:bg-white dark:border-night-border dark:bg-night-input dark:text-white-light dark:focus:bg-night;
         font-variant-numeric: tabular-nums;
     }
     .code-otp-case:focus {
-        box-shadow: 0 0 0 4px rgb(var(--color-primary) / 0.25);
+        box-shadow: 0 0 0 4px rgb(var(--daara-primaire) / 0.25);
     }
     .code-otp-case[aria-invalid='true'] {
         @apply border-danger;

@@ -20,7 +20,7 @@ traductions) est de la démo. La référence Vristo (Angular 15, Tailwind 3) res
   `@if` / `@for`, application **zoneless** (sans zone.js).
 - **État** : signals dans les services ; pas de NgRx. `ThemeService` (clair / sombre / système) et
   `LanguageService` dans `core/`, préférences mémorisées dans `localStorage`.
-- **Styles** : **Tailwind 3.4** (le markup et les 672 lignes de `@apply` de Vristo sont écrits pour la v3,
+- **Styles** : *remplacé par l'ADR-007 (Tailwind 4, 2026-10-04).* **Tailwind 3.4** (le markup et les 672 lignes de `@apply` de Vristo sont écrits pour la v3,
   supportée par `@angular/build` 22). Passage à la v4 : ADR séparé, plus tard.
 - **i18n** : **@ngx-translate/core 18**, bascule à chaud sans rechargement, fichiers dans `public/i18n/`.
   Langues : voir ADR-005.

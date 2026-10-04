@@ -105,6 +105,14 @@ describe('AuthService', () => {
         expect(enrolement).toEqual({ factorId: 'f-1', qrCode: 'data:image/svg+xml;utf-8,<svg/>', secret: 'ABC' });
     });
 
+    it('attend la session restaurée avant de lire les rôles (guards lancés en parallèle au chargement)', async () => {
+        const auth = creer();
+        client.roles = ['parent'];
+
+        // Appel immédiat, avant la fin de getSession() : ne doit pas répondre « aucune daara ».
+        expect(await auth.rolesActifs()).toEqual(['parent']);
+    });
+
     describe('destination', () => {
         it('sans session : connexion', async () => {
             expect(await creer(null).destination()).toBe(ROUTES_AUTH.connexion);

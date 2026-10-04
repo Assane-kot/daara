@@ -61,6 +61,8 @@ Spring Boot n'est pas dans la V1. Il pourra s'ajouter comme service connecté à
 traitements lourds si les Edge Functions deviennent insuffisantes.
 
 ## 5. Découpage fonctionnel
+Les modules métier sont **activables par daara** (ADR-008) : une daara ne voit que ceux qu'elle a activés.
+
 | Module | Contenu | Sprints |
 |---|---|---|
 | Socle | Auth, daaras, membres, rôles, invitations, audit, layout | 1-2 |

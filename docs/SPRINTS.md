@@ -16,6 +16,7 @@ Règle : une story n'entre dans un sprint que si sa section du LLD est détaill�
 ## Definition of Done (toutes les stories)
 - [ ] Section LLD à jour
 - [ ] Migration avec RLS + tests pgTAP verts (accès autorisés et refusés inter-daara)
+- [ ] Table d'un module : politiques conditionnées par `module_actif` + test pgTAP « module désactivé » ; menu et routes déclarent le module (ADR-008)
 - [ ] Types régénérés, aucun `any`
 - [ ] Écrans : chargement / erreur / vide, français + anglais, mode sombre, mobile 375 px
 - [ ] Tests unitaires du service et du composant principal
@@ -57,8 +58,9 @@ Objectif : chaque profil accède à son espace.
 - [ ] Routage `/d/:slug`, `DaaraResolver`, `CurrentDaaraService`, sélecteur multi-daaras
 - [ ] Layout et menus par rôle, `roleGuard`
 - [ ] Paramètres de la daara (nom, logo, barème)
+- [ ] Modules activables par daara (ADR-008) : `daara_modules`, `module_actif`, `definir_modules`, écran Modules, profils à l'onboarding, `moduleGuard`, menus filtrés
 - [ ] Décision OTP téléphone (ADR)
-Livrable : l'admin invite un enseignant et un parent, chacun voit son menu.
+Livrable : l'admin invite un enseignant et un parent, chacun voit son menu ; une daara coranique ne voit aucun écran scolaire.
 
 ## Sprint 3 — Structure scolaire
 - [ ] Années scolaires (une active), périodes, clôture

@@ -195,10 +195,12 @@ export class AuthService {
     // ---------------------------------------------------------------------------------------------------------
 
     /** Rôles actifs de l'utilisateur dans ses daaras (lecture de ses propres memberships, RLS `memberships_select_soi`). */
-    rolesActifs(): Promise<RoleMembre[]> {
-        const userId = this.user()?.id;
+    async rolesActifs(): Promise<RoleMembre[]> {
+        // Attendre la session restaurée : au chargement direct d'une URL, les guards démarrent en parallèle et
+        // liraient sinon « aucun utilisateur » (renvoi à tort vers l'onboarding).
+        const userId = (await this.sessionActuelle())?.user.id;
         if (!userId) {
-            return Promise.resolve([]);
+            return [];
         }
         if (this.roles?.userId !== userId) {
             const promesse = this.lireRoles(userId);
