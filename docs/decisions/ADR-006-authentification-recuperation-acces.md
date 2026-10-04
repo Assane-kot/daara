@@ -61,6 +61,13 @@ Recours normal pour les parents sans e-mail utilisable et pour les apprenants.
 Au passage payant (ADR-003), l'envoi automatique du code du niveau 2 par SMS ou WhatsApp (fournisseur
 payant) pourra remplacer la transmission manuelle, sans changer le reste du mécanisme.
 
+## Notes de mise en œuvre (planification du sprint 2, 2026-10-04)
+- `reset-access` devient la RPC `creer_code_acces` (aucun privilège service_role nécessaire) ; `use-access-code`
+  reste une Edge Function (changement de mot de passe et révocation des sessions par l'API d'administration).
+- Identifiant sans e-mail : téléphone + mot de passe sans SMS (ADR-009, à confirmer par le spike S2.0).
+- Second facteur : second appareil TOTP dans « Mon compte » ; codes de secours non retenus (expérimentaux) ;
+  `aal2` exigé pour tout accès d'un utilisateur ayant un facteur vérifié (`session_suffisante`).
+
 ## Conséquences
 + Récupération possible pour tous les profils, sans coût, adaptée aux usages locaux (WhatsApp).
 + Comptes admin protégés même si leur mot de passe est faible ou volé.

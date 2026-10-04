@@ -9,7 +9,7 @@
 - Sprint 1 — Socle multi-tenant : **code terminé** (bilan ci-dessous, 2026-10-03) ; clôture effective après la
   vérification en 375 px et les configurations Auth / Turnstile du développeur. Sprint suivant : 2 — Membres et
   navigation (planification à faire).
-- Dernière tâche terminée : modules activables par daara décidés (ADR-008) et intégrés au sprint 2 (2026-10-04).
+- Dernière tâche terminée : planification du sprint 2 (LLD détaillé, 7 specs, ADR-009 proposé) (2026-10-04).
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -62,9 +62,23 @@
    `/dev/charte` (puis retrait de la page) ; tag de sprint `s0` sur `develop`.
 2. Sprint 1, pour le clore : vérification en 375 px (connexion, inscription, code, mfa, onboarding, tableau de bord) ;
    tag `s1` sur `develop`.
-3. Sprint 2 (membres et navigation) : planification (LLD §3.2 lignes du sprint 2, §6 Edge Functions, §7.1 à
-   détailler ; specs). À trancher pendant la planification : `is_member` et `aal2` ; modèles d'e-mail restants ;
-   second facteur TOTP et codes de secours ; décision OTP téléphone (ADR).
+3. Sprint 2 : planification faite (2026-10-04). Commencer par S2.0 (spike téléphone sans SMS → ADR-009 confirmé ou
+   alternative présentée au développeur), puis S2.1 à S2.7 dans l'ordre, un commit par story.
+
+### Décisions de planification du sprint 2 (validées le 2026-10-04)
+- Identifiant sans e-mail : téléphone + mot de passe, sans SMS, compte créé seulement sur invitation (ADR-009,
+  à confirmer par le spike S2.0).
+- Invitations : e-mail via l'API Brevo (Mailpit en local) + lien toujours partageable (copie, WhatsApp) ;
+  50 / jour / daara ; jeton dans le fragment de l'URL, 7 jours, usage unique, **lié au contact invité** ;
+  invitation admin acceptée en `aal2`.
+- `aal2` exigé pour tout accès d'un utilisateur ayant un facteur vérifié (`session_suffisante`, livré avec S2.1).
+- Perte du téléphone : second appareil TOTP ; pas de codes de secours (expérimentaux) ; retrait d'un facteur par
+  procédure SQL documentée, lancée par le développeur.
+- Comptes apprenants et liens parent ↔ enfant : sprint 4 ; invitations du sprint 2 : admin, enseignant, parent.
+- Edge Functions testées avec `deno test`, job CI `edge`.
+- Réinitialisation assistée : `reset-access` devient la RPC `creer_code_acces` ; `use-access-code` reste une Edge
+  Function. Table `notifications` reportée au sprint 5.
+- Découpage en 8 stories (S2.0 à S2.7), un commit chacune.
 
 ### Modules activables par daara (ADR-008, validé le 2026-10-04)
 - Chaque daara active ses modules (structure, absences, notes, bulletins, coran_cahier, coran_recitations,

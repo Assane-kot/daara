@@ -51,16 +51,19 @@ Objectif : isolation des daaras prouvée par les tests.
 Livrable : un utilisateur crée sa daara ; une autre daara est invisible.
 
 ## Sprint 2 — Membres et navigation
-Objectif : chaque profil accède à son espace.
-- [ ] Invitations (`invite-member`, `accept-invitation`), email
-- [ ] Réinitialisation d'accès assistée par l'admin (`reset-access`, `use-access-code`, lien `wa.me`) (ADR-006 niveau 2)
-- [ ] Gestion des membres (liste, rôle, désactivation)
-- [ ] Routage `/d/:slug`, `DaaraResolver`, `CurrentDaaraService`, sélecteur multi-daaras
-- [ ] Layout et menus par rôle, `roleGuard`
-- [ ] Paramètres de la daara (nom, logo, barème)
-- [ ] Modules activables par daara (ADR-008) : `daara_modules`, `module_actif`, `definir_modules`, écran Modules, profils à l'onboarding, `moduleGuard`, menus filtrés
-- [ ] Décision OTP téléphone (ADR)
-Livrable : l'admin invite un enseignant et un parent, chacun voit son menu ; une daara coranique ne voit aucun écran scolaire.
+Objectif : chaque profil accède à son espace et ne voit que ses modules ; l'admin invite, gère ses membres et paramètre
+sa daara ; un parent sans e-mail se connecte et récupère son accès.
+Planification validée le 2026-10-04 (LLD §2, §3.2, §4, §5, §6, §7.1 ; specs dans `docs/features/`). Un commit par story.
+- [ ] S2.0 Spike + ADR-009 : compte téléphone + mot de passe sans fournisseur SMS (`identifiant-sans-email`)
+- [ ] S2.1 Navigation par daara : `/d/:slug`, `DaaraResolver`, `CurrentDaaraService`, `/select-daara`, menus par rôle, `roleGuard`, barre basse mobile ; `aal2` exigé pour qui a un facteur (`navigation-daara.md`)
+- [ ] S2.2 Modules activables (ADR-008) : `daara_modules`, `module_actif`, `definir_modules`, écran Modules, profils à l'onboarding, `moduleGuard` (`modules.md`)
+- [ ] S2.3 Paramètres de la daara : informations, logo (Storage `logos`), langue, barème (`parametres-daara.md`)
+- [ ] S2.4 Gestion des membres : liste, rôle, désactivation, dernier admin, auteur des écritures dans `audit_log` (`membres.md`)
+- [ ] S2.5 Invitations : Edge Functions `invite-member`, `invitation-apercu`, `accept-invitation`, e-mail Brevo, lien WhatsApp, page `/invitation`, job CI `edge` (`invitations.md`)
+- [ ] S2.6 Réinitialisation assistée (ADR-006 niveau 2) : `codes_acces`, `creer_code_acces`, Edge `use-access-code`, révocation des sessions (`reinitialisation-assistee.md`)
+- [ ] S2.7 Mon compte et sécurité : profil, mot de passe, second appareil TOTP, modèles d'e-mail restants, procédure super-admin (`mon-compte.md`)
+Livrable : l'admin invite un enseignant (e-mail) et un parent (téléphone), chacun voit son menu ; une daara coranique
+ne voit aucun écran scolaire ; un parent récupère son accès avec le code de l'admin.
 
 ## Sprint 3 — Structure scolaire
 - [ ] Années scolaires (une active), périodes, clôture

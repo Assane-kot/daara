@@ -91,7 +91,7 @@ Les modules métier sont **activables par daara** (ADR-008) : une daara ne voit 
   (`parent_links`).
 - **Authentification** : Supabase Auth (e-mail + mot de passe, flux PKCE), double authentification (TOTP)
   obligatoire pour les admins, récupération d'accès par code e-mail ou assistée par l'admin de la daara
-  (ADR-006) ; OTP téléphone à évaluer au sprint 2.
+  (ADR-006) ; identifiant sans e-mail : téléphone + mot de passe sans SMS (ADR-009).
 - **Autorisation** : RLS = source de vérité. Guards Angular = confort d'interface uniquement.
 - **Secrets** : clé `anon` seule côté front ; `service_role` uniquement dans les Edge Functions.
 - **Traçabilité** : journal d'audit sur les tables sensibles (notes, absences, bulletins, membres).

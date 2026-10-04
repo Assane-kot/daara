@@ -1,4 +1,4 @@
-# Feature : modules activables par daara (sprint 2, ADR-008)
+# Feature : modules activables par daara (sprint 2 : S2.2, ADR-008)
 
 ## Objectif
 Chaque daara n'active que les modules qu'elle utilise (structure scolaire, absences, notes, bulletins, Coran…).
