@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../core/auth/auth.service';
 import { cleErreurAuth } from '../../core/auth/erreurs-auth';
+import { MODULES, ModuleDaara } from '../../core/daara/daara.model';
+import { MODULES_DU_PROFIL, ProfilDaara, avecPrerequis } from '../../core/daara/modules';
 import { LanguageService } from '../../core/i18n/language.service';
 import { FormField, FormFieldControl } from '../../shared/ui/form-field/form-field';
 import { Skeleton } from '../../shared/ui/skeleton/skeleton';
@@ -37,6 +39,10 @@ export class OnboardingPage implements OnInit {
     protected readonly envoi = signal(false);
     protected readonly erreur = signal<string | null>(null);
     protected readonly slugMax = SLUG_MAX;
+    /** Profils de daara proposés (ADR-008) et modules cochés en « Personnalisé ». */
+    protected readonly profils: readonly ProfilDaara[] = ['franco_arabe', 'coranique', 'personnalise'];
+    protected readonly tousModules = MODULES;
+    protected readonly modulesPerso = signal<ModuleDaara[]>([...MODULES_DU_PROFIL.coranique]);
     /** Tant que l'utilisateur n'a pas modifié l'adresse lui-même, elle suit le nom. */
     private slugModifie = false;
 
@@ -47,6 +53,7 @@ export class OnboardingPage implements OnInit {
         telephone: ['', Validators.pattern(MOTIF_TELEPHONE)],
         langueDefaut: [inject(LanguageService).langue() as 'fr' | 'en'],
         bareme: [20 as 10 | 20],
+        profil: ['franco_arabe' as ProfilDaara],
     });
 
     constructor() {
@@ -71,6 +78,16 @@ export class OnboardingPage implements OnInit {
         }
     }
 
+    protected basculerModule(module: ModuleDaara, coche: boolean): void {
+        this.modulesPerso.update((ms) => (coche ? [...ms, module] : ms.filter((m) => m !== module)));
+    }
+
+    /** Modules envoyés à creer_daara, prérequis compris (la base les ajoute aussi). */
+    protected modulesChoisis(): ModuleDaara[] {
+        const profil = this.form.controls.profil.value;
+        return avecPrerequis(profil === 'personnalise' ? this.modulesPerso() : MODULES_DU_PROFIL[profil]);
+    }
+
     protected slugSaisi(): void {
         this.slugModifie = true;
     }
@@ -91,6 +108,7 @@ export class OnboardingPage implements OnInit {
                 telephone: saisie.telephone.trim(),
                 langueDefaut: saisie.langueDefaut,
                 bareme: saisie.bareme,
+                modules: this.modulesChoisis(),
             });
             await this.router.navigateByUrl(await this.auth.destination());
         } catch (erreur) {

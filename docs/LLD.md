@@ -242,7 +242,7 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 | `teaches_class(classe_id)` | enseignant affecté à la classe (titulaire ou classe_matieres) |
 | `membres_administres()` → setof uuid | membres **actifs** des daaras dont l'appelant est admin actif (`aal2`) ; lecture des profils via `id in (select membres_administres())`, évalué une fois par requête. Un membre désactivé n'est plus lisible (minimisation) |
 | `is_platform_admin()` | présent dans `platform_admins` **et** session en `aal2` (ADR-006) |
-| `module_actif(daara_id, module)` | module activé pour la daara (ADR-008) ; à partir du sprint 11, et permis par son offre |
+| `module_actif(daara_id, module)` | module activé pour la daara (ADR-008), faux pour un non-membre (sauf super-admin) ; à partir du sprint 11, et permis par son offre |
 Toutes : `security definer`, `stable`, `search_path = ''`, appelées via `(select ...)`.
 Un utilisateur admin + enseignant **sans facteur** en `aal1` garde ses droits d'enseignant (le rôle admin seul est ignoré) ;
 dès qu'il a un facteur vérifié, plus aucun droit en `aal1` (`session_suffisante`). Ses propres profil et memberships restent
@@ -307,6 +307,7 @@ Garde-fou (trigger `garder_un_admin`) : aucune modification de `memberships` ne 
 | `creer_code_acces(p_membership)` → code en clair (affiché une fois) | réinitialisation assistée (ADR-006 niveau 2 ; remplace l'Edge Function `reset-access` : aucun privilège service_role requis) | admin `aal2` ; cible membre actif de la même daara, **non admin** ; code de 8 caractères (alphabet sans 0/O/1/l/I) tiré par `gen_random_bytes` ; ancien code annulé ; journalisé |
 | `consommer_code_acces(p_user, p_code)` → booléen | vérifie et consomme un code | **service_role uniquement** (Edge `use-access-code`) ; 5 essais puis code invalidé ; expiré / utilisé → faux |
 | `hook_avant_creation_utilisateur(event)` (S2.5, ADR-009) | hook Auth `before_user_created` : refuse toute inscription publique par téléphone (les comptes téléphone naissent par `accept-invitation`, API d'administration, non soumise au hook) | exécutable par `supabase_auth_admin` uniquement |
+| `basculer_module(p_daara, p_module, p_actif)` → `module_daara[]` (S2.2) | active ou désactive un module à partir de l'état en base (écran Modules : pas d'écrasement entre deux admins) ; s'appuie sur `definir_modules` | admin `aal2` ; verrou des lignes de la daara |
 | `definir_modules(p_daara, p_modules module_daara[])` → `module_daara[]` (sprint 2, ADR-008) | fixe les modules actifs de la daara | `security definer` ; `has_role(p_daara, admin)` en `aal2` ; prérequis ajoutés ; refus (`23514`, `module_requis`) de désactiver un prérequis d'un module actif ; journalisé |
 | `creer_daara(p_nom, p_slug, p_ville, p_telephone, p_langue_defaut, p_bareme[, p_modules])` → slug | crée la daara et le membership admin du créateur, dans la même transaction | `security definer`, `search_path = ''` ; `auth.uid()` non nul, session `aal2`, au plus 3 daaras créées par utilisateur (`created_by`), entrées validées par la fonction (paramètre nul, langue, barème) et par les contraintes ; erreurs traduites côté front : `42501` (non authentifié, `aal2` requis), `P0001` (limite), `23505` (slug déjà pris), `23514` (donnée invalide, slug réservé) |
 

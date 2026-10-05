@@ -33,7 +33,7 @@ describe('AuthService', () => {
         const auth = creer();
         await auth.sessionActuelle();
         const courante = TestBed.inject(CurrentDaaraService);
-        courante.definir({ id: 'd-1', slug: 'daara-touba', nom: 'Daara Touba', ville: null, logoPath: null, roles: ['parent'] });
+        courante.definir({ id: 'd-1', slug: 'daara-touba', nom: 'Daara Touba', ville: null, logoPath: null, roles: ['parent'], modules: [] });
         expect(localStorage.getItem('daara.derniere')).toBe('daara-touba');
 
         const rappel = client.auth.onAuthStateChange.mock.calls[0][0] as (e: string, s: unknown) => void;

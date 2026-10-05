@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { AuthService, ROUTES_AUTH, routeDaara } from '../auth/auth.service';
 import { CurrentDaaraService } from './current-daara.service';
-import { RoleMembre } from './daara.model';
+import { ModuleDaara, RoleMembre } from './daara.model';
 
 /*
  * Guards de la navigation par daara (LLD §7.1 ter). Confort d'interface : la RLS ne renvoie de toute façon que les
@@ -56,6 +56,21 @@ export function roleGuard(roles: RoleMembre[]): CanActivateFn {
             return true;
         }
         courante.message.set('navigation.acces_refuse');
+        return router.parseUrl(daara ? routeDaara(daara.slug) : ROUTES_AUTH.selectionDaara);
+    };
+}
+
+/** Route d'un module (ADR-008) : module actif dans la daara ouverte ; sinon tableau de bord avec un message. */
+export function moduleGuard(module: ModuleDaara): CanActivateFn {
+    return async (route) => {
+        const auth = inject(AuthService);
+        const courante = inject(CurrentDaaraService);
+        const router = inject(Router);
+        const daara = (await auth.mesDaaras()).find((d) => d.slug === slugDe(route));
+        if (daara?.modules.includes(module)) {
+            return true;
+        }
+        courante.message.set('navigation.module_inactif');
         return router.parseUrl(daara ? routeDaara(daara.slug) : ROUTES_AUTH.selectionDaara);
     };
 }

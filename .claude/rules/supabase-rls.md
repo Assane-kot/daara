@@ -9,7 +9,9 @@ paths:
 - `alter table ... enable row level security;` dans la même migration que le `create table`.
 - Une politique par opération (select / insert / update / delete) et par profil. Pas de `for all` sauf admin.
 - Utiliser les fonctions helpers `public.is_member(daara_id)` et `public.has_role(daara_id, roles public.role_membre[])`,
-  appelées sous la forme `(select public.has_role(...))` pour que Postgres les mette en cache.
+  appelées sous la forme `(select public.has_role(...))`. Attention : le cache par requête ne joue que si l'argument ne
+  dépend pas de la ligne ; avec `daara_id` en argument, l'appel est refait par ligne. Pour une grosse table, préférer un
+  helper ensembliste évalué une fois (`daara_id in (select public.<helper>())`, modèle de `membres_administres`).
 - Helpers en `security definer`, `stable`, `set search_path = ''`, noms de tables qualifiés (`public.memberships`).
 - Insert/update : `with check` qui vérifie AUSSI le `daara_id` (empêche d'écrire dans une autre daara).
 - Accès parent : via `public.parent_links(parent_user_id, apprenant_id)`, jamais via un champ libre.
@@ -24,6 +26,8 @@ paths:
 - Extensions : `create extension ... with schema extensions`, jamais dans `public`.
 - Textes affichés (noms, libellés) : reprendre la contrainte « caractères interdits » du socle (LLD §3.2).
   Chemins Storage stockés en base : contrainte `check` sur le préfixe attendu.
+- Tables de liaison sans identifiant propre (ex. `daara_modules`) : clé primaire composite commençant par `daara_id`
+  (sert d'index) ; colonnes techniques (`updated_by`…) retirées des droits de lecture si les membres n'en ont pas besoin.
 - Table d'un module (ADR-008 : structure, absences, notes, bulletins, coran_*, notifications) : ajouter
   `(select public.module_actif(daara_id, '<module>'))` à TOUTES ses politiques, lecture comprise, et un test
   pgTAP « module désactivé » (lecture et écriture refusées, même pour l'admin ; données retrouvées après réactivation).

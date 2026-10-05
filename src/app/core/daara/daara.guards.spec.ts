@@ -3,10 +3,26 @@ import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, Url
 import { AuthService } from '../auth/auth.service';
 import { CurrentDaaraService } from './current-daara.service';
 import { DaaraAccessible } from './daara.model';
-import { daaraGuard, racineGuard, roleGuard } from './daara.guards';
+import { daaraGuard, moduleGuard, racineGuard, roleGuard } from './daara.guards';
 
-const TOUBA: DaaraAccessible = { id: 'd-1', slug: 'daara-touba', nom: 'Daara Touba', ville: 'Touba', logoPath: null, roles: ['enseignant'] };
-const THIES: DaaraAccessible = { id: 'd-2', slug: 'daara-thies', nom: 'Daara Thiès', ville: null, logoPath: null, roles: ['parent'] };
+const TOUBA: DaaraAccessible = {
+    id: 'd-1',
+    slug: 'daara-touba',
+    nom: 'Daara Touba',
+    ville: 'Touba',
+    logoPath: null,
+    roles: ['enseignant'],
+    modules: ['structure', 'notes'],
+};
+const THIES: DaaraAccessible = {
+    id: 'd-2',
+    slug: 'daara-thies',
+    nom: 'Daara Thiès',
+    ville: null,
+    logoPath: null,
+    roles: ['parent'],
+    modules: ['coran_cahier'],
+};
 
 /** Route enfant de `/d/:slug`, comme celles que l'on protège. */
 function routeDans(slug: string): ActivatedRouteSnapshot {
@@ -60,5 +76,14 @@ describe('Guards de la navigation par daara', () => {
         // Parent dans l'autre daara : renvoyé au tableau de bord de cette daara.
         expect(await executer(enseignants, routeDans('daara-thies'))).toBe('/d/daara-thies');
         expect(courante.message()).toBe('navigation.acces_refuse');
+    });
+
+    it('moduleGuard : module actif dans cette daara seulement', async () => {
+        auth.mesDaaras.mockResolvedValue([TOUBA, THIES]);
+        const notes = moduleGuard('notes');
+
+        expect(await executer(notes, routeDans('daara-touba'))).toBe(true);
+        expect(await executer(notes, routeDans('daara-thies'))).toBe('/d/daara-thies');
+        expect(courante.message()).toBe('navigation.module_inactif');
     });
 });

@@ -9,6 +9,7 @@ const daara = (roles: DaaraAccessible['roles']): DaaraAccessible => ({
     ville: null,
     logoPath: null,
     roles,
+    modules: MODULES,
 });
 
 describe('CurrentDaaraService', () => {

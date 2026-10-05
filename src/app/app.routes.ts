@@ -27,6 +27,10 @@ export const routes: Routes = [
                 title: 'titres.tableau_de_bord',
                 loadComponent: () => import('./features/dashboard/dashboard-page').then((m) => m.DashboardPage),
             },
+            {
+                path: 'parametres',
+                loadChildren: () => import('./features/parametres/parametres.routes').then((m) => m.PARAMETRES_ROUTES),
+            },
             // Page de référence de la charte (S0.2) : développement uniquement (`ngDevMode` vaut false en build de
             // production, la route et son chunk sont alors supprimés). À retirer après validation.
             // Forme `typeof … || ngDevMode` : la variable n'est définie qu'à la première définition de composant, après

@@ -22,7 +22,8 @@
     },
     "menu": {
         "tableau_de_bord": "Dashboard",
-        "changer_daara": "Switch daara"
+        "changer_daara": "Switch daara",
+        "parametres": "Settings"
     },
     "titres": {
         "tableau_de_bord": "Dashboard",
@@ -33,7 +34,8 @@
         "mot_de_passe_oublie": "Forgot password",
         "mfa": "Two-factor authentication",
         "onboarding": "Create my daara",
-        "select_daara": "Choose a daara"
+        "select_daara": "Choose a daara",
+        "parametres_modules": "Modules"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -204,11 +206,29 @@
             "limite": "You have reached the limit of 3 daaras created.",
             "aal2": "Two-factor authentication is required to create a daara.",
             "inattendue": "The daara could not be created. Try again."
+        },
+        "profil": {
+            "titre": "What does your daara do?",
+            "franco_arabe": {
+                "nom": "Franco-Arabic school",
+                "description": "Classes, grades, report cards, attendance and Quran."
+            },
+            "coranique": {
+                "nom": "Quranic daara",
+                "description": "Quran notebook, recitations, nafar and attendance, without grades or report cards."
+            },
+            "personnalise": {
+                "nom": "Custom",
+                "description": "Choose the modules yourself."
+            },
+            "aide_prerequis": "Modules required by your choice will be added automatically.",
+            "modifiable": "Can be changed at any time in Settings → Modules."
         }
     },
     "navigation": {
         "daara_inaccessible": "This daara is not accessible with your account.",
-        "acces_refuse": "This page is not accessible with your role."
+        "acces_refuse": "This page is not accessible with your role.",
+        "module_inactif": "This module is not enabled in this daara."
     },
     "roles": {
         "admin": "Administrator",
@@ -220,5 +240,59 @@
         "surtitre": "Your daaras",
         "titre": "Choose a daara",
         "intro": "You are a member of several daaras. You can switch at any time from the menu."
+    },
+    "modules": {
+        "structure": {
+            "nom": "School structure",
+            "description": "Years, terms, classes, subjects and assigned teachers."
+        },
+        "absences": {
+            "nom": "Attendance",
+            "description": "Daily roll call, justifications and alerts to parents."
+        },
+        "notes": {
+            "nom": "Grades",
+            "description": "Assessments, grade entry and averages."
+        },
+        "bulletins": {
+            "nom": "Report cards",
+            "description": "Calculation, ranking, PDF report cards and publication to families."
+        },
+        "coran_cahier": {
+            "nom": "Quran notebook",
+            "description": "Tracking of the 114 surahs for each student, and homework."
+        },
+        "coran_recitations": {
+            "nom": "Audio recitations",
+            "description": "Recording of recitations and correction by the teacher."
+        },
+        "coran_nafar": {
+            "nom": "Nafar",
+            "description": "Quran revision schedule for each student."
+        },
+        "notifications": {
+            "nom": "Notifications",
+            "description": "Notifications and weekly reports to parents."
+        }
+    },
+    "parametres": {
+        "titre": "Settings",
+        "onglets": {
+            "modules": "Modules"
+        },
+        "modules": {
+            "intro": "Enable the modules your daara uses: the others disappear for all members. Disabling a module deletes no data.",
+            "requiert": "Requires: {{modules}}",
+            "requis_par": "Required by: {{modules}}. Disable them first.",
+            "prerequis_actives": "{{module}} is enabled, with what it requires: {{prerequis}}.",
+            "desactiver": "Disable",
+            "desactiver_titre": "Disable “{{module}}”?",
+            "desactiver_message": "The module will disappear for all members of the daara. Its data is kept and will come back if you enable it again.",
+            "erreurs": {
+                "requis": "{{prerequis}} is required by {{dependant}}: disable {{dependant}} first.",
+                "droits": "Only an administrator who confirmed their identity can change the modules.",
+                "inattendue": "The modules could not be saved. Try again."
+            }
+        }
     }
 }

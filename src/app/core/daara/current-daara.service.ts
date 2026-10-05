@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { DaaraAccessible, MODULES, ModuleDaara, RoleMembre, memoriserDerniereDaara } from './daara.model';
+import { DaaraAccessible, ModuleDaara, RoleMembre, memoriserDerniereDaara } from './daara.model';
 
 /**
  * Daara ouverte (`/d/:slug`), ses rôles et ses modules (LLD §2 « Services transverses »). Alimenté par `daaraGuard`.
@@ -13,8 +13,8 @@ export class CurrentDaaraService {
     readonly id = computed(() => this.daara()?.id ?? null);
     readonly slug = computed(() => this.daara()?.slug ?? null);
     readonly roles = computed<readonly RoleMembre[]>(() => this.daara()?.roles ?? []);
-    /** Modules actifs : tous jusqu'à S2.2 (table `daara_modules`, ADR-008). */
-    readonly modules = computed<readonly ModuleDaara[]>(() => (this.daara() ? MODULES : []));
+    /** Modules actifs de la daara (ADR-008). */
+    readonly modules = computed<readonly ModuleDaara[]>(() => this.daara()?.modules ?? []);
     /** Parent ou apprenant uniquement : barre de navigation basse en mobile. */
     readonly famille = computed(() => this.roles().length > 0 && this.roles().every((r) => r === 'parent' || r === 'apprenant'));
 

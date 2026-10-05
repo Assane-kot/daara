@@ -56,6 +56,38 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            daara_modules: {
+                Row: {
+                    actif: boolean;
+                    daara_id: string;
+                    module: Database['public']['Enums']['module_daara'];
+                    updated_at: string;
+                    updated_by: string | null;
+                };
+                Insert: {
+                    actif?: boolean;
+                    daara_id: string;
+                    module: Database['public']['Enums']['module_daara'];
+                    updated_at?: string;
+                    updated_by?: string | null;
+                };
+                Update: {
+                    actif?: boolean;
+                    daara_id?: string;
+                    module?: Database['public']['Enums']['module_daara'];
+                    updated_at?: string;
+                    updated_by?: string | null;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'daara_modules_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             daaras: {
                 Row: {
                     bareme: number;
@@ -202,17 +234,39 @@ export type Database = {
             [_ in never]: never;
         };
         Functions: {
+            avec_prerequis: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: Database['public']['Enums']['module_daara'][] };
+            basculer_module: {
+                Args: { p_actif: boolean; p_daara: string; p_module: Database['public']['Enums']['module_daara'] };
+                Returns: Database['public']['Enums']['module_daara'][];
+            };
             creer_daara: {
-                Args: { p_bareme?: number; p_langue_defaut?: string; p_nom: string; p_slug: string; p_telephone?: string; p_ville?: string };
+                Args: {
+                    p_bareme?: number;
+                    p_langue_defaut?: string;
+                    p_modules?: Database['public']['Enums']['module_daara'][];
+                    p_nom: string;
+                    p_slug: string;
+                    p_telephone?: string;
+                    p_ville?: string;
+                };
                 Returns: string;
             };
+            definir_modules: {
+                Args: { p_daara: string; p_modules: Database['public']['Enums']['module_daara'][] };
+                Returns: Database['public']['Enums']['module_daara'][];
+            };
+            ecrire_modules: { Args: { p_actifs: Database['public']['Enums']['module_daara'][]; p_daara: string }; Returns: undefined };
             has_role: { Args: { p_daara: string; p_roles: Database['public']['Enums']['role_membre'][] }; Returns: boolean };
             is_member: { Args: { p_daara: string }; Returns: boolean };
             is_platform_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
             membres_administres: { Args: Record<PropertyKey, never>; Returns: string[] };
+            module_actif: { Args: { p_daara: string; p_module: Database['public']['Enums']['module_daara'] }; Returns: boolean };
+            modules_valides: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: boolean };
+            prerequis_module: { Args: { p_module: Database['public']['Enums']['module_daara'] }; Returns: Database['public']['Enums']['module_daara'][] };
             session_suffisante: { Args: Record<PropertyKey, never>; Returns: boolean };
         };
         Enums: {
+            module_daara: 'structure' | 'absences' | 'notes' | 'bulletins' | 'coran_cahier' | 'coran_recitations' | 'coran_nafar' | 'notifications';
             role_membre: 'admin' | 'enseignant' | 'parent' | 'apprenant';
         };
         CompositeTypes: {
@@ -322,6 +376,7 @@ export const Constants = {
     },
     public: {
         Enums: {
+            module_daara: ['structure', 'absences', 'notes', 'bulletins', 'coran_cahier', 'coran_recitations', 'coran_nafar', 'notifications'],
             role_membre: ['admin', 'enseignant', 'parent', 'apprenant'],
         },
     },

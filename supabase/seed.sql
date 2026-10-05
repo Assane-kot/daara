@@ -9,6 +9,8 @@
 -- | enseignant.dev@daara.local | enseignant               | parent           |
 -- | parent.dev@daara.local     | parent                   | —                |
 -- | admin.dev@daara.local      | admin                    | admin            |
+-- Modules (ADR-008) : Serigne Touba = école franco-arabe (tous) ; Keur Thiès = daara coranique (pas de notes ni de
+-- bulletins).
 -- À compléter au sprint 5 (données de démonstration du pilote).
 
 -- Garde-fou : une base contenant de vrais comptes (adresse hors `.local`) n'est pas une base locale de développement.
@@ -49,3 +51,10 @@ insert into public.memberships (daara_id, user_id, role, created_by) values
     ('d1000000-0000-0000-0000-000000000001', 'd0000000-0000-0000-0000-000000000002', 'parent', 'd0000000-0000-0000-0000-000000000003'),
     ('d1000000-0000-0000-0000-000000000001', 'd0000000-0000-0000-0000-000000000003', 'admin', 'd0000000-0000-0000-0000-000000000003'),
     ('d1000000-0000-0000-0000-000000000002', 'd0000000-0000-0000-0000-000000000003', 'admin', 'd0000000-0000-0000-0000-000000000003');
+
+-- Daaras créées directement (sans creer_daara) : modules écrits ici.
+insert into public.daara_modules (daara_id, module, actif)
+select 'd1000000-0000-0000-0000-000000000001'::uuid, m, true from unnest(enum_range(null::public.module_daara)) as m
+union all
+select 'd1000000-0000-0000-0000-000000000002'::uuid, m, m in ('structure', 'absences', 'coran_cahier', 'coran_recitations', 'coran_nafar', 'notifications')
+from unnest(enum_range(null::public.module_daara)) as m;

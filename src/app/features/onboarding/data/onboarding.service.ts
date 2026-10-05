@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { PostgrestError } from '@supabase/supabase-js';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ModuleDaara } from '../../../core/daara/daara.model';
 import { SupabaseService } from '../../../core/supabase/supabase.service';
 
 export interface NouvelleDaara {
@@ -10,6 +11,8 @@ export interface NouvelleDaara {
     readonly telephone: string;
     readonly langueDefaut: 'fr' | 'en';
     readonly bareme: 10 | 20;
+    /** Modules choisis à l'onboarding (ADR-008) ; la base ajoute les prérequis. */
+    readonly modules: readonly ModuleDaara[];
 }
 
 /** Erreur de création traduite pour l'écran (codes de `creer_daara`, LLD §4 « Fonctions RPC »). */
@@ -49,6 +52,7 @@ export class OnboardingService {
             p_telephone: daara.telephone || undefined,
             p_langue_defaut: daara.langueDefaut,
             p_bareme: daara.bareme,
+            p_modules: [...daara.modules],
         });
         if (error) {
             throw new ErreurCreationDaara(cleErreurCreation(error));

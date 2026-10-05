@@ -2,12 +2,20 @@ import { Database } from '../supabase/database.types';
 
 export type RoleMembre = Database['public']['Enums']['role_membre'];
 
-/**
- * Modules activables par daara (ADR-008). Liste locale jusqu'à la migration de S2.2, qui créera l'enum
- * `module_daara` : ce type sera alors repris de `database.types.ts`.
- */
-export const MODULES = ['structure', 'absences', 'notes', 'bulletins', 'coran_cahier', 'coran_recitations', 'coran_nafar', 'notifications'] as const;
-export type ModuleDaara = (typeof MODULES)[number];
+/** Modules activables par daara (ADR-008), enum `module_daara`. */
+export type ModuleDaara = Database['public']['Enums']['module_daara'];
+
+/** Tous les modules, dans l'ordre de l'enum (et de l'écran Modules). */
+export const MODULES: readonly ModuleDaara[] = [
+    'structure',
+    'absences',
+    'notes',
+    'bulletins',
+    'coran_cahier',
+    'coran_recitations',
+    'coran_nafar',
+    'notifications',
+];
 
 /** Daara accessible à l'utilisateur, avec ses rôles actifs (lue dans ses propres memberships). */
 export interface DaaraAccessible {
@@ -17,6 +25,8 @@ export interface DaaraAccessible {
     readonly ville: string | null;
     readonly logoPath: string | null;
     readonly roles: readonly RoleMembre[];
+    /** Modules actifs de la daara (ADR-008). */
+    readonly modules: readonly ModuleDaara[];
 }
 
 const CLE_DERNIERE_DAARA = 'daara.derniere';

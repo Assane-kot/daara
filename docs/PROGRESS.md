@@ -9,7 +9,7 @@
 - Sprint 1 — Socle multi-tenant : **code terminé** (bilan ci-dessous, 2026-10-03) ; clôture effective après la
   vérification en 375 px et les configurations Auth / Turnstile du développeur. Sprint suivant : 2 — Membres et
   navigation (planification à faire).
-- Sprint 2 en cours : S2.0 (spike, ADR-009 acceptée) et S2.1 (navigation par daara) faits (2026-10-05).
+- Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara) et S2.2 (modules activables) faits (2026-10-05).
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -114,6 +114,34 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-05 — S2.2 Modules activables par daara (ADR-008)
+- Base : enum `module_daara`, table `daara_modules` (lecture par les membres et le super-admin, aucune écriture
+  directe, journalisée), `module_actif()`, `definir_modules()` (admin aal2 ; prérequis inactifs ajoutés ; refus
+  `module_requis:<prérequis>:<dépendant>` si on retire un prérequis encore requis), fonctions internes
+  `prerequis_module`, `avec_prerequis`, `ecrire_modules` ; `creer_daara` recréée avec `p_modules` (tous par défaut,
+  prérequis ajoutés) ; reprise : daaras existantes avec tous les modules. 29 tests pgTAP (173 au total).
+- Front : `ModuleDaara` typé depuis la base, modules lus avec les daaras, `moduleGuard`, catalogue `core/daara/modules.ts`
+  (prérequis, profils « coranique » / « franco-arabe »), Paramètres → Modules (admin : interrupteurs accessibles,
+  prérequis expliqués, prérequis requis non désactivables, confirmation avant désactivation, message des prérequis
+  activés), entrée de menu Paramètres, choix du profil à l'onboarding (« Personnalisé » : cases à cocher).
+- Seed : Serigne Touba = école franco-arabe, Keur Thiès = daara coranique.
+- Vérifié dans le navigateur : admin sans facteur → enrôlement TOTP imposé → Modules ; désactivation de Bulletins puis
+  de Notes (confirmations), réactivation de Bulletins → Notes réactivé avec message ; journal (4 lignes, auteur) ;
+  375 px en sombre ; onboarding d'un nouvel utilisateur avec le profil coranique → notes et bulletins inactifs.
+- Audits : sécurité (0 critique, 0 important, 4 mineurs) et RLS (0 critique, **2 importants**, 4 mineurs), tous corrigés :
+  - `module_actif` répondait pour n'importe quelle daara (oracle de configuration et d'existence) → faux pour un
+    non-membre (sauf super-admin), `session_suffisante` comprise ;
+  - `avec_prerequis` sortait trop tôt avec des doublons (`creer_daara(['bulletins','bulletins'])` créait une daara sans
+    structure) → entrée dédoublonnée ;
+  - tableaux multidimensionnels ou de plus de 16 éléments refusés (`modules_valides`) ; `updated_by` illisible par les
+    membres ; nouvelle RPC `basculer_module` (part de l'état en base, verrou) : deux admins ne s'écrasent plus ;
+    interrupteurs à 44 px ; catalogue front contrôlé contre l'enum ; 61 tests pgTAP sur les modules ;
+  - formulation corrigée dans l'ADR-008 et `supabase-rls.md` : `(select helper(daara_id))` n'est PAS mis en cache par
+    requête (argument dépendant de la ligne) → helper ensembliste pour les grosses tables (sprint 12).
+- Incident pendant l'audit RLS : un script de l'auditeur a écrit hors transaction dans la base locale, nettoyé par
+  l'auditeur puis `db reset` ; aucune donnée hors local.
+- 154 tests unitaires, 205 tests pgTAP ; chargement initial 147,6 kB transférés.
+
 ### 2026-10-05 — S2.0 spike téléphone (ADR-009) et S2.1 navigation par daara
 - S2.0 : connexion téléphone + mot de passe impossible sans fournisseur SMS (`phone_provider_disabled`) ; solution
   validée : fournisseur SMS factice + hook `before_user_created` (refuse les inscriptions publiques par téléphone, ne

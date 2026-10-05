@@ -59,4 +59,6 @@ Les apprenants et les liens parents (sprint 4) appartiennent au socle : toute da
 + Données jamais perdues en cas de désactivation.
 − Chaque story de module ajoute la condition `module_actif` à ses politiques et ses tests pgTAP « module désactivé »
   (inscrit dans la Definition of Done et dans `.claude/rules/supabase-rls.md`).
-− Un appel par politique : `module_actif` est mis en cache par requête grâce à la forme `(select …)`.
+− Un appel par ligne : la forme `(select module_actif(daara_id, …))` n'est pas mise en cache quand l'argument est une
+  colonne (SubPlan évalué par ligne, vérifié par l'audit RLS de S2.2). Pour les grosses tables de module, préférer un
+  helper ensembliste évalué une fois (`daara_id in (select …)`, modèle de `membres_administres`) ; à mesurer au sprint 12.

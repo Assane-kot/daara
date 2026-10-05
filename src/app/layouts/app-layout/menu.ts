@@ -20,7 +20,10 @@ export interface EntreeMenu {
     readonly barreBasse?: boolean;
 }
 
-export const MENU: readonly EntreeMenu[] = [{ cle: 'menu.tableau_de_bord', icone: 'tableau', route: '', barreBasse: true }];
+export const MENU: readonly EntreeMenu[] = [
+    { cle: 'menu.tableau_de_bord', icone: 'tableau', route: '', barreBasse: true },
+    { cle: 'menu.parametres', icone: 'parametres', route: 'parametres', roles: ['admin'] },
+];
 
 /** Entrées visibles pour des rôles et des modules donnés, dans l'ordre déclaré. */
 export function menuVisible(menu: readonly EntreeMenu[], roles: readonly RoleMembre[], modules: readonly ModuleDaara[]): EntreeMenu[] {

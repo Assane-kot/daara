@@ -635,10 +635,11 @@ select ok(
     'creer_daara : le créateur est admin'
 );
 select results_eq(
-    $$ select table_name, action from public.audit_log
-       where daara_id = (select id from public.daaras where slug = 'test-daara-c') order by table_name $$,
-    $$ values ('daaras', 'INSERT'), ('memberships', 'INSERT') $$,
-    'creer_daara : création journalisée (daara + membership)'
+    $$ select table_name, action, count(*)::int from public.audit_log
+       where daara_id = (select id from public.daaras where slug = 'test-daara-c')
+       group by table_name, action order by table_name $$,
+    $$ values ('daara_modules', 'INSERT', 8), ('daaras', 'INSERT', 1), ('memberships', 'INSERT', 1) $$,
+    'creer_daara : création journalisée (daara, membership, 8 modules)'
 );
 select throws_ok(
     $$ select public.creer_daara('Daara pirate', 'test-daara-a') $$,

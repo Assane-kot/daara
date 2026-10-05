@@ -35,6 +35,42 @@
             <p class="auth-intro">{{ 'onboarding.intro' | translate }}</p>
 
             <form class="auth-form" [formGroup]="form" (ngSubmit)="creer()" novalidate>
+                <fieldset class="m-0 border-0 p-0">
+                    <legend class="mb-1.5 text-[13.5px] font-extrabold">{{ 'onboarding.profil.titre' | translate }}</legend>
+                    <div class="grid gap-2">
+                        @for (profil of profils; track profil) {
+                            <label
+                                class="mb-0! flex cursor-pointer items-start gap-3 rounded-xl border-[1.5px] border-white-light p-3 has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary dark:border-night-border"
+                            >
+                                <input class="mt-1 accent-primary" type="radio" formControlName="profil" [value]="profil" />
+                                <span>
+                                    <span class="block font-extrabold">{{ 'onboarding.profil.' + profil + '.nom' | translate }}</span>
+                                    <span class="block text-sm font-normal text-muted dark:text-night-muted">{{
+                                        'onboarding.profil.' + profil + '.description' | translate
+                                    }}</span>
+                                </span>
+                            </label>
+                        }
+                    </div>
+                    @if (form.controls.profil.value === 'personnalise') {
+                        <div class="mt-3 grid gap-1 min-[421px]:grid-cols-2">
+                            @for (module of tousModules; track module) {
+                                <label class="mb-0! flex min-h-11 cursor-pointer items-center gap-2 font-semibold">
+                                    <input
+                                        type="checkbox"
+                                        class="h-4 w-4 accent-primary"
+                                        [checked]="modulesPerso().includes(module)"
+                                        (change)="basculerModule(module, $any($event.target).checked)"
+                                    />
+                                    {{ 'modules.' + module + '.nom' | translate }}
+                                </label>
+                            }
+                        </div>
+                        <p class="mt-1 mb-0 text-xs text-muted dark:text-night-muted">{{ 'onboarding.profil.aide_prerequis' | translate }}</p>
+                    }
+                    <p class="mt-2 mb-0 text-xs text-muted dark:text-night-muted">{{ 'onboarding.profil.modifiable' | translate }}</p>
+                </fieldset>
+
                 <app-form-field [label]="'onboarding.champs.nom' | translate">
                     <input appFormControl class="form-input" type="text" formControlName="nom" maxlength="120" autocomplete="organization" />
                 </app-form-field>

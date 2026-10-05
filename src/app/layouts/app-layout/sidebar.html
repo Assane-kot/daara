@@ -47,6 +47,9 @@
                         >
                             <div class="flex items-center">
                                 @switch (entree.icone) {
+                                    @case ('parametres') {
+                                        <icon-settings class="shrink-0 group-hover:text-primary!" />
+                                    }
                                     @default {
                                         <icon-menu-dashboard class="shrink-0 group-hover:text-primary!" />
                                     }

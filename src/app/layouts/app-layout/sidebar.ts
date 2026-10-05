@@ -5,12 +5,13 @@ import { ROUTES_AUTH } from '../../core/auth/auth.service';
 import { CurrentDaaraService } from '../../core/daara/current-daara.service';
 import { IconCaretsDown } from '../../shared/icon/icon-carets-down';
 import { IconMenuDashboard } from '../../shared/icon/icon-menu-dashboard';
+import { IconSettings } from '../../shared/icon/icon-settings';
 import { LayoutService } from '../layout.service';
 import { MENU, menuVisible } from './menu';
 
 @Component({
     selector: 'app-sidebar',
-    imports: [RouterLink, RouterLinkActive, TranslatePipe, IconCaretsDown, IconMenuDashboard],
+    imports: [RouterLink, RouterLinkActive, TranslatePipe, IconCaretsDown, IconMenuDashboard, IconSettings],
     templateUrl: './sidebar.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

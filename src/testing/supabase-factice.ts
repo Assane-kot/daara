@@ -26,7 +26,7 @@ export interface ClientFactice {
     /** Rôles dans une daara unique « Daara test » (raccourci) ; ignoré si `daaras` est renseigné. */
     roles: string[];
     /** Daaras accessibles, avec les rôles de l'utilisateur. */
-    daaras: { id: string; slug: string; nom: string; roles: string[] }[];
+    daaras: { id: string; slug: string; nom: string; roles: string[]; modules?: string[] }[];
 }
 
 export function sessionFactice(userId = 'u-1', email = 'awa@test.local'): Session {
@@ -72,5 +72,17 @@ export function clientFactice(session: Session | null = null): ClientFactice {
 function lignesMemberships(client: ClientFactice): unknown[] {
     const daaras =
         client.daaras.length > 0 ? client.daaras : client.roles.length > 0 ? [{ id: 'd-1', slug: 'daara-test', nom: 'Daara test', roles: client.roles }] : [];
-    return daaras.flatMap((d) => d.roles.map((role) => ({ role, daaras: { id: d.id, slug: d.slug, nom: d.nom, ville: null, logo_path: null } })));
+    return daaras.flatMap((d) =>
+        d.roles.map((role) => ({
+            role,
+            daaras: {
+                id: d.id,
+                slug: d.slug,
+                nom: d.nom,
+                ville: null,
+                logo_path: null,
+                daara_modules: ('modules' in d && d.modules ? d.modules : []).map((module) => ({ module, actif: true })),
+            },
+        })),
+    );
 }
