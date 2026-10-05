@@ -10,7 +10,7 @@
   vérification en 375 px et les configurations Auth / Turnstile du développeur. Sprint suivant : 2 — Membres et
   navigation (planification à faire).
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
-  de la daara) faits (2026-10-05). Suivante : S2.4 gestion des membres.
+  de la daara) et S2.4 (gestion des membres) faits (2026-10-05). Suivante : S2.5 invitations.
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -47,8 +47,8 @@
     - sprint 2 : un admin invité sans facteur peut être devancé à l'enrôlement TOTP par qui détient son mot de passe ;
     - sprint 12 : verrouillage par compte des codes e-mail ; énumération résiduelle par limite de fréquence (LLD §7.0).
   - Audit du socle (2026-10-03), points reportés :
-    - sprint 2 : les Edge Functions écriront `memberships` en service_role → `audit_log.user_id` nul ; transmettre
-      l'auteur (ex. `set_config` lu par `audit_trigger`) ;
+    - ~~sprint 2 : auteur des écritures en service_role~~ → `daara.auteur` lu par `audit_trigger` (S2.4) ; S2.5 / S2.6 :
+      le fixer avec `set_config(…, true)` dans une seule fonction interne, après vérification de l'auteur ;
     - sprint 2 : le claim `aal2` reste valable jusqu'à l'expiration du JWT (1 h) après retrait d'un facteur TOTP →
       révoquer les sessions dans la procédure de retrait (journalisée) ;
     - AVANT le sprint 5 (ADR) : `audit_trigger` copie les lignes entières, sans durée de conservation, et les
@@ -56,6 +56,14 @@
       purge planifiée et purge à la suppression d'une daara ;
     - sprint 4 (exports CSV / PDF) : neutraliser `= + - @` en tête de cellule (injection de formules) ;
     - sprint 12 : performance des politiques (`(select has_role(daara_id …))` dépend de la ligne).
+  - Audits S2.4 (2026-10-05), points reportés :
+    - S2.5 : `accepter_invitation` doit effacer `nom_affiche` en réactivant une ligne (la contrainte l'impose) et passer
+      par les garde-fous ; promotion en admin d'un compte sans facteur = même risque que l'invitation admin (qui
+      détient le mot de passe enrôle le TOTP en premier) → même correction ;
+    - S2.7 : un membre désactivé de sa seule daara arrive sur l'onboarding (« Créer ma daara ») → message « accès
+      désactivé » (ses memberships inactifs lui restent lisibles) ;
+    - sprint 3 : liste des membres sans pagination (limite de 1 000 lignes de PostgREST) → `data-table` ;
+    - sprint 12 (CDP) : supprimer le compte du dernier admin d'une daara est refusé par le garde-fou → procédure.
   - Audit S2.3 (2026-10-05), points pour information :
     - fichiers du bucket `logos` d'une daara supprimée non effacés par la cascade (le Storage interdit le `delete` SQL)
       → à traiter avec la purge CDP (avant le sprint 5), via l'API Storage ;
@@ -120,6 +128,32 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-05 — S2.4 Gestion des membres
+- Base (migration `membres`) : `memberships.nom_affiche` (nom figé à la désactivation, nul sur une ligne active),
+  `audit_trigger` avec auteur `daara.auteur` (Edge Functions en service_role ; ignoré si `auth.uid()` existe ou si
+  malformé), triggers `garder_un_admin` (mise à jour et suppression ; seule la cascade d'une daara passe) et
+  `memberships_immuables` (`daara_id`, `user_id`), fonction interne `membership_administre` (droits vérifiés avant
+  verrou, verrous daara puis membership, revérification), RPC `changer_role` et `definir_actif` ; politique
+  enseignant limitée aux collègues actifs. 54 tests pgTAP (279 au total) ; concurrence vérifiée à deux sessions.
+- Front : `/d/:slug/membres` (admin) : recherche sans accents, filtres rôle / état (actifs par défaut), tableau au-delà
+  de 640 px et cartes en dessous, badges, menu d'actions CDK par membre (rôles proposés, désactiver / réactiver),
+  confirmations (admin donné ou retiré, désactivation), un admin qui se retire ses droits quitte l'écran ; entrée de
+  menu « Membres » ; icônes Vristo `users`, `horizontal-dots`, `search`.
+- Vérifié dans le navigateur : désactivation (nom figé visible dans « Désactivés »), réactivation, promotion admin et
+  retour, refus « dernier admin » sur soi-même avec message, journal avec auteur, 375 px en sombre sans débordement.
+- Audits : sécurité (0 critique, **1 important**, 4 mineurs) et RLS (0 critique, **1 important**, 3 mineurs), corrigés :
+  - important (relevé par les deux) : l'enseignant lisait le nom figé de ses collègues désactivés → politique limitée
+    aux actifs + contrainte `not actif or nom_affiche is null` ;
+  - verrou pris avant l'autorisation et droits non revérifiés après verrou ; `for update` sur la daara bloquait les
+    clés étrangères (→ `for no key update`) ; garde-fou contournable par `delete` ou `update … set daara_id` ;
+    robustesse en REPEATABLE READ (autres admins verrouillés) ; confirmation de désactivation en style « danger » ;
+  - 21 cas pgTAP ajoutés (collègue désactivé, isolation du journal, admin désactivé, anon, apprenant, auteur usurpé,
+    seul admin à deux rôles, mise à jour groupée, suppression, ligne immuable).
+- Incident : l'auditeur RLS a de nouveau écrit hors transaction dans la base locale (un `\set` sans antislash a fusionné
+  avec `begin`) ; lignes supprimées par l'auditeur, puis `db reset`. Aucune donnée hors local. Consigne renforcée
+  côté auditeur : garde-fou `now() = statement_timestamp()` après `begin`.
+- 185 tests unitaires, 279 tests pgTAP ; chargement initial 148,3 kB transférés.
+
 ### 2026-10-05 — S2.3 Paramètres de la daara
 - Base (migration `logos_daara`) : bucket `logos` public en lecture, 512 Ko, PNG / JPEG / WebP (pas de SVG) ;
   4 politiques sur `storage.objects` (select requis par l'upsert, insert, update, delete) pour l'admin `aal2` de la

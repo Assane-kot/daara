@@ -140,6 +140,7 @@ export type Database = {
                     created_by: string | null;
                     daara_id: string;
                     id: string;
+                    nom_affiche: string | null;
                     role: Database['public']['Enums']['role_membre'];
                     updated_at: string;
                     user_id: string;
@@ -150,6 +151,7 @@ export type Database = {
                     created_by?: string | null;
                     daara_id: string;
                     id?: string;
+                    nom_affiche?: string | null;
                     role: Database['public']['Enums']['role_membre'];
                     updated_at?: string;
                     user_id: string;
@@ -160,6 +162,7 @@ export type Database = {
                     created_by?: string | null;
                     daara_id?: string;
                     id?: string;
+                    nom_affiche?: string | null;
                     role?: Database['public']['Enums']['role_membre'];
                     updated_at?: string;
                     user_id?: string;
@@ -239,6 +242,7 @@ export type Database = {
                 Args: { p_actif: boolean; p_daara: string; p_module: Database['public']['Enums']['module_daara'] };
                 Returns: Database['public']['Enums']['module_daara'][];
             };
+            changer_role: { Args: { p_membership: string; p_role: Database['public']['Enums']['role_membre'] }; Returns: undefined };
             creer_daara: {
                 Args: {
                     p_bareme?: number;
@@ -251,6 +255,7 @@ export type Database = {
                 };
                 Returns: string;
             };
+            definir_actif: { Args: { p_actif: boolean; p_membership: string }; Returns: undefined };
             definir_modules: {
                 Args: { p_daara: string; p_modules: Database['public']['Enums']['module_daara'][] };
                 Returns: Database['public']['Enums']['module_daara'][];
@@ -259,6 +264,26 @@ export type Database = {
             has_role: { Args: { p_daara: string; p_roles: Database['public']['Enums']['role_membre'][] }; Returns: boolean };
             is_member: { Args: { p_daara: string }; Returns: boolean };
             is_platform_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+            membership_administre: {
+                Args: { p_membership: string };
+                Returns: {
+                    actif: boolean;
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    id: string;
+                    nom_affiche: string | null;
+                    role: Database['public']['Enums']['role_membre'];
+                    updated_at: string;
+                    user_id: string;
+                };
+                SetofOptions: {
+                    from: '*';
+                    to: 'memberships';
+                    isOneToOne: true;
+                    isSetofReturn: false;
+                };
+            };
             membres_administres: { Args: Record<PropertyKey, never>; Returns: string[] };
             module_actif: { Args: { p_daara: string; p_module: Database['public']['Enums']['module_daara'] }; Returns: boolean };
             modules_valides: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: boolean };

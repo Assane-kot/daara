@@ -23,6 +23,7 @@
     "menu": {
         "tableau_de_bord": "Tableau de bord",
         "changer_daara": "Changer de daara",
+        "membres": "Membres",
         "parametres": "Paramètres"
     },
     "titres": {
@@ -36,7 +37,8 @@
         "onboarding": "Créer ma daara",
         "select_daara": "Choisir une daara",
         "parametres_modules": "Modules",
-        "parametres_general": "Paramètres généraux"
+        "parametres_general": "Paramètres généraux",
+        "membres": "Membres"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -325,6 +327,66 @@
                 "logo_illisible": "Ce fichier n’est pas une image lisible.",
                 "logo_suppression": "Le logo n’a pas pu être supprimé. Réessayez."
             }
+        }
+    },
+    "membres": {
+        "titre": "Membres",
+        "reessayer": "Réessayer",
+        "vous": "vous",
+        "sans_nom": "Membre sans nom",
+        "compte": "{{n}} membre(s) affiché(s) sur {{total}}",
+        "filtres": {
+            "recherche": "Rechercher un nom ou un téléphone",
+            "role": "Filtrer par rôle",
+            "tous_roles": "Tous les rôles",
+            "etat": "Filtrer par état",
+            "actifs": "Actifs",
+            "desactives": "Désactivés",
+            "tous": "Tous"
+        },
+        "colonnes": {
+            "nom": "Nom",
+            "role": "Rôle",
+            "etat": "État",
+            "depuis": "Membre depuis",
+            "actions": "Actions"
+        },
+        "etat": {
+            "actif": "Actif",
+            "desactive": "Désactivé"
+        },
+        "vide": {
+            "titre": "Aucun membre ne correspond",
+            "message": "Modifiez la recherche ou les filtres."
+        },
+        "actions": {
+            "menu": "Actions pour {{nom}}",
+            "passer_en": "Passer en {{role}}",
+            "desactiver": "Désactiver",
+            "reactiver": "Réactiver",
+            "confirmer_role": "Changer le rôle"
+        },
+        "confirmer": {
+            "role_titre": "{{nom}} : passer en {{role}} ?",
+            "promouvoir_message": "Un administrateur gère toute la daara : membres, paramètres et modules. Il devra activer la double authentification à sa prochaine connexion.",
+            "retrograder_message": "{{nom}} perdra les droits d’administration de la daara.",
+            "retrograder_soi_message": "Vous perdrez vos droits d’administration de la daara et quitterez cet écran.",
+            "desactiver_titre": "Désactiver {{nom}} ({{role}}) ?",
+            "desactiver_message": "Le membre perd immédiatement l’accès à la daara. Ses données sont conservées ; vous pourrez le réactiver.",
+            "desactiver_soi_message": "Vous perdrez immédiatement l’accès à cet espace. Un autre administrateur pourra vous réactiver."
+        },
+        "succes": {
+            "role": "{{nom}} est maintenant {{role}}.",
+            "desactive": "{{nom}} est désactivé.",
+            "reactive": "{{nom}} est réactivé."
+        },
+        "erreurs": {
+            "chargement": "La liste des membres n’a pas pu être chargée.",
+            "droits": "Seul un administrateur ayant confirmé son identité peut gérer les membres.",
+            "dernier_admin": "La daara doit garder au moins un administrateur actif : nommez-en un autre d’abord.",
+            "role_deja_attribue": "Cette personne a déjà ce rôle dans la daara.",
+            "role_invalide": "Ce rôle ne peut pas être attribué ici.",
+            "inattendue": "L’action a échoué. Réessayez."
         }
     }
 }

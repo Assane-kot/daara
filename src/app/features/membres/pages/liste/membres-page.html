@@ -1,0 +1,186 @@
+<app-page-header [titre]="'membres.titre' | translate" />
+
+@if (chargement()) {
+    <div class="panel"><app-skeleton [lignes]="6" [avecTitre]="true" /></div>
+} @else if (erreurChargement()) {
+    <div class="panel grid gap-4">
+        <div class="rounded-md border border-danger/30 bg-danger-light p-3.5 text-danger-strong dark:bg-danger-dark-light dark:text-danger-soft" role="alert">
+            {{ 'membres.erreurs.chargement' | translate }}
+        </div>
+        <div>
+            <button type="button" class="btn btn-outline-primary" (click)="charger()">{{ 'membres.reessayer' | translate }}</button>
+        </div>
+    </div>
+} @else {
+    <div class="panel">
+        <!-- Filtres -->
+        <div class="mb-4 grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+            <label class="relative mb-0!">
+                <span class="sr-only">{{ 'membres.filtres.recherche' | translate }}</span>
+                <input
+                    type="search"
+                    class="form-input ltr:pl-10 rtl:pr-10"
+                    [placeholder]="'membres.filtres.recherche' | translate"
+                    [value]="recherche()"
+                    (input)="saisieRecherche($event)"
+                />
+                <icon-search class="pointer-events-none absolute top-1/2 h-5 w-5 -translate-y-1/2 text-muted ltr:left-3 rtl:right-3 dark:text-night-muted" />
+            </label>
+            <label class="mb-0!">
+                <span class="sr-only">{{ 'membres.filtres.role' | translate }}</span>
+                <select class="form-select" [value]="filtreRole()" (change)="choixRole($event)">
+                    <option value="">{{ 'membres.filtres.tous_roles' | translate }}</option>
+                    @for (role of roles; track role) {
+                        <option [value]="role">{{ 'roles.' + role | translate }}</option>
+                    }
+                </select>
+            </label>
+            <label class="mb-0!">
+                <span class="sr-only">{{ 'membres.filtres.etat' | translate }}</span>
+                <select class="form-select" [value]="filtreEtat()" (change)="choixEtat($event)">
+                    @for (etat of etats; track etat) {
+                        <option [value]="etat">{{ 'membres.filtres.' + etat | translate }}</option>
+                    }
+                </select>
+            </label>
+        </div>
+
+        @if (erreur(); as erreur) {
+            <div
+                class="mb-4 rounded-md border border-danger/30 bg-danger-light p-3.5 text-danger-strong dark:bg-danger-dark-light dark:text-danger-soft"
+                role="alert"
+            >
+                {{ erreur | translate }}
+            </div>
+        }
+        @if (succes(); as succes) {
+            <div class="mb-4 rounded-md border border-primary/30 bg-primary/10 p-3.5 text-black dark:text-white-light" role="status">
+                {{ succes.cle | translate: succes.params }}
+            </div>
+        }
+
+        <p class="mt-0 mb-3 text-sm text-muted dark:text-night-muted" aria-live="polite">
+            {{ 'membres.compte' | translate: { n: visibles().length, total: membres().length } }}
+        </p>
+
+        @if (visibles().length === 0) {
+            <app-empty-state [titre]="'membres.vide.titre' | translate" [message]="'membres.vide.message' | translate" />
+        } @else {
+            <!-- Tableau (≥ 640 px) -->
+            <div class="table-responsive hidden sm:block">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'membres.colonnes.nom' | translate }}</th>
+                            <th scope="col">{{ 'membres.colonnes.role' | translate }}</th>
+                            <th scope="col">{{ 'membres.colonnes.etat' | translate }}</th>
+                            <th scope="col">{{ 'membres.colonnes.depuis' | translate }}</th>
+                            <th scope="col" class="ltr:text-right rtl:text-left">
+                                <span class="sr-only">{{ 'membres.colonnes.actions' | translate }}</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (membre of visibles(); track membre.id) {
+                            <tr>
+                                <td>
+                                    <span class="font-semibold text-black dark:text-white-light">{{ nom(membre) }}</span>
+                                    @if (membre.moi) {
+                                        <span class="text-muted dark:text-night-muted"> ({{ 'membres.vous' | translate }})</span>
+                                    }
+                                    @if (membre.telephone) {
+                                        <span class="block text-xs text-muted dark:text-night-muted">{{ membre.telephone }}</span>
+                                    }
+                                </td>
+                                <td>
+                                    <app-badge [variante]="variante[membre.role]">{{ 'roles.' + membre.role | translate }}</app-badge>
+                                </td>
+                                <td>
+                                    <app-badge [variante]="membre.actif ? 'success' : 'dark'">{{
+                                        (membre.actif ? 'membres.etat.actif' : 'membres.etat.desactive') | translate
+                                    }}</app-badge>
+                                </td>
+                                <td class="whitespace-nowrap">{{ date(membre.depuis) }}</td>
+                                <td class="ltr:text-right rtl:text-left">
+                                    <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: membre }" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cartes (< 640 px) -->
+            <ul class="m-0 grid list-none gap-3 p-0 sm:hidden">
+                @for (membre of visibles(); track membre.id) {
+                    <li class="flex items-start gap-3 rounded-md border border-white-light p-3 dark:border-night-border">
+                        <div class="min-w-0 flex-1">
+                            <p class="m-0 truncate font-semibold text-black dark:text-white-light">
+                                {{ nom(membre) }}
+                                @if (membre.moi) {
+                                    <span class="font-normal text-muted dark:text-night-muted"> ({{ 'membres.vous' | translate }})</span>
+                                }
+                            </p>
+                            @if (membre.telephone) {
+                                <p class="m-0 text-xs text-muted dark:text-night-muted">{{ membre.telephone }}</p>
+                            }
+                            <div class="mt-2 flex flex-wrap gap-1.5">
+                                <app-badge [variante]="variante[membre.role]">{{ 'roles.' + membre.role | translate }}</app-badge>
+                                <app-badge [variante]="membre.actif ? 'success' : 'dark'">{{
+                                    (membre.actif ? 'membres.etat.actif' : 'membres.etat.desactive') | translate
+                                }}</app-badge>
+                            </div>
+                        </div>
+                        <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: membre }" />
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+}
+
+<!-- Menu d'actions d'un membre (CDK Menu : clavier, Échap, focus restauré). -->
+<ng-template #actions let-membre>
+    <button
+        type="button"
+        class="icon-btn inline-grid h-9 w-9 place-items-center rounded-full hover:bg-primary/10 hover:text-primary disabled:opacity-60"
+        [cdkMenuTriggerFor]="menu"
+        [disabled]="enCours() !== null"
+        [attr.aria-label]="'membres.actions.menu' | translate: { nom: nom(membre) }"
+    >
+        @if (enCours() === membre.id) {
+            <span class="auth-spinner" aria-hidden="true"></span>
+        } @else {
+            <icon-horizontal-dots class="h-5 w-5" />
+        }
+    </button>
+    <ng-template #menu>
+        <div cdkMenu class="min-w-[220px] rounded-lg border border-white-light bg-white p-1.5 shadow-lg dark:border-night-border dark:bg-night-raised">
+            @if (membre.actif) {
+                @for (role of rolesPossibles(membre); track role) {
+                    <button
+                        cdkMenuItem
+                        type="button"
+                        class="flex min-h-11 w-full items-center rounded-md px-3 text-left font-semibold hover:bg-primary/10 hover:text-primary focus:bg-primary/10"
+                        (cdkMenuItemTriggered)="changerRole(membre, role)"
+                    >
+                        {{ 'membres.actions.passer_en' | translate: { role: ('roles.' + role | translate) } }}
+                    </button>
+                }
+            }
+            <button
+                cdkMenuItem
+                type="button"
+                class="flex min-h-11 w-full items-center rounded-md px-3 text-left font-semibold focus:bg-primary/10"
+                [class]="
+                    membre.actif
+                        ? 'text-danger-strong hover:bg-danger-light dark:text-danger-soft dark:hover:bg-danger-dark-light'
+                        : 'hover:bg-primary/10 hover:text-primary'
+                "
+                (cdkMenuItemTriggered)="basculerActif(membre)"
+            >
+                {{ (membre.actif ? 'membres.actions.desactiver' : 'membres.actions.reactiver') | translate }}
+            </button>
+        </div>
+    </ng-template>
+</ng-template>

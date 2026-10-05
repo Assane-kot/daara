@@ -163,8 +163,11 @@ apprenants, liens parents, tableau de bord) n'est pas un module : toujours actif
 Colonnes ajoutées au sprint 2 :
 - `memberships.nom_affiche` text null : nom figé à la désactivation (l'admin ne lit plus le profil d'un membre
   désactivé, mais doit pouvoir le reconnaître dans la liste pour le réactiver).
-- `audit_log.user_id` : `coalesce(auth.uid(), current_setting('daara.auteur', true)::uuid)` ; les RPC appelées par les
-  Edge Functions en service_role fixent `daara.auteur` (transaction locale) : l'auteur réel est toujours tracé.
+- `audit_log.user_id` : `coalesce(auth.uid(), <daara.auteur si c'est un uuid valide>)` (valeur malformée ignorée) ; les
+  RPC appelées par les Edge Functions en service_role fixent `daara.auteur` avec `set_config(…, true)` (transaction
+  locale, jamais `false` : la connexion du pool la garderait) après avoir vérifié l'auteur ; un client connecté ne peut
+  pas usurper l'auteur (`auth.uid()` prime, testé).
+- `memberships` : `daara_id` et `user_id` immuables (trigger) ; `nom_affiche` nul sur une ligne active (contrainte).
 
 Table `notifications` : reportée au sprint 5 (module Notifications, ADR-008).
 
@@ -290,11 +293,17 @@ acceptation d'invitation). Au sprint 2 : modification du rôle / désactivation 
 |---|---|---|
 | `invitations` | `has_role(daara_id, admin)` ; colonnes lisibles : toutes sauf `token_hash` | aucune (RPC `creer_invitation`, `revoquer_invitation`, `accepter_invitation`) |
 | `codes_acces` | `has_role(daara_id, admin)` ; colonnes lisibles : id, user_id, expires_at, used_at, tentatives, created_at | aucune (RPC `creer_code_acces`, `consommer_code_acces`) |
-| `memberships` | inchangé (sprint 1) | aucune écriture directe : RPC `changer_role`, `definir_actif`, `accepter_invitation` |
+| `memberships` | sprint 1, sauf l'enseignant : collègues enseignants **actifs** seulement (S2.4) | aucune écriture directe : RPC `changer_role`, `definir_actif`, `accepter_invitation` |
 | `daaras` | inchangé | update de `logo_path` également (chemin contraint `<id>/logo.<ext>`) |
 | `storage.objects`, bucket `logos` | public (logos affichés sur l'écran de connexion de la daara, à terme) | select (requis par l'upsert de l'API Storage), insert / update / delete : `has_role(<1er segment>, admin)` ; nom `logo.png` / `logo.jpg` / `logo.webp` ; chemin contrôlé par expression régulière avant la conversion en uuid |
 
-Garde-fou (trigger `garder_un_admin`) : aucune modification de `memberships` ne peut laisser une daara sans admin actif.
+Garde-fou (trigger `garder_un_admin`, S2.4) : aucune mise à jour (rôle, état) ni suppression de `memberships` ne peut
+laisser une daara sans admin actif ; seule la suppression en cascade d'une daara passe. La suppression d'un compte qui
+est le dernier admin d'une daara est donc refusée (effacement CDP, sprint 12 : nommer un autre admin ou supprimer la
+daara d'abord). Verrous dans un ordre unique (daara en `for no key update`, puis memberships) ; les RPC revérifient les
+droits de l'appelant après verrou (un admin désactivé entre-temps n'agit plus).
+Erreurs des RPC membres : `42501 admin_aal2_requis` (aussi pour un membership inconnu ou d'une autre daara : pas
+d'oracle), `22023 role_invalide`, `23505 role_deja_attribue`, `23514 dernier_admin`.
 
 ### Fonctions RPC
 | Fonction | Rôle | Sécurité |

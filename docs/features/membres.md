@@ -6,7 +6,8 @@ sans jamais laisser la daara sans admin.
 
 ## Profils concernés et droits (lecture / écriture par rôle)
 - Admin (`aal2`) : liste, rôle, désactivation, réactivation (RPC).
-- Enseignant : voit les enseignants (sprint 1), aucune action.
+- Enseignant : voit les enseignants **actifs** (sprint 1, filtre `actif` ajouté en S2.4), aucune action ; pas d'accès à l'écran
+  (aucun profil de collègue ne lui est lisible).
 - Parent, apprenant : aucun accès à la liste.
 
 ## Données (tables, colonnes, contraintes)
@@ -26,6 +27,8 @@ sans jamais laisser la daara sans admin.
 recherche locale, pas encore le composant `data-table` du sprint 3) ; badges de rôle et d'état ; actions dans un menu
 par ligne ; confirmation (`ConfirmDialogService`) avant désactivation et changement de rôle admin.
 Cartes à la place du tableau en 375 px. États : chargement, erreur, vide (« Invitez votre premier membre »).
+Livré en S2.4 : onglet Membres seul (une ligne par membership, triée par rôle puis nom) ; l'onglet Invitations et le
+bouton « Inviter » arrivent avec S2.5 (table `invitations`).
 
 ## Temps réel / notifications
 Aucun.

@@ -28,6 +28,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/dashboard/dashboard-page').then((m) => m.DashboardPage),
             },
             {
+                path: 'membres',
+                loadChildren: () => import('./features/membres/membres.routes').then((m) => m.MEMBRES_ROUTES),
+            },
+            {
                 path: 'parametres',
                 loadChildren: () => import('./features/parametres/parametres.routes').then((m) => m.PARAMETRES_ROUTES),
             },

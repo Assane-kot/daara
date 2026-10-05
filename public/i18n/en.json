@@ -23,6 +23,7 @@
     "menu": {
         "tableau_de_bord": "Dashboard",
         "changer_daara": "Switch daara",
+        "membres": "Members",
         "parametres": "Settings"
     },
     "titres": {
@@ -36,7 +37,8 @@
         "onboarding": "Create my daara",
         "select_daara": "Choose a daara",
         "parametres_modules": "Modules",
-        "parametres_general": "General settings"
+        "parametres_general": "General settings",
+        "membres": "Members"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -325,6 +327,66 @@
                 "logo_illisible": "This file is not a readable image.",
                 "logo_suppression": "The logo could not be deleted. Please try again."
             }
+        }
+    },
+    "membres": {
+        "titre": "Members",
+        "reessayer": "Try again",
+        "vous": "you",
+        "sans_nom": "Unnamed member",
+        "compte": "{{n}} member(s) shown out of {{total}}",
+        "filtres": {
+            "recherche": "Search a name or phone number",
+            "role": "Filter by role",
+            "tous_roles": "All roles",
+            "etat": "Filter by status",
+            "actifs": "Active",
+            "desactives": "Deactivated",
+            "tous": "All"
+        },
+        "colonnes": {
+            "nom": "Name",
+            "role": "Role",
+            "etat": "Status",
+            "depuis": "Member since",
+            "actions": "Actions"
+        },
+        "etat": {
+            "actif": "Active",
+            "desactive": "Deactivated"
+        },
+        "vide": {
+            "titre": "No matching member",
+            "message": "Change the search or the filters."
+        },
+        "actions": {
+            "menu": "Actions for {{nom}}",
+            "passer_en": "Make {{role}}",
+            "desactiver": "Deactivate",
+            "reactiver": "Reactivate",
+            "confirmer_role": "Change role"
+        },
+        "confirmer": {
+            "role_titre": "Make {{nom}} {{role}}?",
+            "promouvoir_message": "An administrator manages the whole daara: members, settings and modules. They will have to turn on two-factor authentication at their next sign-in.",
+            "retrograder_message": "{{nom}} will lose administration rights for the daara.",
+            "retrograder_soi_message": "You will lose your administration rights for the daara and leave this screen.",
+            "desactiver_titre": "Deactivate {{nom}} ({{role}})?",
+            "desactiver_message": "The member immediately loses access to the daara. Their data is kept; you can reactivate them.",
+            "desactiver_soi_message": "You will immediately lose access to this space. Another administrator can reactivate you."
+        },
+        "succes": {
+            "role": "{{nom}} is now {{role}}.",
+            "desactive": "{{nom}} has been deactivated.",
+            "reactive": "{{nom}} has been reactivated."
+        },
+        "erreurs": {
+            "chargement": "The member list could not be loaded.",
+            "droits": "Only an administrator who has confirmed their identity can manage members.",
+            "dernier_admin": "The daara must keep at least one active administrator: appoint another one first.",
+            "role_deja_attribue": "This person already has this role in the daara.",
+            "role_invalide": "This role cannot be assigned here.",
+            "inattendue": "The action failed. Please try again."
         }
     }
 }

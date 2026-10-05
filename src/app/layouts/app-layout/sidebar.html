@@ -52,6 +52,9 @@
                         >
                             <div class="flex items-center">
                                 @switch (entree.icone) {
+                                    @case ('membres') {
+                                        <icon-users class="shrink-0 group-hover:text-primary!" />
+                                    }
                                     @case ('parametres') {
                                         <icon-settings class="shrink-0 group-hover:text-primary!" />
                                     }

@@ -239,14 +239,18 @@ export class AuthService {
         this.daaras = null;
     }
 
-    /** Relit les daaras après une modification de la daara ouverte (modules, paramètres) : menus, guards et logo suivent. */
-    async rechargerDaaraCourante(): Promise<void> {
+    /**
+     * Relit les daaras après une modification de la daara ouverte (modules, paramètres, ses propres rôles) : menus,
+     * guards et logo suivent. Renvoie faux si la daara n'est plus accessible (membre qui s'est retiré).
+     */
+    async rechargerDaaraCourante(): Promise<boolean> {
         const daaraId = this.courante.id();
         this.invaliderDaaras();
         const daara = (await this.mesDaaras()).find((d) => d.id === daaraId);
         if (daara) {
             this.courante.definir(daara);
         }
+        return !!daara;
     }
 
     /**
