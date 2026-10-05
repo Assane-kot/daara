@@ -1,13 +1,25 @@
 import { Routes } from '@angular/router';
 import { authGuard, avecDaaraGuard, mfaGuard, sansDaaraGuard } from './core/auth/auth.guards';
+import { daaraGuard, racineGuard } from './core/daara/daara.guards';
 
+/*
+ * Routage (LLD §2, §7.1 ter). Layouts chargés à la demande : chacun n'embarque que le sien (CDK Menu du header).
+ * Guards : session, double authentification si requise, puis daara.
+ */
 export const routes: Routes = [
     {
+        // Redirection vers la destination de l'utilisateur : connexion, mfa, onboarding, sa daara ou le sélecteur.
         path: '',
-        // Chargé à la demande comme le layout « cover » : chacun n'embarque que son layout (CDK Menu du header).
+        pathMatch: 'full',
+        canActivate: [racineGuard],
+        children: [],
+    },
+    {
+        path: 'd/:slug',
         loadComponent: () => import('./layouts/app-layout/app-layout').then((m) => m.AppLayout),
-        // Session, double authentification si requise (admin : aal2), au moins une daara (LLD §7.0).
-        canActivate: [authGuard, mfaGuard, avecDaaraGuard],
+        canActivate: [authGuard, mfaGuard, daaraGuard],
+        // Les mêmes enfants pour une autre daara : le layout et ses guards sont réévalués au changement de slug.
+        runGuardsAndResolvers: 'paramsChange',
         children: [
             {
                 path: '',
@@ -31,15 +43,28 @@ export const routes: Routes = [
         ],
     },
     {
+        path: 'select-daara',
+        loadComponent: () => import('./layouts/auth-layout/auth-layout').then((m) => m.AuthLayout),
+        canActivate: [authGuard, mfaGuard, avecDaaraGuard],
+        children: [
+            {
+                path: '',
+                title: 'titres.select_daara',
+                loadComponent: () => import('./features/select-daara/select-daara-page').then((m) => m.SelectDaaraPage),
+            },
+        ],
+    },
+    {
         path: 'auth',
-        // Layout « cover » chargé à la demande : absent du chargement initial de l'espace connecté.
         loadComponent: () => import('./layouts/auth-layout/auth-layout').then((m) => m.AuthLayout),
         loadChildren: () => import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
     },
     {
         path: 'onboarding',
         loadComponent: () => import('./layouts/auth-layout/auth-layout').then((m) => m.AuthLayout),
-        canActivate: [authGuard, sansDaaraGuard],
+        // mfaGuard d'abord : en aal1 avec un facteur, la daara n'est pas lisible et sansDaaraGuard croirait à tort
+        // l'utilisateur sans daara (audit S2.1, M1).
+        canActivate: [authGuard, mfaGuard, sansDaaraGuard],
         children: [
             {
                 path: '',

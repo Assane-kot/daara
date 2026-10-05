@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { AuthError, Session } from '@supabase/supabase-js';
 import { ClientFactice, clientFactice, sessionFactice } from '../../../testing/supabase-factice';
 import { provideTranslateTesting } from '../../../testing/translate-testing';
+import { CurrentDaaraService } from '../daara/current-daara.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { AuthService, ROUTES_AUTH } from './auth.service';
 
@@ -26,6 +27,20 @@ describe('AuthService', () => {
 
         expect(auth.user()?.id).toBe('u-2');
         expect(auth.email()).toBe('modou@test.local');
+    });
+
+    it('déconnexion : daara ouverte et dernière daara oubliées (téléphone partagé)', async () => {
+        const auth = creer();
+        await auth.sessionActuelle();
+        const courante = TestBed.inject(CurrentDaaraService);
+        courante.definir({ id: 'd-1', slug: 'daara-touba', nom: 'Daara Touba', ville: null, logoPath: null, roles: ['parent'] });
+        expect(localStorage.getItem('daara.derniere')).toBe('daara-touba');
+
+        const rappel = client.auth.onAuthStateChange.mock.calls[0][0] as (e: string, s: unknown) => void;
+        rappel('SIGNED_OUT', null);
+
+        expect(courante.daara()).toBeNull();
+        expect(localStorage.getItem('daara.derniere')).toBeNull();
     });
 
     it("inscrit avec la langue de l'interface et le jeton Turnstile, et retient l'e-mail", async () => {
@@ -134,22 +149,50 @@ describe('AuthService', () => {
             expect(await creer().destination()).toBe(ROUTES_AUTH.onboarding);
         });
 
-        it("enseignant en aal1 : espace de l'application", async () => {
+        it('une seule daara : son espace', async () => {
             const auth = creer();
             client.roles = ['enseignant'];
-            expect(await auth.destination()).toBe(ROUTES_AUTH.espace);
+            expect(await auth.destination()).toBe('/d/daara-test');
         });
 
-        it('admin en aal2 : espace, rôles lus une seule fois', async () => {
+        it('plusieurs daaras : la dernière utilisée si toujours membre, sinon le sélecteur', async () => {
+            const auth = creer();
+            client.daaras = [
+                { id: 'd-1', slug: 'daara-touba', nom: 'Daara Touba', roles: ['parent'] },
+                { id: 'd-2', slug: 'daara-thies', nom: 'Daara Thiès', roles: ['enseignant', 'parent'] },
+            ];
+            localStorage.removeItem('daara.derniere');
+            expect(await auth.destination()).toBe(ROUTES_AUTH.selectionDaara);
+
+            localStorage.setItem('daara.derniere', 'daara-thies');
+            expect(await auth.destination()).toBe('/d/daara-thies');
+
+            localStorage.setItem('daara.derniere', 'daara-quittee');
+            expect(await auth.destination()).toBe(ROUTES_AUTH.selectionDaara);
+        });
+
+        it('regroupe les rôles par daara et trie par nom', async () => {
+            const auth = creer();
+            client.daaras = [
+                { id: 'd-2', slug: 'b', nom: 'Daara B', roles: ['admin', 'enseignant'] },
+                { id: 'd-1', slug: 'a', nom: 'Daara A', roles: ['parent'] },
+            ];
+            const daaras = await auth.mesDaaras();
+            expect(daaras.map((d) => d.slug)).toEqual(['a', 'b']);
+            expect(daaras[1].roles).toEqual(['admin', 'enseignant']);
+            expect(await auth.rolesActifs()).toEqual(['parent', 'admin', 'enseignant']);
+        });
+
+        it('admin en aal2 : son espace, daaras lues une seule fois', async () => {
             const auth = creer();
             client.roles = ['admin'];
             client.auth.mfa.getAuthenticatorAssuranceLevel.mockResolvedValue({ data: { currentLevel: 'aal2', nextLevel: 'aal2' }, error: null });
 
-            expect(await auth.destination()).toBe(ROUTES_AUTH.espace);
-            expect(await auth.destination()).toBe(ROUTES_AUTH.espace);
+            expect(await auth.destination()).toBe('/d/daara-test');
+            expect(await auth.destination()).toBe('/d/daara-test');
             expect(client.from).toHaveBeenCalledTimes(1);
 
-            auth.invaliderRoles();
+            auth.invaliderDaaras();
             await auth.destination();
             expect(client.from).toHaveBeenCalledTimes(2);
         });

@@ -193,6 +193,9 @@ npx supabase db push        # vérifier la liste des migrations affichée avant 
 ```
 Pour `daara-prod`, uniquement à une release, après vérification d'une sauvegarde récente (S0.9).
 
+**Interdit sur les projets cloud** : `npx supabase db push --include-seed` et `npx supabase db reset --linked`. Le
+fichier `supabase/seed.sql` crée des comptes de développement au mot de passe connu, dont un admin.
+
 ## 3. En-têtes de sécurité (`public/_headers`)
 
 | En-tête | Valeur | Raison |

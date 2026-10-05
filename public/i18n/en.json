@@ -17,10 +17,12 @@
         "compte": {
             "menu": "My account",
             "deconnexion": "Sign out"
-        }
+        },
+        "navigation_mobile": "Main navigation"
     },
     "menu": {
-        "tableau_de_bord": "Dashboard"
+        "tableau_de_bord": "Dashboard",
+        "changer_daara": "Switch daara"
     },
     "titres": {
         "tableau_de_bord": "Dashboard",
@@ -30,7 +32,8 @@
         "confirmation": "Email confirmation",
         "mot_de_passe_oublie": "Forgot password",
         "mfa": "Two-factor authentication",
-        "onboarding": "Create my daara"
+        "onboarding": "Create my daara",
+        "select_daara": "Choose a daara"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -202,5 +205,20 @@
             "aal2": "Two-factor authentication is required to create a daara.",
             "inattendue": "The daara could not be created. Try again."
         }
+    },
+    "navigation": {
+        "daara_inaccessible": "This daara is not accessible with your account.",
+        "acces_refuse": "This page is not accessible with your role."
+    },
+    "roles": {
+        "admin": "Administrator",
+        "enseignant": "Teacher",
+        "parent": "Parent",
+        "apprenant": "Student"
+    },
+    "select_daara": {
+        "surtitre": "Your daaras",
+        "titre": "Choose a daara",
+        "intro": "You are a member of several daaras. You can switch at any time from the menu."
     }
 }

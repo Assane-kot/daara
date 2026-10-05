@@ -1,13 +1,18 @@
-<!-- Menu par rôle : sprint 2 (LLD §2). -->
+<!-- Menu filtré par rôle et par module (LLD §2, menu.ts). -->
 <nav
     class="sidebar fixed top-0 bottom-0 z-50 h-full min-h-screen w-[260px] shadow-[5px_0_25px_0_rgba(14,26,20,0.08)] transition-all duration-300"
     [attr.aria-label]="'layout.menu_principal' | translate"
 >
     <div class="h-full bg-white dark:bg-night">
         <div class="flex items-center justify-between px-4 py-3">
-            <a routerLink="/" class="main-logo flex shrink-0 items-center">
+            <a [routerLink]="base()" class="main-logo flex min-w-0 shrink-0 items-center">
                 <img class="ml-[5px] w-8 flex-none" src="/images/logo.svg" alt="" />
-                <span class="align-middle text-2xl font-semibold lg:inline ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light">DAARA</span>
+                <span class="min-w-0 ltr:ml-1.5 rtl:mr-1.5">
+                    <span class="block align-middle text-2xl leading-tight font-semibold dark:text-white-light">DAARA</span>
+                    @if (courante.daara(); as daara) {
+                        <span class="block max-w-[170px] truncate text-xs font-semibold text-muted dark:text-night-muted">{{ daara.nom }}</span>
+                    }
+                </span>
             </a>
             <button
                 type="button"
@@ -20,23 +25,39 @@
         </div>
 
         <div class="sidebar-scroll relative h-[calc(100vh-80px)] overflow-x-hidden overflow-y-auto">
-            <ul class="relative space-y-0.5 p-4 py-0 font-semibold">
-                <li class="nav-item">
+            @if (courante.plusieursDaaras()) {
+                <div class="px-4 pb-3">
                     <a
-                        routerLink="/"
-                        routerLinkActive="active"
-                        [routerLinkActiveOptions]="{ exact: true }"
-                        class="group"
-                        (click)="layout.closeSidebarOnMobile()"
+                        [routerLink]="selectionDaara"
+                        class="flex min-h-11 items-center justify-center rounded-md border border-white-light text-sm font-semibold text-primary hover:border-primary dark:border-night-border"
                     >
-                        <div class="flex items-center">
-                            <icon-menu-dashboard class="shrink-0 group-hover:text-primary!" />
-                            <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-night-muted dark:group-hover:text-white-dark">{{
-                                'menu.tableau_de_bord' | translate
-                            }}</span>
-                        </div>
+                        {{ 'menu.changer_daara' | translate }}
                     </a>
-                </li>
+                </div>
+            }
+            <ul class="relative space-y-0.5 p-4 py-0 font-semibold">
+                @for (entree of entrees(); track entree.route) {
+                    <li class="nav-item">
+                        <a
+                            [routerLink]="entree.route ? [...base(), entree.route] : base()"
+                            routerLinkActive="active"
+                            [routerLinkActiveOptions]="{ exact: !entree.route }"
+                            class="group"
+                            (click)="layout.closeSidebarOnMobile()"
+                        >
+                            <div class="flex items-center">
+                                @switch (entree.icone) {
+                                    @default {
+                                        <icon-menu-dashboard class="shrink-0 group-hover:text-primary!" />
+                                    }
+                                }
+                                <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-night-muted dark:group-hover:text-white-dark">{{
+                                    entree.cle | translate
+                                }}</span>
+                            </div>
+                        </a>
+                    </li>
+                }
             </ul>
         </div>
     </div>

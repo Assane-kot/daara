@@ -1,4 +1,8 @@
-<div class="main-section vertical full relative font-nunito text-body font-normal antialiased" [class.toggle-sidebar]="layout.sidebarToggled()">
+<div
+    class="main-section vertical full relative font-nunito text-body font-normal antialiased"
+    [class.toggle-sidebar]="layout.sidebarToggled()"
+    [class.espace-famille]="famille()"
+>
     <div class="relative">
         <!-- Fond assombri derrière la sidebar ouverte en mobile -->
         <div
@@ -9,7 +13,7 @@
         ></div>
 
         @if (showTopButton()) {
-            <div class="fixed bottom-6 z-50 ltr:right-6 rtl:left-6">
+            <div class="fixed bottom-6 z-50 ltr:right-6 rtl:left-6" [class.bottom-20]="famille()">
                 <button
                     type="button"
                     class="btn btn-outline-primary animate-pulse rounded-full bg-page p-2 dark:bg-night-deep dark:hover:bg-primary"
@@ -46,5 +50,9 @@
                 <footer appFooter></footer>
             </div>
         </div>
+
+        @if (famille()) {
+            <app-barre-basse />
+        }
     </div>
 </div>

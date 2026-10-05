@@ -9,12 +9,12 @@
 - Sprint 1 — Socle multi-tenant : **code terminé** (bilan ci-dessous, 2026-10-03) ; clôture effective après la
   vérification en 375 px et les configurations Auth / Turnstile du développeur. Sprint suivant : 2 — Membres et
   navigation (planification à faire).
-- Dernière tâche terminée : planification du sprint 2 (LLD détaillé, 7 specs, ADR-009 proposé) (2026-10-04).
+- Sprint 2 en cours : S2.0 (spike, ADR-009 acceptée) et S2.1 (navigation par daara) faits (2026-10-05).
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
-  - Page `/dev/charte` (charte + démonstration `shared/ui`) à retirer (route + `features/dev-charte/`)
-    dès que la charte est validée par le développeur.
+  - Page de charte (`/d/<slug>/dev/charte` depuis S2.1, charte + démonstration `shared/ui`) à retirer (route +
+    `features/dev-charte/`) dès que la charte est validée par le développeur.
   - Pas encore d'icônes PNG (apple-touch-icon, PWA) : à générer depuis le logo avec la PWA (sprint 8).
   - À faire par le développeur, dans cet ordre : S0.8 (`docs/deploiement.md` §2 : projets `daara-dev` /
     `daara-prod`, Auth, Brevo, tests d'envoi), puis S0.7 (§1 : branchement Cloudflare Pages). Sans
@@ -67,7 +67,7 @@
 
 ### Décisions de planification du sprint 2 (validées le 2026-10-04)
 - Identifiant sans e-mail : téléphone + mot de passe, sans SMS, compte créé seulement sur invitation (ADR-009,
-  à confirmer par le spike S2.0).
+  acceptée le 2026-10-05 après le spike S2.0 : fournisseur SMS factice + hook `before_user_created`).
 - Invitations : e-mail via l'API Brevo (Mailpit en local) + lien toujours partageable (copie, WhatsApp) ;
   50 / jour / daara ; jeton dans le fragment de l'URL, 7 jours, usage unique, **lié au contact invité** ;
   invitation admin acceptée en `aal2`.
@@ -114,6 +114,31 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-05 — S2.0 spike téléphone (ADR-009) et S2.1 navigation par daara
+- S2.0 : connexion téléphone + mot de passe impossible sans fournisseur SMS (`phone_provider_disabled`) ; solution
+  validée : fournisseur SMS factice + hook `before_user_created` (refuse les inscriptions publiques par téléphone, ne
+  s'applique pas à l'API d'administration). Téléphone stocké sans « + ». `updateUserById(password)` révoque déjà les
+  sessions → RPC `revoquer_sessions` abandonnée. ADR-009 acceptée, LLD et specs ajustés.
+- S2.1 base : `session_suffisante()` (aal2 exigé pour tout accès dès qu'un facteur est vérifié ; profil et memberships
+  personnels lisibles en aal1) intégré à `is_member` et `has_role` ; 16 tests pgTAP (139 au total).
+- S2.1 front : `/d/:slug` (`daaraGuard`, `runGuardsAndResolvers: 'paramsChange'`), `/` (`racineGuard` : 1 daara → elle ;
+  plusieurs → dernière utilisée si toujours membre, sinon `/select-daara`), page de sélection (layout « cover »),
+  `CurrentDaaraService` (daara, rôles, modules, famille), `roleGuard`, menus déclarés en données (`menu.ts`, rôle +
+  module), sélecteur « Changer de daara », barre basse mobile pour parents et apprenants (sidebar et bouton menu
+  masqués). `AuthService.mesDaaras()` (memberships + daaras jointes, cache par utilisateur).
+- Jeu de données de développement dans `supabase/seed.sql` (2 daaras, 3 comptes fictifs, mot de passe documenté) :
+  local uniquement.
+- Vérifié dans le navigateur : connexion d'un membre de 2 daaras → sélecteur → daara → changement de daara → daara
+  inaccessible (message neutre) → `/` rouvre la dernière ; **vue 375 px vérifiée** grâce à une iframe de 375 px
+  (barre basse parent, bouton menu enseignant, sélecteur, aucun débordement horizontal).
+- Piège : zoom de Chrome différent de 100 % → clics à côté ; saisie par script dans ce cas.
+- Audit `auditeur-securite` : 0 critique, 0 important ; 6 mineurs corrigés : `mfaGuard` sur `/onboarding` (sinon un membre
+  avec facteur en aal1 passait pour « sans daara ») ; garde-fou dans `seed.sql` + interdiction de `db push --include-seed`
+  et `db reset --linked` sur le cloud (`docs/deploiement.md` §2.7) ; daara ouverte et dernière daara oubliées à la
+  déconnexion ; LLD aligné (`daaraGuard`) ; tests pgTAP admin + enseignant avec facteur. À vérifier sur `daara-dev`
+  après la migration : un membre avec facteur en aal1 ne voit pas sa daara.
+- 140 tests unitaires, 144 tests pgTAP ; chargement initial 146 kB transférés.
+
 ### 2026-10-04 — Passage à Tailwind 4 (ADR-007)
 - Tailwind 4.3 via `@tailwindcss/postcss` ; thème en CSS (`@theme` dans `src/styles.css`), `tailwind.config.js`
   supprimé ; mode sombre `@custom-variant dark` ; couche de compatibilité du préflight v3 (bordures, placeholders,

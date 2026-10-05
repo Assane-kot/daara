@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AuthService, ROUTES_AUTH } from '../../core/auth/auth.service';
+import { AuthService } from '../../core/auth/auth.service';
 import { cleErreurAuth } from '../../core/auth/erreurs-auth';
 import { LanguageService } from '../../core/i18n/language.service';
 import { FormField, FormFieldControl } from '../../shared/ui/form-field/form-field';
@@ -92,7 +92,7 @@ export class OnboardingPage implements OnInit {
                 langueDefaut: saisie.langueDefaut,
                 bareme: saisie.bareme,
             });
-            await this.router.navigateByUrl(ROUTES_AUTH.espace);
+            await this.router.navigateByUrl(await this.auth.destination());
         } catch (erreur) {
             this.erreur.set(erreur instanceof ErreurCreationDaara ? erreur.cle : 'onboarding.erreurs.inattendue');
             if (erreur instanceof ErreurCreationDaara && erreur.cle === 'onboarding.erreurs.aal2') {

@@ -8,8 +8,8 @@ change de daara s'il en a plusieurs. Le second facteur s'applique à tout accès
 Tous les membres. Lecture de la daara, de ses rôles et de ses modules (RLS du socle). Aucune écriture.
 
 ## Données (tables, colonnes, contraintes)
-Aucune table nouvelle. Migration : helper `session_suffisante()` intégré à `is_member`, `has_role`,
-`membres_administres` (LLD §4) + tests pgTAP (utilisateur avec facteur en `aal1` : plus aucun accès sauf son profil
+Aucune table nouvelle. Migration : helper `session_suffisante()` intégré à `is_member` et `has_role`
+(`membres_administres` et `is_platform_admin` exigent déjà `aal2`) (LLD §4) + tests pgTAP (utilisateur avec facteur en `aal1` : plus aucun accès sauf son profil
 et ses memberships ; sans facteur : inchangé).
 
 ## Règles métier
@@ -31,7 +31,7 @@ Aucun.
 
 ## Cas de test (dont accès refusés inter-daara)
 pgTAP : `session_suffisante` ; enseignant avec facteur en `aal1` → aucune donnée de sa daara ; sans facteur → inchangé.
-Unitaires : `CurrentDaaraService`, `DaaraResolver` (slug inconnu, non membre), redirection de `/`, `roleGuard`,
+Unitaires : `CurrentDaaraService`, `daaraGuard` (slug inconnu, non membre), redirection de `/`, `roleGuard`,
 `moduleGuard`, filtrage du menu par rôle et module, barre basse par rôle.
 
 ## Hors périmètre

@@ -49,7 +49,7 @@ src/app/
 /onboarding                        connecté, sans daara
 /select-daara                      connecté, plusieurs daaras (layout « cover »)
 /                                  redirection : 1 daara → /d/:slug ; plusieurs → dernière utilisée, sinon /select-daara
-/d/:slug                           DaaraResolver → vérifie le membership, charge CurrentDaara (rôles, modules)
+/d/:slug                           daaraGuard → vérifie le membership, charge CurrentDaara (rôles, modules)
                                    chaque route de module : moduleGuard('<module>') (ADR-008)
   ├── dashboard                    tous
   ├── compte                       tous : profil, langue, mot de passe, appareils TOTP (sprint 2)
@@ -301,12 +301,12 @@ Garde-fou (trigger `garder_un_admin`) : aucune modification de `memberships` ne 
 |---|---|---|
 | `creer_invitation(p_daara, p_role, p_email, p_telephone, p_nom, p_prenom, p_langue, p_token_hash)` → id (sprint 2) | crée l'invitation (appelée par l'Edge Function `invite-member`, avec le JWT de l'admin) | admin `aal2` ; rôle `admin`/`enseignant`/`parent` ; 50 / jour / daara ; annule l'invitation en attente identique ; journalisé |
 | `revoquer_invitation(p_invitation)` | annule une invitation en attente | admin `aal2` de la daara |
-| `accepter_invitation(p_token)` → slug | crée le membership de l'utilisateur connecté | jeton haché comparé, non expiré, non utilisé, non révoqué ; **contact lié** : e-mail confirmé (`auth.users.email`) ou téléphone (`auth.users.phone`) identique à celui de l'invitation ; rôle admin : session `aal2` ; membership existant inactif → réactivé ; journalisé |
+| `accepter_invitation(p_token)` → slug | crée le membership de l'utilisateur connecté | jeton haché comparé, non expiré, non utilisé, non révoqué ; **contact lié** : e-mail confirmé (`auth.users.email`) ou téléphone (`auth.users.phone`, stocké sans « + » : comparaison sur les chiffres seuls) identique à celui de l'invitation ; rôle admin : session `aal2` ; membership existant inactif → réactivé ; journalisé |
 | `changer_role(p_membership, p_role)` | change le rôle d'un membre | admin `aal2` de la même daara ; rôle cible ≠ `apprenant` au sprint 2 ; garde-fou du dernier admin |
 | `definir_actif(p_membership, p_actif)` | désactive / réactive un membre | admin `aal2` ; fige `nom_affiche` à la désactivation ; garde-fou du dernier admin |
 | `creer_code_acces(p_membership)` → code en clair (affiché une fois) | réinitialisation assistée (ADR-006 niveau 2 ; remplace l'Edge Function `reset-access` : aucun privilège service_role requis) | admin `aal2` ; cible membre actif de la même daara, **non admin** ; code de 8 caractères (alphabet sans 0/O/1/l/I) tiré par `gen_random_bytes` ; ancien code annulé ; journalisé |
 | `consommer_code_acces(p_user, p_code)` → booléen | vérifie et consomme un code | **service_role uniquement** (Edge `use-access-code`) ; 5 essais puis code invalidé ; expiré / utilisé → faux |
-| `revoquer_sessions(p_user)` | supprime les sessions et jetons de rafraîchissement | **service_role uniquement** ; les jetons d'accès déjà émis restent valides jusqu'à leur expiration (1 h) |
+| `hook_avant_creation_utilisateur(event)` (S2.5, ADR-009) | hook Auth `before_user_created` : refuse toute inscription publique par téléphone (les comptes téléphone naissent par `accept-invitation`, API d'administration, non soumise au hook) | exécutable par `supabase_auth_admin` uniquement |
 | `definir_modules(p_daara, p_modules module_daara[])` → `module_daara[]` (sprint 2, ADR-008) | fixe les modules actifs de la daara | `security definer` ; `has_role(p_daara, admin)` en `aal2` ; prérequis ajoutés ; refus (`23514`, `module_requis`) de désactiver un prérequis d'un module actif ; journalisé |
 | `creer_daara(p_nom, p_slug, p_ville, p_telephone, p_langue_defaut, p_bareme[, p_modules])` → slug | crée la daara et le membership admin du créateur, dans la même transaction | `security definer`, `search_path = ''` ; `auth.uid()` non nul, session `aal2`, au plus 3 daaras créées par utilisateur (`created_by`), entrées validées par la fonction (paramètre nul, langue, barème) et par les contraintes ; erreurs traduites côté front : `42501` (non authentifié, `aal2` requis), `P0001` (limite), `23505` (slug déjà pris), `23514` (donnée invalide, slug réservé) |
 
@@ -345,7 +345,7 @@ Anti-pause : `anti-pause.yml`, rôle `keepalive` sans droits, tous les deux jour
 | `invite-member` (sprint 2) | daara_id, rôle, e-mail ou téléphone, nom, prénom, langue | lien d'invitation (affiché à l'admin : copie, WhatsApp) ; e-mail envoyé si adresse | JWT de l'admin transmis à `creer_invitation` (qui vérifie `aal2`) ; jeton de 32 octets aléatoires, seul son haché est stocké ; e-mail via l'API Brevo (Mailpit en local) |
 | `invitation-apercu` (sprint 2) | jeton | nom de la daara, rôle, contact masqué (`a***@g***.com`, `+221 77 *** ** 34`), état (valide / expirée / utilisée) | public ; aucune donnée de plus |
 | `accept-invitation` (sprint 2) | jeton, mot de passe, (nom, prénom) | compte téléphone créé (`auth.admin.createUser`, téléphone confirmé) | public ; uniquement pour une invitation **par téléphone** dont le numéro n'a pas encore de compte (ADR-009) ; ensuite le client se connecte et appelle `accepter_invitation` |
-| `use-access-code` (sprint 2) | identifiant (e-mail ou téléphone), code, nouveau mot de passe, jeton Turnstile | mot de passe changé, sessions révoquées, audit, e-mail si adresse | public ; Turnstile vérifié côté serveur ; `consommer_code_acces` ; réponse neutre en cas d'échec |
+| `use-access-code` (sprint 2) | identifiant (e-mail ou téléphone), code, nouveau mot de passe, jeton Turnstile | mot de passe changé par `auth.admin.updateUserById` (qui révoque les jetons de rafraîchissement, vérifié par le spike S2.0), audit, e-mail si adresse | public ; Turnstile vérifié côté serveur ; `consommer_code_acces` ; réponse neutre en cas d'échec |
 | `generate-bulletins` | periode_id, classe_id | bulletins calculés + PDF | admin |
 | `dispatch-notifications` | (planifiée / webhook DB) | push, SMS, WhatsApp | interne (service_role) |
 | `payment-webhook` | payload fournisseur | paiement + abonnement mis à jour | signature du fournisseur |
@@ -355,6 +355,8 @@ Toutes vérifient le JWT quand il est requis, valident les entrées et réponden
 front). Module partagé `supabase/functions/_shared/` : clients Supabase (utilisateur / service_role), CORS limité aux
 origines de l'application, validation, envoi d'e-mail. La clé service_role n'existe que dans l'environnement des
 fonctions. Secrets : `BREVO_API_KEY`, `TURNSTILE_SECRET`, `APP_URL` (secrets Supabase en cloud, `.env` local hors Git).
+Connexion par téléphone (ADR-009) : fournisseur SMS **factice** déclaré (seule façon d'activer le fournisseur téléphone,
+aucun envoi possible), hook `before_user_created` qui refuse les inscriptions publiques par téléphone.
 
 ## 7. Flux principaux
 
@@ -418,8 +420,8 @@ sequenceDiagram
 ### 7.1 ter Navigation par daara (sprint 2)
 - `/` : 0 daara → onboarding ; 1 → `/d/:slug` ; plusieurs → dernière utilisée (mémorisée dans le navigateur, revérifiée)
   sinon `/select-daara`.
-- `DaaraResolver` lit la daara par son slug (la RLS ne renvoie que les daaras dont on est membre), ses rôles et ses
-  modules ; daara inconnue ou non membre → `/select-daara` avec un message neutre.
+- `daaraGuard` cherche le slug dans les daaras de l'utilisateur (`AuthService.mesDaaras()`, aucune requête par slug :
+  daara inexistante et daara non accessible sont indiscernables), charge ses rôles et ses modules ; daara inconnue ou non membre → `/select-daara` avec un message neutre.
 - Menu et barre basse filtrés par rôle et par module ; `roleGuard` et `moduleGuard` sur les routes.
 
 ### 7.2 Saisie d'une absence

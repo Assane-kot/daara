@@ -17,10 +17,12 @@
         "compte": {
             "menu": "Mon compte",
             "deconnexion": "Se déconnecter"
-        }
+        },
+        "navigation_mobile": "Navigation principale"
     },
     "menu": {
-        "tableau_de_bord": "Tableau de bord"
+        "tableau_de_bord": "Tableau de bord",
+        "changer_daara": "Changer de daara"
     },
     "titres": {
         "tableau_de_bord": "Tableau de bord",
@@ -30,7 +32,8 @@
         "confirmation": "Confirmation de l’e-mail",
         "mot_de_passe_oublie": "Mot de passe oublié",
         "mfa": "Double authentification",
-        "onboarding": "Créer ma daara"
+        "onboarding": "Créer ma daara",
+        "select_daara": "Choisir une daara"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -202,5 +205,20 @@
             "aal2": "La double authentification est requise pour créer une daara.",
             "inattendue": "La daara n’a pas pu être créée. Réessayez."
         }
+    },
+    "navigation": {
+        "daara_inaccessible": "Cette daara n’est pas accessible avec votre compte.",
+        "acces_refuse": "Cette page n’est pas accessible avec votre rôle."
+    },
+    "roles": {
+        "admin": "Administrateur",
+        "enseignant": "Enseignant",
+        "parent": "Parent",
+        "apprenant": "Apprenant"
+    },
+    "select_daara": {
+        "surtitre": "Vos daaras",
+        "titre": "Choisissez une daara",
+        "intro": "Vous êtes membre de plusieurs daaras. Vous pourrez en changer à tout moment depuis le menu."
     }
 }

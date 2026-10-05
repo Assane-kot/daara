@@ -22,6 +22,10 @@ créant son compte ou en se connectant. Premières Edge Functions du projet.
   `wa.me` vers le numéro, message dans la langue de l'invité).
 - Quota : 50 invitations par daara et par jour.
 - Invitation par téléphone sans compte existant : création du compte par `accept-invitation` (ADR-009).
+- Connexion par téléphone (ADR-009) : fournisseur SMS factice dans `config.toml` et en cloud, hook
+  `before_user_created` (migration) qui refuse les inscriptions publiques par téléphone ; numéros comparés sur les
+  chiffres seuls (Supabase les stocke sans « + ») ; champ « E-mail ou téléphone » à la connexion ; procédure cloud dans
+  `docs/deploiement.md`.
 - Déjà membre actif avec ce rôle : message « déjà membre » ; membership inactif : réactivé.
 - Rôles invitables au sprint 2 : admin, enseignant, parent.
 
@@ -39,7 +43,8 @@ Aucun.
 ## Cas de test (dont accès refusés inter-daara)
 pgTAP : `creer_invitation` (admin `aal2` OK ; `aal1`, enseignant, autre daara refusés ; quota ; doublon annulé) ;
 `accepter_invitation` (jeton invalide, expiré, utilisé, révoqué ; **contact différent refusé** ; admin sans `aal2`
-refusé ; réactivation) ; `token_hash` illisible ; journalisation.
+refusé ; réactivation) ; `token_hash` illisible ; journalisation ; hook : inscription publique par téléphone refusée,
+par e-mail acceptée.
 Deno : validation des entrées, masquage du contact, jeton et haché, réponses `{ code }`.
 Unitaires : service d'invitation, page `/invitation` (états, conservation du jeton pendant l'inscription).
 Manuel : parcours e-mail (Mailpit) et téléphone de bout en bout.

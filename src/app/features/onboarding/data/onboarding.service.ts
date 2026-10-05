@@ -53,7 +53,7 @@ export class OnboardingService {
         if (error) {
             throw new ErreurCreationDaara(cleErreurCreation(error));
         }
-        this.auth.invaliderRoles();
+        this.auth.invaliderDaaras();
         return data;
     }
 }

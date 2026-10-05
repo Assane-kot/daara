@@ -210,6 +210,7 @@ export type Database = {
             is_member: { Args: { p_daara: string }; Returns: boolean };
             is_platform_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
             membres_administres: { Args: Record<PropertyKey, never>; Returns: string[] };
+            session_suffisante: { Args: Record<PropertyKey, never>; Returns: boolean };
         };
         Enums: {
             role_membre: 'admin' | 'enseignant' | 'parent' | 'apprenant';

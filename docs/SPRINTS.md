@@ -54,8 +54,8 @@ Livrable : un utilisateur crée sa daara ; une autre daara est invisible.
 Objectif : chaque profil accède à son espace et ne voit que ses modules ; l'admin invite, gère ses membres et paramètre
 sa daara ; un parent sans e-mail se connecte et récupère son accès.
 Planification validée le 2026-10-04 (LLD §2, §3.2, §4, §5, §6, §7.1 ; specs dans `docs/features/`). Un commit par story.
-- [ ] S2.0 Spike + ADR-009 : compte téléphone + mot de passe sans fournisseur SMS (`identifiant-sans-email`)
-- [ ] S2.1 Navigation par daara : `/d/:slug`, `DaaraResolver`, `CurrentDaaraService`, `/select-daara`, menus par rôle, `roleGuard`, barre basse mobile ; `aal2` exigé pour qui a un facteur (`navigation-daara.md`)
+- [x] S2.0 Spike + ADR-009 : compte téléphone + mot de passe sans fournisseur SMS (`identifiant-sans-email`)
+- [x] S2.1 Navigation par daara : `/d/:slug`, `DaaraResolver`, `CurrentDaaraService`, `/select-daara`, menus par rôle, `roleGuard`, barre basse mobile ; `aal2` exigé pour qui a un facteur (`navigation-daara.md`)
 - [ ] S2.2 Modules activables (ADR-008) : `daara_modules`, `module_actif`, `definir_modules`, écran Modules, profils à l'onboarding, `moduleGuard` (`modules.md`)
 - [ ] S2.3 Paramètres de la daara : informations, logo (Storage `logos`), langue, barème (`parametres-daara.md`)
 - [ ] S2.4 Gestion des membres : liste, rôle, désactivation, dernier admin, auteur des écritures dans `audit_log` (`membres.md`)

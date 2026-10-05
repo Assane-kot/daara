@@ -1,6 +1,6 @@
 # ADR-009 — Identifiant des comptes sans e-mail
 
-Statut : **proposée** (2026-10-04) ; spike S2.0 fait : point 2 en échec, alternative en attente de validation · Remplace la « décision OTP téléphone » prévue
+Statut : **acceptée** (2026-10-05), avec l'alternative issue du spike S2.0 · Remplace la « décision OTP téléphone » prévue
 au sprint 2 (ADR-006 §1)
 
 ## Contexte
@@ -39,7 +39,7 @@ toute implémentation (par exemple identifiant de connexion interne associé au 
 | 3 ter. Hook `before_user_created` | appelé pour **toutes les inscriptions publiques** (payload : `provider` `phone` ou `email`, téléphone) et **pas** pour `auth.admin.createUser` : il peut refuser toute inscription libre par téléphone avant la moindre tentative de SMS |
 | 4. `updateUserById(password)` | OK ; **les jetons de rafraîchissement existants sont révoqués** (ancienne session refusée) : pas besoin de RPC `revoquer_sessions` dédiée ; les jetons d'accès déjà émis restent valides jusqu'à leur expiration |
 
-## Alternative proposée (point 2 en échec)
+## Décision retenue (alternative validée le 2026-10-05)
 - Déclarer un **fournisseur SMS factice** (identifiants fictifs, jamais d'envoi), seule façon d'activer la connexion
   par téléphone ;
 - **hook `before_user_created`** (fonction Postgres versionnée par migration) : refuse toute inscription publique

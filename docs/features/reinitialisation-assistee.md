@@ -10,8 +10,8 @@ et choisit lui-même son nouveau mot de passe.
 - Enseignants : aucun pouvoir de réinitialisation.
 
 ## Données (tables, colonnes, contraintes)
-`codes_acces` (LLD §3.2) ; RPC `creer_code_acces`, `consommer_code_acces`, `revoquer_sessions` ; Edge Function
-`use-access-code` (LLD §6).
+`codes_acces` (LLD §3.2) ; RPC `creer_code_acces`, `consommer_code_acces` ; Edge Function `use-access-code` (LLD §6),
+qui change le mot de passe par l'API d'administration (sessions révoquées, spike S2.0).
 
 ## Règles métier
 - Code : 8 caractères sans 0 / O / 1 / l / I, usage unique, 24 h, haché ; un nouveau code annule le précédent.
@@ -33,8 +33,7 @@ Aucun.
 
 ## Cas de test (dont accès refusés inter-daara)
 pgTAP : `creer_code_acces` (admin `aal2` OK ; cible admin refusée ; autre daara refusée ; enseignant refusé ; ancien
-code annulé ; code haché) ; `consommer_code_acces` (service_role seulement ; 5 essais ; expiré ; usage unique) ;
-`revoquer_sessions` (service_role seulement).
+code annulé ; code haché) ; `consommer_code_acces` (service_role seulement ; 5 essais ; expiré ; usage unique).
 Deno : validation, réponse neutre, contrôle Turnstile.
 Manuel : parcours complet avec un compte téléphone (ADR-009), sessions révoquées sur un second navigateur.
 

@@ -23,8 +23,10 @@ export interface ClientFactice {
     };
     from: Mock;
     rpc: Mock;
-    /** Rôles renvoyés par la lecture de `memberships`. */
+    /** Rôles dans une daara unique « Daara test » (raccourci) ; ignoré si `daaras` est renseigné. */
     roles: string[];
+    /** Daaras accessibles, avec les rôles de l'utilisateur. */
+    daaras: { id: string; slug: string; nom: string; roles: string[] }[];
 }
 
 export function sessionFactice(userId = 'u-1', email = 'awa@test.local'): Session {
@@ -54,13 +56,21 @@ export function clientFactice(session: Session | null = null): ClientFactice {
         from: vi.fn(),
         rpc: vi.fn().mockResolvedValue({ data: 'slug', error: null }),
         roles: [],
+        daaras: [],
     };
-    // Requête `from('memberships').select().eq().eq()` : objet « thenable » qui renvoie les rôles configurés.
+    // Requête `from('memberships').select('role, daaras!inner(…)').eq().eq()` : objet « thenable » qui renvoie les rôles configurés.
     const requete = {
         select: vi.fn(() => requete),
         eq: vi.fn(() => requete),
-        then: (resoudre: (valeur: unknown) => unknown) => resoudre({ data: client.roles.map((role) => ({ role })), error: null }),
+        then: (resoudre: (valeur: unknown) => unknown) => resoudre({ data: lignesMemberships(client), error: null }),
     };
     client.from.mockReturnValue(requete);
     return client;
+}
+
+/** Lignes renvoyées par la lecture des memberships avec la daara jointe. */
+function lignesMemberships(client: ClientFactice): unknown[] {
+    const daaras =
+        client.daaras.length > 0 ? client.daaras : client.roles.length > 0 ? [{ id: 'd-1', slug: 'daara-test', nom: 'Daara test', roles: client.roles }] : [];
+    return daaras.flatMap((d) => d.roles.map((role) => ({ role, daaras: { id: d.id, slug: d.slug, nom: d.nom, ville: null, logo_path: null } })));
 }

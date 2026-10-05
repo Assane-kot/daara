@@ -676,6 +676,17 @@
     scrollbar-color: var(--color-night-border-strong) transparent;
 }
 
+/* Parents et apprenants en mobile : barre basse à la place de la sidebar et du bouton menu (LLD §2). */
+@media (max-width: 639px) {
+    .espace-famille .sidebar,
+    .espace-famille .collapse-icon {
+        display: none;
+    }
+    .espace-famille main {
+        padding-bottom: 5rem;
+    }
+}
+
 /* Focus clavier visible (accessibilité) : placé hors des couches pour primer sur `outline-none` de Vristo. */
 a:focus-visible,
 button:focus-visible,

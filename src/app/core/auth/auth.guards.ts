@@ -43,5 +43,5 @@ export const avecDaaraGuard: CanActivateFn = async () => {
 export const sansDaaraGuard: CanActivateFn = async () => {
     const auth = inject(AuthService);
     const router = inject(Router);
-    return (await auth.rolesActifs()).length === 0 ? true : router.parseUrl(ROUTES_AUTH.espace);
+    return (await auth.rolesActifs()).length === 0 ? true : router.parseUrl(ROUTES_AUTH.racine);
 };

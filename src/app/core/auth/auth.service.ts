@@ -1,10 +1,11 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Session, isAuthError } from '@supabase/supabase-js';
+import { CurrentDaaraService } from '../daara/current-daara.service';
+import { DaaraAccessible, RoleMembre, lireDerniereDaara, oublierDerniereDaara } from '../daara/daara.model';
 import { LanguageService } from '../i18n/language.service';
-import { Database } from '../supabase/database.types';
 import { SupabaseService } from '../supabase/supabase.service';
 
-export type RoleMembre = Database['public']['Enums']['role_membre'];
+export type { RoleMembre } from '../daara/daara.model';
 
 /** Facteur TOTP en cours d'enrôlement : QR code (image SVG fournie par Supabase) et clé à saisir à la main. */
 export interface EnrolementTotp {
@@ -26,8 +27,14 @@ export const ROUTES_AUTH = {
     connexion: '/auth/connexion',
     mfa: '/auth/mfa',
     onboarding: '/onboarding',
-    espace: '/',
+    selectionDaara: '/select-daara',
+    racine: '/',
 } as const;
+
+/** Espace d'une daara (LLD §2 « Routage »). */
+export function routeDaara(slug: string): string {
+    return `/d/${slug}`;
+}
 
 /**
  * Session et parcours d'authentification (LLD §2 « Services transverses », §7.0, ADR-006).
@@ -38,11 +45,12 @@ export const ROUTES_AUTH = {
 export class AuthService {
     private readonly sb = inject(SupabaseService).client;
     private readonly language = inject(LanguageService);
+    private readonly courante = inject(CurrentDaaraService);
 
     private readonly sessionCouranteSig = signal<Session | null>(null);
     private readonly pret: Promise<void>;
     /** Rôles actifs de l'utilisateur, mis en cache par utilisateur (invalidés à chaque changement de session). */
-    private roles: { readonly userId: string; readonly promesse: Promise<RoleMembre[]> } | null = null;
+    private daaras: { readonly userId: string; readonly promesse: Promise<DaaraAccessible[]> } | null = null;
 
     readonly session = this.sessionCouranteSig.asReadonly();
     readonly user = computed(() => this.session()?.user ?? null);
@@ -55,7 +63,14 @@ export class AuthService {
         // Pas d'appel Supabase dans ce rappel (verrou interne de supabase-js) : uniquement des signaux.
         this.sb.auth.onAuthStateChange((evenement, session) => {
             if (evenement !== 'TOKEN_REFRESHED' || session?.user.id !== this.user()?.id) {
-                this.roles = null;
+                this.daaras = null;
+            }
+            // Déconnexion ou changement d'utilisateur : rien de la session précédente ne reste (audit S2.1, M3 / M4).
+            if (!session || session.user.id !== this.user()?.id) {
+                this.courante.vider();
+            }
+            if (evenement === 'SIGNED_OUT') {
+                oublierDerniereDaara();
             }
             this.sessionCouranteSig.set(session);
         });
@@ -194,26 +209,34 @@ export class AuthService {
     // Routage
     // ---------------------------------------------------------------------------------------------------------
 
-    /** Rôles actifs de l'utilisateur dans ses daaras (lecture de ses propres memberships, RLS `memberships_select_soi`). */
-    async rolesActifs(): Promise<RoleMembre[]> {
+    /**
+     * Daaras dont l'utilisateur est membre actif, avec ses rôles (lecture de ses propres memberships, RLS
+     * `memberships_select_soi`, et des daaras, RLS `is_member`).
+     */
+    async mesDaaras(): Promise<DaaraAccessible[]> {
         // Attendre la session restaurée : au chargement direct d'une URL, les guards démarrent en parallèle et
         // liraient sinon « aucun utilisateur » (renvoi à tort vers l'onboarding).
         const userId = (await this.sessionActuelle())?.user.id;
         if (!userId) {
             return [];
         }
-        if (this.roles?.userId !== userId) {
-            const promesse = this.lireRoles(userId);
-            this.roles = { userId, promesse };
+        if (this.daaras?.userId !== userId) {
+            const promesse = this.lireDaaras(userId);
+            this.daaras = { userId, promesse };
             // Une erreur ne doit pas rester en cache.
-            promesse.catch(() => (this.roles = null));
+            promesse.catch(() => (this.daaras = null));
         }
-        return this.roles.promesse;
+        return this.daaras.promesse;
     }
 
-    /** À appeler après une création de daara ou un changement de membership. */
-    invaliderRoles(): void {
-        this.roles = null;
+    /** Rôles actifs de l'utilisateur, toutes daaras confondues. */
+    async rolesActifs(): Promise<RoleMembre[]> {
+        return (await this.mesDaaras()).flatMap((daara) => daara.roles);
+    }
+
+    /** À appeler après une création de daara, une acceptation d'invitation ou un changement de membership. */
+    invaliderDaaras(): void {
+        this.daaras = null;
     }
 
     /**
@@ -242,14 +265,41 @@ export class AuthService {
         if (await this.mfaRequise()) {
             return ROUTES_AUTH.mfa;
         }
-        return (await this.rolesActifs()).length === 0 ? ROUTES_AUTH.onboarding : ROUTES_AUTH.espace;
+        const daaras = await this.mesDaaras();
+        if (daaras.length === 0) {
+            return ROUTES_AUTH.onboarding;
+        }
+        if (daaras.length === 1) {
+            return routeDaara(daaras[0].slug);
+        }
+        const derniere = lireDerniereDaara();
+        return daaras.some((d) => d.slug === derniere) ? routeDaara(derniere as string) : ROUTES_AUTH.selectionDaara;
     }
 
-    private async lireRoles(userId: string): Promise<RoleMembre[]> {
-        const { data, error } = await this.sb.from('memberships').select('role').eq('user_id', userId).eq('actif', true);
+    private async lireDaaras(userId: string): Promise<DaaraAccessible[]> {
+        // Un membre dont la session est insuffisante (facteur vérifié, aal1) ne lit pas la daara : la jointure interne
+        // l'écarte, et mfaRequise() l'envoie d'abord vers /auth/mfa.
+        const { data, error } = await this.sb
+            .from('memberships')
+            .select('role, daaras!inner(id, slug, nom, ville, logo_path)')
+            .eq('user_id', userId)
+            .eq('actif', true);
         if (error) {
             throw error;
         }
-        return data.map((ligne) => ligne.role);
+        const parId = new Map<string, DaaraAccessible>();
+        for (const ligne of data) {
+            const d = ligne.daaras;
+            const existante = parId.get(d.id);
+            parId.set(d.id, {
+                id: d.id,
+                slug: d.slug,
+                nom: d.nom,
+                ville: d.ville,
+                logoPath: d.logo_path,
+                roles: [...(existante?.roles ?? []), ligne.role],
+            });
+        }
+        return [...parId.values()].sort((a, b) => a.nom.localeCompare(b.nom));
     }
 }
