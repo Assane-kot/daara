@@ -7,6 +7,7 @@ package-lock.json
 src/environments/environment.prod.ts
 supabase/.temp/
 supabase/.branches/
+supabase/functions/deno.lock
 
 # Documentation rédigée à la main (tableaux et retours à la ligne volontaires)
 *.md

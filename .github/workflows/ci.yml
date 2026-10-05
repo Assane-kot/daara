@@ -52,6 +52,19 @@ jobs:
             - name: Audit des dépendances (vulnérabilités hautes et critiques)
               run: npm audit --audit-level=high
 
+    edge:
+        name: Edge Functions (lint, types, tests Deno)
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+
+            # Deno dans son conteneur officiel épinglé par empreinte (scripts/edge-test.mjs) : aucune dépendance npm.
+            - name: Lint, types et tests (Deno 2.5.6)
+              run: node scripts/edge-test.mjs
+
     base:
         name: Base (migrations + tests pgTAP)
         runs-on: ubuntu-latest

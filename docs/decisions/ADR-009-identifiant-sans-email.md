@@ -55,6 +55,20 @@ toute implémentation (par exemple identifiant de connexion interne associé au 
   l'envoi ; le fournisseur Twilio factice reste déclaré (seul moyen d'activer le téléphone) mais n'est plus jamais
   appelé : **aucun numéro ne quitte la plateforme** (vérifié : demande d'OTP → 200 sans appel externe).
 
+## Risque résiduel accepté (audit S2.5a, point I3 ; décision du développeur le 2026-10-05)
+L'admin qui invite par téléphone détient le lien (il l'envoie sur WhatsApp) : il peut ouvrir lui-même `/invitation` et
+créer le compte de ce numéro avec un mot de passe de son choix. Le vrai titulaire serait alors bloqué, y compris quand
+une **autre** daara l'invite. Sans vérification du numéro par SMS (payant, exclu par l'ADR-003), ce risque ne peut pas
+être supprimé ; il est **accepté et limité** :
+- `accept-invitation` crée le compte **et** le rattache à la daara dans la même opération (pas de compte orphelin
+  réutilisable) ; le compte porte `app_metadata.invitation` (invitation d'origine, non modifiable par l'utilisateur) ;
+- création et rattachement journalisés (`audit_log`, invitation avec son auteur) ;
+- `invitation-apercu` ne révèle jamais si un compte existe ; seul le détenteur d'un jeton valide l'apprend, à
+  l'acceptation (`compte_existant`, ou numéro déjà pris), ce qui permet à un admin de tester un numéro par invitation :
+  inévitable sans SMS, limité par les quotas d'invitations par auteur (50 / 24 h) et journalisé ;
+- récupération d'un numéro usurpé : procédure super-admin (S2.7) ;
+- évolution possible sans refonte : vérification du numéro par SMS ou WhatsApp quand l'offre le permettra.
+
 ## Conséquences
 + Aucun coût, adapté aux usages locaux (WhatsApp).
 + Pas de création de comptes en masse par des inconnus (création seulement sur invitation).

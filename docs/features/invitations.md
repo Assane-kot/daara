@@ -49,5 +49,16 @@ Deno : validation des entrées, masquage du contact, jeton et haché, réponses 
 Unitaires : service d'invitation, page `/invitation` (états, conservation du jeton pendant l'inscription).
 Manuel : parcours e-mail (Mailpit) et téléphone de bout en bout.
 
+## Réalisation
+- S2.5a (base) : migration `invitations`, 78 tests pgTAP ; jeton tiré par la base ; quotas daara / auteur / global e-mail.
+- S2.5b (Edge Functions) : `invite-member`, `invitation-apercu`, `accept-invitation` + migration
+  `invitation_nouveau_compte` (création du compte téléphone et rattachement dans la même opération, décision I3) ;
+  27 tests Deno (`npm run edge:test`, dépendances verrouillées), job CI `edge` ; parcours vérifié de bout en bout sur le
+  runtime local (Mailpit, compte téléphone). Codes d'erreur pour le front : `captcha`, `jeton_invalide`,
+  `invitation_expiree|utilisee|revoquee|suspendue`, `invitation_email`, `compte_existant`, `mot_de_passe_faible`,
+  `donnee_invalide`, `contact_invalide`, `admin_aal2_requis`, `deja_membre`, `quota_invitations`, `quota_global_email`,
+  `daara_suspendue`, `inattendue`.
+- S2.5c (front) : à faire.
+
 ## Hors périmètre
 Invitations d'apprenants et rattachement aux enfants (sprint 4) ; import CSV (sprint 4).

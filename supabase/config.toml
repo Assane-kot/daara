@@ -404,8 +404,26 @@ inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
 
-# [edge_runtime.secrets]
-# secret_key = "env(SECRET_VALUE)"
+# Variables LOCALES des Edge Functions (aucun secret : URL de l'app, Mailpit, clé Turnstile de TEST publique, la même
+# que [auth.captcha]). En cloud : secrets Supabase (APP_URL, ORIGINES_AUTORISEES, BREVO_API_KEY, EMAIL_EXPEDITEUR,
+# TURNSTILE_SECRET), voir docs/deploiement.md §2.9 ; MAILPIT_URL n'y existe pas.
+[edge_runtime.secrets]
+APP_URL = "http://localhost:4200"
+ORIGINES_AUTORISEES = "http://localhost:4200,http://127.0.0.1:4200,http://localhost:4300"
+MAILPIT_URL = "http://supabase_inbucket_daara:8025"
+EMAIL_EXPEDITEUR = "no-reply@daara.local"
+TURNSTILE_SECRET = "1x0000000000000000000000000000000AA"
+
+# Edge Functions (S2.5b, LLD §6). invite-member exige le JWT de l'appelant ; les deux autres sont publiques (le jeton
+# d'invitation sert d'autorisation, Turnstile protège la création de compte).
+[functions.invite-member]
+verify_jwt = true
+
+[functions.invitation-apercu]
+verify_jwt = false
+
+[functions.accept-invitation]
+verify_jwt = false
 
 [analytics]
 enabled = false

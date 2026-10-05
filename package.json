@@ -15,6 +15,7 @@
         "db:reset": "supabase db reset",
         "db:test": "supabase test db",
         "db:types": "supabase gen types typescript --local > src/app/core/supabase/database.types.ts && prettier --write src/app/core/supabase/database.types.ts",
+        "edge:test": "node scripts/edge-test.mjs",
         "lint": "ng lint",
         "format": "prettier --write .",
         "format:check": "prettier --check ."

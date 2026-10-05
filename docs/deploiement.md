@@ -219,6 +219,27 @@ Objectif : connexion téléphone + mot de passe, **aucune** inscription publique
    - connexion par téléphone d'un compte créé par invitation (S2.5c) → OK.
 6. Aucun coût, aucun appel externe.
 
+### 2.9 Edge Functions (S2.5b) — dans chaque projet
+1. Secrets (Edge Functions → Secrets, ou `npx supabase secrets set --project-ref <ref> NOM=valeur`) :
+   | Secret | `daara-dev` | `daara-prod` |
+   |---|---|---|
+   | `APP_URL` | URL de la preview (`https://develop.<projet>.pages.dev`) | URL de production |
+   | `ORIGINES_AUTORISEES` | même URL (séparer par des virgules si plusieurs) | URL de production uniquement |
+   | `BREVO_API_KEY` | clé API Brevo du compte de dev (§2.4) | clé API Brevo du compte de prod |
+   | `EMAIL_EXPEDITEUR` | adresse expéditrice validée dans Brevo | idem |
+   | `TURNSTILE_SECRET` | clé secrète du widget Turnstile (§2.6) | idem (widget de prod) |
+   Jamais de `MAILPIT_URL` en cloud. `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` sont fournis par
+   Supabase : ne pas les créer.
+2. Déploiement (après `db push`) :
+   ```powershell
+   npx supabase functions deploy invite-member invitation-apercu accept-invitation --project-ref <ref>
+   ```
+   Les réglages `verify_jwt` sont lus dans `supabase/config.toml` (invite-member : JWT exigé ; les deux autres : publiques).
+3. Vérifier sur `daara-dev` :
+   - `OPTIONS` vers une fonction avec `Origin: https://exemple.invalide` → **pas** d'en-tête `Access-Control-Allow-Origin` ;
+   - invitation par e-mail → e-mail reçu (Brevo), lien `/invitation#…` ;
+   - invitation par téléphone → acceptation → connexion par téléphone (S2.5c).
+
 ## 3. En-têtes de sécurité (`public/_headers`)
 
 | En-tête | Valeur | Raison |

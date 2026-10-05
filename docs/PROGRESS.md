@@ -11,7 +11,7 @@
   navigation (planification à faire).
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
   de la daara) et S2.4 (gestion des membres) faits (2026-10-05). S2.5 invitations découpée en 3 commits : S2.5a (base)
-  faite ; suivantes : S2.5b (Edge Functions), S2.5c (front).
+  et S2.5b (Edge Functions) faites ; suivante : S2.5c (front).
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -57,6 +57,11 @@
       purge planifiée et purge à la suppression d'une daara ;
     - sprint 4 (exports CSV / PDF) : neutraliser `= + - @` en tête de cellule (injection de formules) ;
     - sprint 12 : performance des politiques (`(select has_role(daara_id …))` dépend de la ligne).
+  - À faire par le développeur avant la preview : déployer les Edge Functions et leurs secrets (`docs/deploiement.md`
+    §2.9 : APP_URL, ORIGINES_AUTORISEES, BREVO_API_KEY, EMAIL_EXPEDITEUR, TURNSTILE_SECRET), hooks et téléphone (§2.8) ;
+    vérifier sur `daara-dev` que `verify_jwt` accepte les JWT (nouvelles clés de signature) et que le CORS ne répond
+    qu'aux origines de l'application (en local, Kong ajoute un CORS ouvert).
+  - CI : job `edge` jamais exécuté sur GitHub → vérifier le premier run (image Docker Deno épinglée par empreinte).
   - Audits S2.4 (2026-10-05), points reportés :
     - S2.5 : `accepter_invitation` doit effacer `nom_affiche` en réactivant une ligne (la contrainte l'impose) et passer
       par les garde-fous ; promotion en admin d'un compte sans facteur = même risque que l'invitation admin (qui
@@ -129,6 +134,32 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-05 — S2.5b Invitations : Edge Functions
+- Décision I3 (validée) : risque résiduel accepté qu'un admin crée le compte du numéro qu'il invite, limité par la
+  création et le rattachement dans la même opération, le marqueur `app_metadata.invitation`, le journal et les quotas
+  (ADR-009). Migration `invitation_nouveau_compte` : `accepter_invitation_nouveau_compte` (service_role), logique
+  d'acceptation mise en commun, aperçu qui tient compte de l'auteur et de la suspension, e-mail d'invitation à une
+  seule adresse. 20 tests pgTAP (377 au total).
+- `supabase/functions/` : `invite-member` (JWT de l'admin → RPC, lien `/invitation#jeton`, e-mail, message WhatsApp),
+  `invitation-apercu` (public, contact masqué), `accept-invitation` (public, Turnstile ; compte téléphone créé et
+  rattaché, supprimé seulement si le refus est certain) ; `_shared/` : validation (E.164, +221 par défaut), masquage,
+  réponses `{ code }` et CORS, e-mail (Brevo / Mailpit, une seule porte), modèles fr / en échappés, Turnstile (clés de
+  test refusées hors local, nom d'hôte vérifié), clients Supabase. Logique en fonctions pures, 27 tests Deno.
+- Outillage : `npm run edge:test` (lint, types, tests dans `denoland/deno:2.5.6` épinglé par empreinte, `deno.lock`
+  versionné, `--frozen`), job CI `edge` ; variables locales dans `[edge_runtime.secrets]` de `config.toml` (aucun
+  secret, pas de `.env`) ; `docs/deploiement.md` §2.9 (secrets et déploiement cloud).
+- Vérifié de bout en bout sur le runtime local : admin en aal2 (TOTP calculé) → invitation par e-mail reçue dans
+  Mailpit (lien dans le fragment) → aperçu masqué ; invitation par téléphone → acceptation (captcha, mot de passe,
+  invitation e-mail refusée) → compte créé et rattaché → connexion par téléphone → membership parent ; rejouer →
+  `invitation_utilisee`.
+- Constat : en local, la passerelle Kong ajoute un CORS ouvert (`*`) à toutes les routes ; la restriction des fonctions
+  se vérifie en cloud (§2.9).
+- Audit sécurité : 0 critique, 0 important, 6 mineurs corrigés (suppression d'un compte peut-être rattaché, clé
+  Turnstile de test en cloud, dépendances non verrouillées, e-mail à adresses multiples, aperçu « valide » trompeur,
+  tests manquants). Piège : la clé secrète Turnstile de test a 31 zéros (un test l'a révélé).
+- Incident : une commande de diagnostic a affiché la configuration de Kong, qui contient les clés de démonstration
+  locales par défaut de Supabase (publiques, sans valeur hors du poste) ; à éviter.
+
 ### 2026-10-05 — S2.5a Invitations : base
 - Décisions (validées) : S2.5 en 3 commits (base, Edge Functions, front) ; tests Deno dans le conteneur `denoland/deno`
   (rien à installer) ; e-mails par l'API Brevo en cloud et l'API de Mailpit en local, une seule fonction d'envoi ;
