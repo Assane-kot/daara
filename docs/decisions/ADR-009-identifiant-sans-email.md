@@ -44,14 +44,16 @@ toute implémentation (par exemple identifiant de connexion interne associé au 
   par téléphone ;
 - **hook `before_user_created`** (fonction Postgres versionnée par migration) : refuse toute inscription publique
   par téléphone ; les comptes téléphone ne naissent que par `accept-invitation` (API d'administration) ;
-- configuration testée : `[auth.sms] enable_signup = true` et `enable_confirmations = true` (confirmation SMS exigée :
-  défense en profondeur derrière le hook). Non testé : `enable_signup = false` avec le fournisseur factice (à vérifier
-  à l'implémentation ; le hook suffit à bloquer les inscriptions dans tous les cas) ;
+- configuration retenue : `[auth.sms] enable_signup = true` et `enable_confirmations = true` (confirmation SMS exigée :
+  défense en profondeur derrière le hook). **Vérifié en S2.5 : `enable_signup = false` désactive tout le fournisseur
+  téléphone, connexion comprise** (`phone_provider_disabled`) → impossible ; le hook bloque les inscriptions ;
 - comparaison du téléphone d'une invitation avec `auth.users.phone` **sur les chiffres seuls** (stocké sans « + ») ;
 - en cloud (à vérifier par le développeur sur `daara-dev`) : accepter des identifiants Twilio fictifs dans le
   tableau de bord, activer le hook ;
-- reste ouvert : `signInWithOtp` / `resend` par téléphone d'un compte existant déclenchent une tentative d'envoi
-  vers Twilio, qui échoue (aucun coût) ; limités par Turnstile et par les limites de débit.
+- ~~reste ouvert : `signInWithOtp` / `resend` par téléphone déclenchent une tentative d'envoi vers Twilio~~ → réglé en
+  S2.5 (audit) : le hook **`send_sms`** = `public.envoi_sms_factice` (fonction Postgres qui ne fait rien) remplace
+  l'envoi ; le fournisseur Twilio factice reste déclaré (seul moyen d'activer le téléphone) mais n'est plus jamais
+  appelé : **aucun numéro ne quitte la plateforme** (vérifié : demande d'OTP → 200 sans appel externe).
 
 ## Conséquences
 + Aucun coût, adapté aux usages locaux (WhatsApp).

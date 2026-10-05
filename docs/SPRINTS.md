@@ -59,7 +59,7 @@ Planification validée le 2026-10-04 (LLD §2, §3.2, §4, §5, §6, §7.1 ; spe
 - [x] S2.2 Modules activables (ADR-008) : `daara_modules`, `module_actif`, `definir_modules`, écran Modules, profils à l'onboarding, `moduleGuard` (`modules.md`)
 - [x] S2.3 Paramètres de la daara : informations, logo (Storage `logos`), langue, barème (`parametres-daara.md`)
 - [x] S2.4 Gestion des membres : liste, rôle, désactivation, dernier admin, auteur des écritures dans `audit_log` (`membres.md`)
-- [ ] S2.5 Invitations : Edge Functions `invite-member`, `invitation-apercu`, `accept-invitation`, e-mail Brevo, lien WhatsApp, page `/invitation`, job CI `edge` (`invitations.md`)
+- [ ] S2.5 Invitations (S2.5a base faite ; S2.5b Edge Functions, S2.5c front) : Edge Functions `invite-member`, `invitation-apercu`, `accept-invitation`, e-mail Brevo, lien WhatsApp, page `/invitation`, job CI `edge` (`invitations.md`)
 - [ ] S2.6 Réinitialisation assistée (ADR-006 niveau 2) : `codes_acces`, `creer_code_acces`, Edge `use-access-code`, révocation des sessions (`reinitialisation-assistee.md`)
 - [ ] S2.7 Mon compte et sécurité : profil, mot de passe, second appareil TOTP, modèles d'e-mail restants, procédure super-admin (`mon-compte.md`)
 Livrable : l'admin invite un enseignant (e-mail) et un parent (téléphone), chacun voit son menu ; une daara coranique

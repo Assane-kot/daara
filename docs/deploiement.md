@@ -196,6 +196,29 @@ Pour `daara-prod`, uniquement à une release, après vérification d'une sauvega
 **Interdit sur les projets cloud** : `npx supabase db push --include-seed` et `npx supabase db reset --linked`. Le
 fichier `supabase/seed.sql` crée des comptes de développement au mot de passe connu, dont un admin.
 
+### 2.8 Connexion par téléphone sans SMS (S2.5, ADR-009) — dans chaque projet, APRÈS `db push` de la migration `invitations`
+Objectif : connexion téléphone + mot de passe, **aucune** inscription publique par téléphone, **aucun** SMS envoyé.
+1. **Authentication → Hooks → Before User Created** : activer, type « Postgres », fonction
+   `public.avant_creation_utilisateur`. (La migration accorde déjà le droit d'exécution à `supabase_auth_admin`.)
+2. **Authentication → Hooks → Send SMS** : activer, type « Postgres », fonction `public.envoi_sms_factice` (ne fait
+   rien : aucun SMS, aucun numéro transmis à un tiers).
+3. **Authentication → Sign In / Providers → Phone** : activer ; fournisseur **Twilio** avec des valeurs **fictives**
+   (Account SID `ACfactice-aucun-envoi`, Auth Token `factice-aucun-envoi`, Message Service SID
+   `MGfactice-aucun-envoi`), jamais appelé grâce au hook Send SMS ; « Enable phone signup » **activé** (le désactiver
+   coupe aussi la connexion par téléphone, vérifié en local) ; « Enable phone confirmations » **activé**.
+   Si le tableau de bord refuse des identifiants fictifs : le signaler (alternative à étudier, ADR-009).
+4. Garde-fous à contrôler (audit S2.5a ; sans eux, le lien d'une invitation par téléphone pourrait être pris) :
+   - liste **« Test OTP »** (numéros à code fixe) **vide** ;
+   - **MFA par téléphone désactivé** (seul le TOTP est utilisé) ;
+   - « Confirm phone » et « Secure email change » (double confirmation) **activés**.
+5. Vérifier (sur `daara-dev`, depuis l'application ou l'API) :
+   - inscription publique par téléphone → refusée (HTTP 403, « Inscription par téléphone réservée aux invitations ») ;
+   - `signInWithOtp({ phone })` pour un numéro inconnu → refusé (403), aucun compte créé ;
+   - `updateUser({ phone })` sur un compte e-mail → numéro **non** confirmé (`auth.users.phone` inchangé) ;
+   - inscription par e-mail → toujours possible ;
+   - connexion par téléphone d'un compte créé par invitation (S2.5c) → OK.
+6. Aucun coût, aucun appel externe.
+
 ## 3. En-têtes de sécurité (`public/_headers`)
 
 | En-tête | Valeur | Raison |

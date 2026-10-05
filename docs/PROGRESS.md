@@ -10,7 +10,8 @@
   vérification en 375 px et les configurations Auth / Turnstile du développeur. Sprint suivant : 2 — Membres et
   navigation (planification à faire).
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
-  de la daara) et S2.4 (gestion des membres) faits (2026-10-05). Suivante : S2.5 invitations.
+  de la daara) et S2.4 (gestion des membres) faits (2026-10-05). S2.5 invitations découpée en 3 commits : S2.5a (base)
+  faite ; suivantes : S2.5b (Edge Functions), S2.5c (front).
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -128,6 +129,29 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-05 — S2.5a Invitations : base
+- Décisions (validées) : S2.5 en 3 commits (base, Edge Functions, front) ; tests Deno dans le conteneur `denoland/deno`
+  (rien à installer) ; e-mails par l'API Brevo en cloud et l'API de Mailpit en local, une seule fonction d'envoi ;
+  seuil e-mail ajouté à l'ADR-003 (e-mail réservé aux codes et invitations ; offre payante au-delà de ~200 / jour ou à
+  R4).
+- Migration `invitations` : table (haché du jeton illisible, y compris dans le journal ; une invitation en attente par
+  contact et rôle), RPC `creer_invitation` (jeton tiré par la base et renvoyé une fois ; quotas 50 / daara, 50 / auteur,
+  200 e-mails / plateforme sur 24 h ; daara active ; `deja_membre`), `revoquer_invitation`, `accepter_invitation`
+  (contact lié : e-mail ou téléphone confirmé ; admin en aal2 ; auteur encore admin actif ; réactivation ; ordre des
+  verrous commun), fonctions internes (`invitation_par_jeton` pour service_role, `definir_auteur`), trigger qui
+  révoque les invitations d'un admin retiré et celles adressées à un membre désactivé, `audit_trigger` avec colonnes
+  exclues, hooks Auth `before_user_created` (refus des inscriptions publiques par téléphone) et `send_sms` (ne fait
+  rien). 78 tests pgTAP (357 au total).
+- `config.toml` : fournisseur téléphone activé (Twilio factice déclaré, jamais appelé grâce au hook `send_sms`),
+  `enable_signup = true` (vérifié : `false` coupe aussi la connexion par téléphone), confirmation exigée.
+- Vérifié contre Auth local : inscription publique par téléphone → 403 ; par e-mail → OK ; compte téléphone créé par
+  l'API d'administration → connexion téléphone + mot de passe OK ; demande d'OTP par téléphone → aucun appel externe.
+- Audits sécurité (0 critique, 3 importants, 9 mineurs) et RLS (0 critique, 2 importants, 4 mineurs) : corrigés (admin
+  retiré qui revenait par ses invitations, haché dans le journal, quotas contournables par plusieurs daaras, jeton
+  fourni par l'appelant, comptes non confirmés comptés, interblocage, daara suspendue, numéros transmis à Twilio,
+  garde-fous cloud ajoutés à `docs/deploiement.md` §2.8). Point I3 (compte téléphone créé par l'admin à la place du
+  titulaire) : décision du développeur attendue avant S2.5b. L'auditeur RLS a respecté le garde-fou de transaction.
+
 ### 2026-10-05 — S2.4 Gestion des membres
 - Base (migration `membres`) : `memberships.nom_affiche` (nom figé à la désactivation, nul sur une ligne active),
   `audit_trigger` avec auteur `daara.auteur` (Edge Functions en service_role ; ignoré si `auth.uid()` existe ou si

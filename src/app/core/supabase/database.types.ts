@@ -133,6 +133,69 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            invitations: {
+                Row: {
+                    accepted_at: string | null;
+                    accepted_by: string | null;
+                    created_at: string;
+                    daara_id: string;
+                    email: string | null;
+                    expires_at: string;
+                    id: string;
+                    invited_by: string | null;
+                    langue: string;
+                    nom: string | null;
+                    prenom: string | null;
+                    revoked_at: string | null;
+                    role: Database['public']['Enums']['role_membre'];
+                    telephone: string | null;
+                    token_hash: string;
+                    etat_invitation: string | null;
+                };
+                Insert: {
+                    accepted_at?: string | null;
+                    accepted_by?: string | null;
+                    created_at?: string;
+                    daara_id: string;
+                    email?: string | null;
+                    expires_at?: string;
+                    id?: string;
+                    invited_by?: string | null;
+                    langue?: string;
+                    nom?: string | null;
+                    prenom?: string | null;
+                    revoked_at?: string | null;
+                    role: Database['public']['Enums']['role_membre'];
+                    telephone?: string | null;
+                    token_hash: string;
+                };
+                Update: {
+                    accepted_at?: string | null;
+                    accepted_by?: string | null;
+                    created_at?: string;
+                    daara_id?: string;
+                    email?: string | null;
+                    expires_at?: string;
+                    id?: string;
+                    invited_by?: string | null;
+                    langue?: string;
+                    nom?: string | null;
+                    prenom?: string | null;
+                    revoked_at?: string | null;
+                    role?: Database['public']['Enums']['role_membre'];
+                    telephone?: string | null;
+                    token_hash?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'invitations_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             memberships: {
                 Row: {
                     actif: boolean;
@@ -237,12 +300,16 @@ export type Database = {
             [_ in never]: never;
         };
         Functions: {
+            accepter_invitation: { Args: { p_token: string }; Returns: string };
+            avant_creation_utilisateur: { Args: { event: Json }; Returns: Json };
             avec_prerequis: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: Database['public']['Enums']['module_daara'][] };
             basculer_module: {
                 Args: { p_actif: boolean; p_daara: string; p_module: Database['public']['Enums']['module_daara'] };
                 Returns: Database['public']['Enums']['module_daara'][];
             };
             changer_role: { Args: { p_membership: string; p_role: Database['public']['Enums']['role_membre'] }; Returns: undefined };
+            chiffres: { Args: { p_texte: string }; Returns: string };
+            compte_du_contact: { Args: { p_email: string; p_telephone: string }; Returns: string };
             creer_daara: {
                 Args: {
                     p_bareme?: number;
@@ -255,13 +322,45 @@ export type Database = {
                 };
                 Returns: string;
             };
+            creer_invitation: {
+                Args: {
+                    p_daara: string;
+                    p_email: string;
+                    p_langue: string;
+                    p_nom: string;
+                    p_prenom: string;
+                    p_role: Database['public']['Enums']['role_membre'];
+                    p_telephone: string;
+                };
+                Returns: {
+                    id: string;
+                    jeton: string;
+                }[];
+            };
             definir_actif: { Args: { p_actif: boolean; p_membership: string }; Returns: undefined };
+            definir_auteur: { Args: { p_auteur: string }; Returns: undefined };
             definir_modules: {
                 Args: { p_daara: string; p_modules: Database['public']['Enums']['module_daara'][] };
                 Returns: Database['public']['Enums']['module_daara'][];
             };
             ecrire_modules: { Args: { p_actifs: Database['public']['Enums']['module_daara'][]; p_daara: string }; Returns: undefined };
+            envoi_sms_factice: { Args: { event: Json }; Returns: Json };
+            etat_invitation: { Args: { p_invitation: Database['public']['Tables']['invitations']['Row'] }; Returns: string };
+            hacher_jeton: { Args: { p_token: string }; Returns: string };
             has_role: { Args: { p_daara: string; p_roles: Database['public']['Enums']['role_membre'][] }; Returns: boolean };
+            invitation_par_jeton: {
+                Args: { p_token: string };
+                Returns: {
+                    compte_existant: boolean;
+                    daara_nom: string;
+                    email: string;
+                    etat: string;
+                    id: string;
+                    langue: string;
+                    role: Database['public']['Enums']['role_membre'];
+                    telephone: string;
+                }[];
+            };
             is_member: { Args: { p_daara: string }; Returns: boolean };
             is_platform_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
             membership_administre: {
@@ -288,6 +387,7 @@ export type Database = {
             module_actif: { Args: { p_daara: string; p_module: Database['public']['Enums']['module_daara'] }; Returns: boolean };
             modules_valides: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: boolean };
             prerequis_module: { Args: { p_module: Database['public']['Enums']['module_daara'] }; Returns: Database['public']['Enums']['module_daara'][] };
+            revoquer_invitation: { Args: { p_invitation: string }; Returns: undefined };
             session_suffisante: { Args: Record<PropertyKey, never>; Returns: boolean };
         };
         Enums: {
