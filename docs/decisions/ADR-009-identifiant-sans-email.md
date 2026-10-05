@@ -1,6 +1,6 @@
 # ADR-009 — Identifiant des comptes sans e-mail
 
-Statut : **proposée** (2026-10-04), à confirmer par le spike S2.0 · Remplace la « décision OTP téléphone » prévue
+Statut : **proposée** (2026-10-04) ; spike S2.0 fait : point 2 en échec, alternative en attente de validation · Remplace la « décision OTP téléphone » prévue
 au sprint 2 (ADR-006 §1)
 
 ## Contexte
@@ -27,6 +27,31 @@ au sprint 2 (ADR-006 §1)
 
 Si le point 1 ou 2 échoue (fournisseur SMS exigé même inutilisé) : alternative à présenter au développeur avant
 toute implémentation (par exemple identifiant de connexion interne associé au numéro, résolu par une Edge Function).
+
+## Résultats du spike S2.0 (2026-10-04, Supabase local, Auth 2.197)
+| Point | Résultat |
+|---|---|
+| 1. `createUser(phone, password, phone_confirm)` sans fournisseur SMS | **OK** ; profil créé par `handle_new_user` ; téléphone stocké **sans « + »** (`221770009901`), e-mail vide |
+| 2. `signInWithPassword(phone)` sans fournisseur SMS | **Échec** : `phone_provider_disabled`. La CLI (et Supabase) n'active le fournisseur téléphone (`GOTRUE_EXTERNAL_PHONE_ENABLED`) que si un fournisseur SMS est configuré |
+| 2 bis. Avec un fournisseur SMS **déclaré mais factice** (identifiants Twilio fictifs) | **OK** : connexion avec `+221…`, `221…` ou avec espaces ; aucun SMS possible |
+| 3. Turnstile, mauvais mot de passe | jeton exigé (`captcha_failed`) ; `invalid_credentials` neutre |
+| 3 bis. Inscription libre par téléphone (fournisseur factice) | échoue à l'envoi du SMS (`sms_send_failed`), **aucun compte créé** (pas de squat de numéro), mais Supabase appelle réellement l'API Twilio avec les identifiants fictifs |
+| 3 ter. Hook `before_user_created` | appelé pour **toutes les inscriptions publiques** (payload : `provider` `phone` ou `email`, téléphone) et **pas** pour `auth.admin.createUser` : il peut refuser toute inscription libre par téléphone avant la moindre tentative de SMS |
+| 4. `updateUserById(password)` | OK ; **les jetons de rafraîchissement existants sont révoqués** (ancienne session refusée) : pas besoin de RPC `revoquer_sessions` dédiée ; les jetons d'accès déjà émis restent valides jusqu'à leur expiration |
+
+## Alternative proposée (point 2 en échec)
+- Déclarer un **fournisseur SMS factice** (identifiants fictifs, jamais d'envoi), seule façon d'activer la connexion
+  par téléphone ;
+- **hook `before_user_created`** (fonction Postgres versionnée par migration) : refuse toute inscription publique
+  par téléphone ; les comptes téléphone ne naissent que par `accept-invitation` (API d'administration) ;
+- configuration testée : `[auth.sms] enable_signup = true` et `enable_confirmations = true` (confirmation SMS exigée :
+  défense en profondeur derrière le hook). Non testé : `enable_signup = false` avec le fournisseur factice (à vérifier
+  à l'implémentation ; le hook suffit à bloquer les inscriptions dans tous les cas) ;
+- comparaison du téléphone d'une invitation avec `auth.users.phone` **sur les chiffres seuls** (stocké sans « + ») ;
+- en cloud (à vérifier par le développeur sur `daara-dev`) : accepter des identifiants Twilio fictifs dans le
+  tableau de bord, activer le hook ;
+- reste ouvert : `signInWithOtp` / `resend` par téléphone d'un compte existant déclenchent une tentative d'envoi
+  vers Twilio, qui échoue (aucun coût) ; limités par Turnstile et par les limites de débit.
 
 ## Conséquences
 + Aucun coût, adapté aux usages locaux (WhatsApp).
