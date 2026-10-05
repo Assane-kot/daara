@@ -4,7 +4,10 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { PageHeader } from '../../shared/ui/page-header/page-header';
 
 /** Onglets des paramètres de la daara (admin) : Général (S2.3) et Modules (S2.2, ADR-008). */
-export const ONGLETS_PARAMETRES = [{ route: 'modules', cle: 'parametres.onglets.modules' }] as const;
+export const ONGLETS_PARAMETRES = [
+    { route: 'general', cle: 'parametres.onglets.general' },
+    { route: 'modules', cle: 'parametres.onglets.modules' },
+] as const;
 
 @Component({
     selector: 'app-parametres-page',

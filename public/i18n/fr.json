@@ -35,7 +35,8 @@
         "mfa": "Double authentification",
         "onboarding": "Créer ma daara",
         "select_daara": "Choisir une daara",
-        "parametres_modules": "Modules"
+        "parametres_modules": "Modules",
+        "parametres_general": "Paramètres généraux"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -278,6 +279,7 @@
     "parametres": {
         "titre": "Paramètres",
         "onglets": {
+            "general": "Général",
             "modules": "Modules"
         },
         "modules": {
@@ -292,6 +294,36 @@
                 "requis": "{{prerequis}} est requis par {{dependant}} : désactivez d’abord {{dependant}}.",
                 "droits": "Seul un administrateur ayant confirmé son identité peut modifier les modules.",
                 "inattendue": "Les modules n’ont pas pu être enregistrés. Réessayez."
+            }
+        },
+        "general": {
+            "infos": "Informations de la daara",
+            "aide_langue": "Langue proposée aux nouveaux membres. Chacun garde la langue qu’il a choisie.",
+            "enregistrer": "Enregistrer",
+            "enregistre": "Les informations de la daara sont enregistrées.",
+            "reessayer": "Réessayer",
+            "logo": {
+                "titre": "Logo",
+                "aide": "PNG, JPEG ou WebP (10 Mo maximum), redimensionné à 512 px. Le logo est public : visible sans connexion par toute personne qui a son adresse. N’utilisez pas de photo de personnes.",
+                "alt": "Logo de {{nom}}",
+                "choisir": "Choisir un logo",
+                "remplacer": "Remplacer le logo",
+                "retirer": "Retirer le logo",
+                "retirer_titre": "Retirer le logo ?",
+                "retirer_message": "Le logo ne sera plus affiché. Vous pourrez en déposer un autre à tout moment.",
+                "envoi": "Envoi du logo en cours…",
+                "depose": "Le logo est enregistré.",
+                "retire": "Le logo est retiré."
+            },
+            "erreurs": {
+                "chargement": "Les informations de la daara n’ont pas pu être chargées.",
+                "droits": "Seul un administrateur ayant confirmé son identité peut modifier la daara.",
+                "donnee_invalide": "Une information est invalide : vérifiez le nom, la ville et le téléphone.",
+                "logo_type": "Format non accepté : choisissez une image PNG, JPEG ou WebP.",
+                "logo_taille": "Image trop lourde : 10 Mo maximum.",
+                "inattendue": "L’enregistrement a échoué. Réessayez.",
+                "logo_illisible": "Ce fichier n’est pas une image lisible.",
+                "logo_suppression": "Le logo n’a pas pu être supprimé. Réessayez."
             }
         }
     }

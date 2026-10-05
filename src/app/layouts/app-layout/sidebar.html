@@ -10,7 +10,12 @@
                 <span class="min-w-0 ltr:ml-1.5 rtl:mr-1.5">
                     <span class="block align-middle text-2xl leading-tight font-semibold dark:text-white-light">DAARA</span>
                     @if (courante.daara(); as daara) {
-                        <span class="block max-w-[170px] truncate text-xs font-semibold text-muted dark:text-night-muted">{{ daara.nom }}</span>
+                        <span class="flex max-w-[170px] items-center gap-1.5 text-xs font-semibold text-muted dark:text-night-muted">
+                            @if (daara.logoUrl) {
+                                <img class="h-4 w-4 flex-none rounded-xs object-contain" [src]="daara.logoUrl" alt="" />
+                            }
+                            <span class="truncate">{{ daara.nom }}</span>
+                        </span>
                     }
                 </span>
             </a>

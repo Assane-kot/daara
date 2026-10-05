@@ -9,7 +9,8 @@
 - Sprint 1 — Socle multi-tenant : **code terminé** (bilan ci-dessous, 2026-10-03) ; clôture effective après la
   vérification en 375 px et les configurations Auth / Turnstile du développeur. Sprint suivant : 2 — Membres et
   navigation (planification à faire).
-- Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara) et S2.2 (modules activables) faits (2026-10-05).
+- Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
+  de la daara) faits (2026-10-05). Suivante : S2.4 gestion des membres.
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -55,6 +56,11 @@
       purge planifiée et purge à la suppression d'une daara ;
     - sprint 4 (exports CSV / PDF) : neutraliser `= + - @` en tête de cellule (injection de formules) ;
     - sprint 12 : performance des politiques (`(select has_role(daara_id …))` dépend de la ligne).
+  - Audit S2.3 (2026-10-05), points pour information :
+    - fichiers du bucket `logos` d'une daara supprimée non effacés par la cascade (le Storage interdit le `delete` SQL)
+      → à traiter avec la purge CDP (avant le sprint 5), via l'API Storage ;
+    - l'admin d'une daara suspendue modifie encore ses paramètres (`has_role` ignore `statut`) → sprint 11 ;
+    - uuid de la daara visible dans l'URL publique du logo (non secret) ; ancienne URL en cache 5 min au plus.
 
 ## Prochaine étape
 1. Développeur, pour clore le sprint 0 : configurations de `docs/deploiement.md` dans l'ordre §2 (Supabase +
@@ -114,6 +120,27 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-05 — S2.3 Paramètres de la daara
+- Base (migration `logos_daara`) : bucket `logos` public en lecture, 512 Ko, PNG / JPEG / WebP (pas de SVG) ;
+  4 politiques sur `storage.objects` (select requis par l'upsert, insert, update, delete) pour l'admin `aal2` de la
+  daara du 1er segment, chemin `<uuid>/logo.(png|jpg|webp)` contrôlé par expression régulière avant la conversion en
+  uuid ; contrainte `daaras_logo_path_check` (même règle) à la place de `daaras_check` (nom généré du socle).
+  20 tests pgTAP (225 au total). Piège : le `delete` SQL sur `storage.objects` est bloqué par le déclencheur
+  `protect_delete` → `set local storage.allow_delete_query = 'true'` dans les tests.
+- Front : Paramètres → Général (onglet par défaut) : nom, ville, téléphone, langue par défaut, barème (mise à jour
+  vérifiée : aucune ligne renvoyée = refus RLS) ; logo : ré-encodage dans le navigateur (`ImageLogoService`, 512 px,
+  WebP sinon PNG, EXIF retiré), dépôt en upsert, autres noms supprimés, retrait confirmé ; `logoUrl` (URL publique +
+  `?v=updated_at`) dans `DaaraAccessible`, logo affiché dans la sidebar et le sélecteur de daara ;
+  `AuthService.rechargerDaaraCourante()` partagé avec les modules ; `MOTIF_TELEPHONE` partagé.
+- Piège : le Storage répond en HTTP 400 avec le vrai code (403, 413, 415) dans `statusCode` → lu en priorité.
+- Vérifié dans le navigateur : dépôt PNG puis WebP (ancien supprimé), photo JPEG 2000 px → WebP 512 px de 920 octets,
+  faux PNG refusé, retrait, enregistrement persistant, erreurs de validation, sombre, 375 px sans débordement ;
+  appels directs à l'API Storage refusés (SVG 415, 600 Ko 413, autre daara et autre nom 403).
+- Audit `auditeur-securite` : 0 critique, 0 important ; 4 mineurs corrigés (échec du retrait signalé, nettoyage des
+  trois noms sans se fier au cache, ré-encodage contre EXIF et faux fichiers, texte « logo public ») + tests de
+  lecture du bucket (anon, enseignant, autre admin). Points d'information : voir « Problèmes ouverts ».
+- 172 tests unitaires, 225 tests pgTAP ; chargement initial 147,8 kB transférés.
+
 ### 2026-10-05 — S2.2 Modules activables par daara (ADR-008)
 - Base : enum `module_daara`, table `daara_modules` (lecture par les membres et le super-admin, aucune écriture
   directe, journalisée), `module_actif()`, `definir_modules()` (admin aal2 ; prérequis inactifs ajoutés ; refus

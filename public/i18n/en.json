@@ -35,7 +35,8 @@
         "mfa": "Two-factor authentication",
         "onboarding": "Create my daara",
         "select_daara": "Choose a daara",
-        "parametres_modules": "Modules"
+        "parametres_modules": "Modules",
+        "parametres_general": "General settings"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -278,6 +279,7 @@
     "parametres": {
         "titre": "Settings",
         "onglets": {
+            "general": "General",
             "modules": "Modules"
         },
         "modules": {
@@ -292,6 +294,36 @@
                 "requis": "{{prerequis}} is required by {{dependant}}: disable {{dependant}} first.",
                 "droits": "Only an administrator who confirmed their identity can change the modules.",
                 "inattendue": "The modules could not be saved. Try again."
+            }
+        },
+        "general": {
+            "infos": "Daara details",
+            "aide_langue": "Language offered to new members. Everyone keeps the language they chose.",
+            "enregistrer": "Save",
+            "enregistre": "The daara details have been saved.",
+            "reessayer": "Try again",
+            "logo": {
+                "titre": "Logo",
+                "aide": "PNG, JPEG or WebP (10 MB maximum), resized to 512 px. The logo is public: anyone with its address can see it without signing in. Do not use photos of people.",
+                "alt": "{{nom}} logo",
+                "choisir": "Choose a logo",
+                "remplacer": "Replace the logo",
+                "retirer": "Remove the logo",
+                "retirer_titre": "Remove the logo?",
+                "retirer_message": "The logo will no longer be displayed. You can upload another one at any time.",
+                "envoi": "Uploading the logo…",
+                "depose": "The logo has been saved.",
+                "retire": "The logo has been removed."
+            },
+            "erreurs": {
+                "chargement": "The daara details could not be loaded.",
+                "droits": "Only an administrator who has confirmed their identity can edit the daara.",
+                "donnee_invalide": "Some information is invalid: check the name, city and phone number.",
+                "logo_type": "Format not accepted: choose a PNG, JPEG or WebP image.",
+                "logo_taille": "Image too large: 10 MB maximum.",
+                "inattendue": "Saving failed. Please try again.",
+                "logo_illisible": "This file is not a readable image.",
+                "logo_suppression": "The logo could not be deleted. Please try again."
             }
         }
     }

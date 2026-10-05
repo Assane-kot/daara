@@ -11,6 +11,7 @@ const TOUBA: DaaraAccessible = {
     nom: 'Daara Touba',
     ville: 'Touba',
     logoPath: null,
+    logoUrl: null,
     roles: ['enseignant'],
     modules: ['structure', 'notes'],
 };
@@ -20,6 +21,7 @@ const THIES: DaaraAccessible = {
     nom: 'Daara Thiès',
     ville: null,
     logoPath: null,
+    logoUrl: null,
     roles: ['parent'],
     modules: ['coran_cahier'],
 };

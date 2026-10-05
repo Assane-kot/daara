@@ -36,11 +36,15 @@ import { Skeleton } from '../../shared/ui/skeleton/skeleton';
                                 [routerLink]="lien(daara)"
                                 class="flex min-h-16 items-center gap-3 rounded-xl border-[1.5px] border-white-light bg-white px-4 py-3 hover:border-primary dark:border-night-border dark:bg-night"
                             >
-                                <span
-                                    class="grid h-10 w-10 flex-none place-items-center rounded-lg bg-primary/10 text-lg font-black text-primary uppercase"
-                                    aria-hidden="true"
-                                    >{{ daara.nom.charAt(0) }}</span
-                                >
+                                @if (daara.logoUrl) {
+                                    <img class="h-10 w-10 flex-none rounded-lg bg-white object-contain" [src]="daara.logoUrl" alt="" />
+                                } @else {
+                                    <span
+                                        class="grid h-10 w-10 flex-none place-items-center rounded-lg bg-primary/10 text-lg font-black text-primary uppercase"
+                                        aria-hidden="true"
+                                        >{{ daara.nom.charAt(0) }}</span
+                                    >
+                                }
                                 <span class="min-w-0 flex-1">
                                     <span class="block truncate font-extrabold text-black dark:text-white-light">{{ daara.nom }}</span>
                                     <span class="block truncate text-sm text-muted dark:text-night-muted">

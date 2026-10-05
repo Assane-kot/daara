@@ -9,15 +9,13 @@ import { MODULES, ModuleDaara } from '../../core/daara/daara.model';
 import { MODULES_DU_PROFIL, ProfilDaara, avecPrerequis } from '../../core/daara/modules';
 import { LanguageService } from '../../core/i18n/language.service';
 import { FormField, FormFieldControl } from '../../shared/ui/form-field/form-field';
+import { MOTIF_TELEPHONE } from '../../shared/ui/form-field/validateurs';
 import { Skeleton } from '../../shared/ui/skeleton/skeleton';
 import { MfaPanel } from '../auth/components/mfa-panel';
 import { ErreurCreationDaara, OnboardingService } from './data/onboarding.service';
 import { SLUG_MAX, proposerSlug, slugValidateur } from './slug';
 
 type Etape = 'chargement' | 'securite' | 'daara';
-
-/** Même règle que la contrainte `daaras.telephone`. */
-const MOTIF_TELEPHONE = /^\+?[0-9][0-9 .-]{5,19}$/;
 
 /**
  * Onboarding (LLD §7.0) : 1. sécuriser le compte (TOTP, car `creer_daara` exige `aal2`) ;

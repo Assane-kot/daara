@@ -24,6 +24,8 @@ export interface DaaraAccessible {
     readonly nom: string;
     readonly ville: string | null;
     readonly logoPath: string | null;
+    /** URL publique du logo (bucket `logos`), avec `?v=` qui change à chaque modification de la daara (anti-cache). */
+    readonly logoUrl: string | null;
     readonly roles: readonly RoleMembre[];
     /** Modules actifs de la daara (ADR-008). */
     readonly modules: readonly ModuleDaara[];

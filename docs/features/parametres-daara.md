@@ -14,6 +14,11 @@ d'écriture sur `storage.objects` (premier segment = daara dont l'appelant est a
 ## Règles métier
 - Logo : contrôle du type et de la taille côté client et côté Storage ; pas de SVG ; nom imposé `logo.<ext>`
   (remplacement, pas d'accumulation) ; `logo_path` mis à jour après le dépôt.
+- Logo ré-encodé dans le navigateur avant l'envoi (`ImageLogoService` : canvas, 512 px au plus, WebP sinon PNG) :
+  métadonnées EXIF (position GPS) retirées, faux fichiers rejetés ; fichier source accepté jusqu'à 10 Mo. Après un
+  dépôt, les deux autres noms possibles sont supprimés ; le retrait supprime les trois noms avant d'effacer
+  `logo_path` (échec signalé). Le logo est **public** (visible sans connexion) : l'écran le dit.
+- Cache : `cacheControl` 300 s ; l'application change d'URL à chaque modification (`?v=updated_at`).
 - Slug et statut non modifiables (sprint 1).
 - Changer la langue par défaut n'affecte pas la langue choisie par chaque utilisateur.
 

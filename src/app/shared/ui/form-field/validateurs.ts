@@ -1,5 +1,8 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
+/** Téléphone : même règle que les contraintes `daaras.telephone` et `profiles.telephone`. */
+export const MOTIF_TELEPHONE = /^\+?[0-9][0-9 .-]{5,19}$/;
+
 /**
  * Mot de passe DAARA (ADR-006) : au moins 8 caractères, une lettre et un chiffre. Même règle que Supabase Auth
  * (`password_requirements = "letters_digits"`), qui reste le contrôle de référence.

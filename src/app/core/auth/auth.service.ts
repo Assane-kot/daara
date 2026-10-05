@@ -239,6 +239,16 @@ export class AuthService {
         this.daaras = null;
     }
 
+    /** Relit les daaras après une modification de la daara ouverte (modules, paramètres) : menus, guards et logo suivent. */
+    async rechargerDaaraCourante(): Promise<void> {
+        const daaraId = this.courante.id();
+        this.invaliderDaaras();
+        const daara = (await this.mesDaaras()).find((d) => d.id === daaraId);
+        if (daara) {
+            this.courante.definir(daara);
+        }
+    }
+
     /**
      * Double authentification à faire avant d'aller plus loin : facteur vérifié mais session `aal1`, ou admin d'une
      * daara sans facteur (enrôlement imposé, ADR-006).
@@ -276,12 +286,17 @@ export class AuthService {
         return daaras.some((d) => d.slug === derniere) ? routeDaara(derniere as string) : ROUTES_AUTH.selectionDaara;
     }
 
+    private urlLogo(chemin: string, version: string): string {
+        const url = this.sb.storage.from('logos').getPublicUrl(chemin).data.publicUrl;
+        return `${url}?v=${encodeURIComponent(version)}`;
+    }
+
     private async lireDaaras(userId: string): Promise<DaaraAccessible[]> {
         // Un membre dont la session est insuffisante (facteur vérifié, aal1) ne lit pas la daara : la jointure interne
         // l'écarte, et mfaRequise() l'envoie d'abord vers /auth/mfa.
         const { data, error } = await this.sb
             .from('memberships')
-            .select('role, daaras!inner(id, slug, nom, ville, logo_path, daara_modules(module, actif))')
+            .select('role, daaras!inner(id, slug, nom, ville, logo_path, updated_at, daara_modules(module, actif))')
             .eq('user_id', userId)
             .eq('actif', true);
         if (error) {
@@ -297,6 +312,7 @@ export class AuthService {
                 nom: d.nom,
                 ville: d.ville,
                 logoPath: d.logo_path,
+                logoUrl: d.logo_path ? this.urlLogo(d.logo_path, d.updated_at) : null,
                 roles: [...(existante?.roles ?? []), ligne.role],
                 modules: MODULES.filter((m) => d.daara_modules.some((dm) => dm.module === m && dm.actif)),
             });

@@ -9,7 +9,12 @@ export const PARAMETRES_ROUTES: Routes = [
         component: ParametresPage,
         canActivate: [roleGuard(['admin'])],
         children: [
-            { path: '', pathMatch: 'full', redirectTo: 'modules' },
+            { path: '', pathMatch: 'full', redirectTo: 'general' },
+            {
+                path: 'general',
+                title: 'titres.parametres_general',
+                loadComponent: () => import('./pages/general/general-page').then((m) => m.GeneralPage),
+            },
             {
                 path: 'modules',
                 title: 'titres.parametres_modules',

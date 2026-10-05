@@ -136,7 +136,7 @@ Type : `public.role_membre` = enum (`admin`, `enseignant`, `parent`, `apprenant`
 
 | Table | Colonnes | Contraintes |
 |---|---|---|
-| `daaras` | id, nom text (2-120), slug text, ville text null (≤ 80), telephone text null (≤ 20), logo_path text null, langue_defaut text (`fr`/`en`, défaut `fr`), bareme smallint (10/20, défaut 20), statut text (`active`/`suspendue`, défaut `active`), created_by uuid (défaut `auth.uid()`) | slug unique, `^[a-z0-9]+(-[a-z0-9]+)*$`, 3-50 car., hors liste des slugs réservés (segments de routes, `admin`, `api`…) ; `logo_path` = `<id>/<fichier>.<ext>` ; sans `daara_id` (exception) ; créée uniquement par `creer_daara()` |
+| `daaras` | id, nom text (2-120), slug text, ville text null (≤ 80), telephone text null (≤ 20), logo_path text null, langue_defaut text (`fr`/`en`, défaut `fr`), bareme smallint (10/20, défaut 20), statut text (`active`/`suspendue`, défaut `active`), created_by uuid (défaut `auth.uid()`) | slug unique, `^[a-z0-9]+(-[a-z0-9]+)*$`, 3-50 car., hors liste des slugs réservés (segments de routes, `admin`, `api`…) ; `logo_path` = `<id>/logo.(png|jpg|webp)` (contrainte `daaras_logo_path_check`, S2.3) ; sans `daara_id` (exception) ; créée uniquement par `creer_daara()` |
 | `profiles` | id (pk, fk `auth.users` on delete cascade), nom text (≤ 100), prenom text (≤ 100), telephone text null (≤ 20), langue text (`fr`/`en`, défaut `fr`), avatar_path text null | `avatar_path` = `<id>/<fichier>.<ext>` ; sans `daara_id` (exception) ; créé par `handle_new_user` |
 | `memberships` | id, daara_id (fk cascade), user_id (fk `profiles` cascade), role `role_membre`, actif bool (défaut true), created_by | unique (daara_id, user_id, role) ; index `daara_id`, index `(user_id, daara_id)` ; aucune écriture directe par le client (§4) |
 | `audit_log` | id bigint identity, daara_id (**sans** clé étrangère : le journal est écrit pendant la suppression en cascade d'une daara et lui survit ; conservation et purge à décider avant le sprint 5), table_name text, record_id uuid, action text (`INSERT`/`UPDATE`/`DELETE`), old_data jsonb, new_data jsonb, user_id uuid (`auth.uid()`), at timestamptz | index `(daara_id, at desc)` ; écrit uniquement par `audit_trigger` |
@@ -292,7 +292,7 @@ acceptation d'invitation). Au sprint 2 : modification du rôle / désactivation 
 | `codes_acces` | `has_role(daara_id, admin)` ; colonnes lisibles : id, user_id, expires_at, used_at, tentatives, created_at | aucune (RPC `creer_code_acces`, `consommer_code_acces`) |
 | `memberships` | inchangé (sprint 1) | aucune écriture directe : RPC `changer_role`, `definir_actif`, `accepter_invitation` |
 | `daaras` | inchangé | update de `logo_path` également (chemin contraint `<id>/logo.<ext>`) |
-| `storage.objects`, bucket `logos` | public (logos affichés sur l'écran de connexion de la daara, à terme) | insert / update / delete : `has_role(<1er segment>, admin)` ; nom `logo.png` / `logo.jpg` / `logo.webp` |
+| `storage.objects`, bucket `logos` | public (logos affichés sur l'écran de connexion de la daara, à terme) | select (requis par l'upsert de l'API Storage), insert / update / delete : `has_role(<1er segment>, admin)` ; nom `logo.png` / `logo.jpg` / `logo.webp` ; chemin contrôlé par expression régulière avant la conversion en uuid |
 
 Garde-fou (trigger `garder_un_admin`) : aucune modification de `memberships` ne peut laisser une daara sans admin actif.
 

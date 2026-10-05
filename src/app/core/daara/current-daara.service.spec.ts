@@ -8,6 +8,7 @@ const daara = (roles: DaaraAccessible['roles']): DaaraAccessible => ({
     nom: 'Daara Touba',
     ville: null,
     logoPath: null,
+    logoUrl: null,
     roles,
     modules: MODULES,
 });

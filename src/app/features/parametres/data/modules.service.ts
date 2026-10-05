@@ -46,11 +46,7 @@ export class ModulesService {
         if (error) {
             throw erreurModules(error);
         }
-        this.auth.invaliderDaaras();
-        const daara = (await this.auth.mesDaaras()).find((d) => d.id === daaraId);
-        if (daara) {
-            this.courante.definir(daara);
-        }
+        await this.auth.rechargerDaaraCourante();
         return data;
     }
 }
