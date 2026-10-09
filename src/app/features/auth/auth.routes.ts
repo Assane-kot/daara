@@ -29,6 +29,12 @@ export const AUTH_ROUTES: Routes = [
         loadComponent: () => import('./pages/mot-de-passe-oublie/mot-de-passe-oublie-page').then((m) => m.MotDePasseOubliePage),
     },
     {
+        path: 'code-acces',
+        title: 'titres.code_acces',
+        canActivate: [anonymeGuard],
+        loadComponent: () => import('./pages/code-acces/code-acces-page').then((m) => m.CodeAccesPage),
+    },
+    {
         path: 'mfa',
         title: 'titres.mfa',
         canActivate: [authGuard],

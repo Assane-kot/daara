@@ -40,7 +40,8 @@
         "parametres_general": "General settings",
         "membres": "Members",
         "invitation": "Invitation",
-        "invitations": "Invitations"
+        "invitations": "Invitations",
+        "code_acces": "Code from your daara"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -67,7 +68,8 @@
             "code": "Enter the 6 digits of the code.",
             "different": "The two passwords do not match.",
             "slug": "Lowercase letters, digits and hyphens only (3 to 50 characters).",
-            "identifiant": "Enter a valid email address or phone number."
+            "identifiant": "Enter a valid email address or phone number.",
+            "code_acces": "Enter the 8 characters of the code (for example ABCD-EFGH)."
         },
         "code": {
             "chiffre": "Digit {{n}} of 6"
@@ -182,6 +184,26 @@
             "session_expiree": "Your session has expired. Sign in again.",
             "reseau": "Cannot reach the server. Check your Internet connection.",
             "inattendue": "An unexpected error occurred. Try again."
+        },
+        "code_acces": {
+            "surtitre": "Access",
+            "titre": "Code from your daara",
+            "intro": "Enter the code given by your daara’s administrator, then choose your new password.",
+            "code": "Access code",
+            "aide_code": "8 characters, for example ABCD-EFGH.",
+            "bouton": "Change my password",
+            "succes_titre": "Password changed",
+            "succes_message": "Sign in with your new password. Your other sessions have been signed out.",
+            "se_connecter": "Sign in",
+            "lien": "Have a code from your daara?",
+            "retour": "Back to sign in",
+            "erreurs": {
+                "code_invalide": "Invalid or expired code. Check your identifier and the code, or ask your daara for a new code.",
+                "mot_de_passe_faible": "At least 8 characters, with at least one letter and one digit.",
+                "captcha": "The anti-robot check failed. Try again.",
+                "reseau": "Unable to connect. Check your network and try again.",
+                "inattendue": "The password could not be changed. Try again or ask your daara for a new code."
+            }
         }
     },
     "onboarding": {
@@ -369,7 +391,8 @@
             "passer_en": "Make {{role}}",
             "desactiver": "Deactivate",
             "reactiver": "Reactivate",
-            "confirmer_role": "Change role"
+            "confirmer_role": "Change role",
+            "reinitialiser": "Reset access"
         },
         "confirmer": {
             "role_titre": "Make {{nom}} {{role}}?",
@@ -378,7 +401,10 @@
             "retrograder_soi_message": "You will lose your administration rights for the daara and leave this screen.",
             "desactiver_titre": "Deactivate {{nom}} ({{role}})?",
             "desactiver_message": "The member immediately loses access to the daara. Their data is kept; you can reactivate them.",
-            "desactiver_soi_message": "You will immediately lose access to this space. Another administrator can reactivate you."
+            "desactiver_soi_message": "You will immediately lose access to this space. Another administrator can reactivate you.",
+            "code_titre": "Reset access for {{nom}}?",
+            "code_message": "An access code valid for 24 hours will be created; any previous code will be cancelled. {{nom}} will use it to choose a new password, and their open sessions will be signed out.",
+            "code_bouton": "Create the code"
         },
         "succes": {
             "role": "{{nom}} is now {{role}}.",
@@ -391,11 +417,21 @@
             "dernier_admin": "The daara must keep at least one active administrator: appoint another one first.",
             "role_deja_attribue": "This person already has this role in the daara.",
             "role_invalide": "This role cannot be assigned here.",
-            "inattendue": "The action failed. Please try again."
+            "inattendue": "The action failed. Please try again.",
+            "code_cible": "This person cannot receive an access code."
         },
         "onglets": {
             "membres": "Members",
             "invitations": "Invitations"
+        },
+        "code": {
+            "titre": "Access code for {{nom}}",
+            "intro": "Give this code to {{nom}} by WhatsApp or in person. It will not be shown again.",
+            "validite": "Valid for 24 hours, once, on the “Have a code from your daara?” page of the sign-in screen.",
+            "copier": "Copy the code",
+            "copie": "Code copied",
+            "whatsapp": "Send by WhatsApp",
+            "message": "Your DAARA access code: {{code}} (valid for 24 hours). Choose your new password here: {{lien}}"
         }
     },
     "invitations": {

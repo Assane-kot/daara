@@ -55,7 +55,7 @@ jobs:
                   supabase db dump --db-url "$DB_URL" --role-only -f dump/roles.sql
                   supabase db dump --db-url "$DB_URL" -f dump/schema.sql
                   supabase db dump --db-url "$DB_URL" --data-only --use-copy --schema public,auth \
-                      --exclude auth.refresh_tokens,auth.sessions,auth.one_time_tokens,auth.flow_state,auth.mfa_challenges,auth.mfa_amr_claims,auth.audit_log_entries,auth.webauthn_challenges,auth.oauth_client_states,auth.saml_relay_states \
+                      --exclude public.codes_acces,auth.refresh_tokens,auth.sessions,auth.one_time_tokens,auth.flow_state,auth.mfa_challenges,auth.mfa_amr_claims,auth.audit_log_entries,auth.webauthn_challenges,auth.oauth_client_states,auth.saml_relay_states \
                       -f dump/data.sql
                   [ -s dump/schema.sql ] && [ -s dump/data.sql ] || { echo "::error::Dump vide"; exit 1; }
                   ls -l dump

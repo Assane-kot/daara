@@ -425,6 +425,9 @@ verify_jwt = false
 [functions.accept-invitation]
 verify_jwt = false
 
+[functions.use-access-code]
+verify_jwt = false
+
 [analytics]
 enabled = false
 port = 54327

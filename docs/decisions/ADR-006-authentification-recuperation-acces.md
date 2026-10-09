@@ -68,6 +68,21 @@ payant) pourra remplacer la transmission manuelle, sans changer le reste du méc
 - Second facteur : second appareil TOTP dans « Mon compte » ; codes de secours non retenus (expérimentaux) ;
   `aal2` exigé pour tout accès d'un utilisateur ayant un facteur vérifié (`session_suffisante`).
 
+### Mise en œuvre S2.6 (2026-10-09, décisions validées)
+- D1 : la personne visée ne doit être admin dans **aucune** daara (et non seulement dans celle de l'admin qui crée le
+  code) : sinon l'admin d'une daara B connaîtrait le mot de passe d'une personne admin d'une daara A.
+- D2 (risque résiduel accepté) : l'admin qui crée le code peut l'utiliser lui-même et prendre le compte du membre, y
+  compris son accès aux autres daaras de ce membre ; c'est inhérent au niveau 2. Limité par : sessions du membre
+  révoquées (il s'en aperçoit), journal (création et consommation, auteur), e-mail de notification si le membre a une
+  adresse, double authentification jamais contournée. Refuser le code aux membres de plusieurs daaras les laisserait
+  sans recours : écarté.
+- Conséquences acceptées de D1 et du code unique par compte (audits S2.6) : le refus « ne peut pas recevoir de code »
+  indique à l'admin que la personne est admin ailleurs (ou super-admin) ; pour un membre de deux daaras, le code de
+  l'une annule celui de l'autre ; un tiers qui connaît l'identifiant peut épuiser les 5 essais (5 vérifications
+  Turnstile) et invalider le code : l'admin en crée un nouveau.
+- Le code est consommé avant le changement du mot de passe : si l'API d'administration échoue, le membre demande un
+  nouveau code (cas rare).
+
 ## Conséquences
 + Récupération possible pour tous les profils, sans coût, adaptée aux usages locaux (WhatsApp).
 + Comptes admin protégés même si leur mot de passe est faible ou volé.

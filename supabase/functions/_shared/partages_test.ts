@@ -2,7 +2,7 @@ import { assert, assertEquals, assertFalse, assertStringIncludes } from 'jsr:@st
 import { envoyerCourriel, type Fetch } from './email.ts';
 import { entetesCors, erreurRpc, originesAutorisees, servir } from './http.ts';
 import { masquerEmail, masquerTelephone } from './masquage.ts';
-import { courrielInvitation, echapperHtml, messageWhatsapp } from './modeles.ts';
+import { courrielInvitation, courrielMotDePasseChange, echapperHtml, messageWhatsapp } from './modeles.ts';
 import { estLocal, verifierTurnstile } from './turnstile.ts';
 import * as v from './validation.ts';
 
@@ -40,6 +40,9 @@ Deno.test('validation : rôle, uuid, jeton, mot de passe, langue', () => {
     assertEquals(v.motDePasse('daara2026'), 'daara2026');
     assertEquals(v.motDePasse('12345678'), null);
     assertEquals(v.motDePasse('motdepasse'), null);
+    assertEquals(v.motDePasse('éééééé12'), null);
+    assertEquals(v.motDePasse('a1' + 'é'.repeat(36)), null);
+    assertEquals(v.motDePasse('dàara2026'), 'dàara2026');
     assertEquals(v.motDePasse('a1' + 'x'.repeat(80)), null);
     assertEquals(v.langue('en'), 'en');
     assertEquals(v.langue('wo'), 'fr');
@@ -136,4 +139,20 @@ Deno.test('Turnstile : clé secrète de test refusée hors du local', async () =
     assertFalse(await verifierTurnstile('x', envDe({ TURNSTILE_SECRET: test, SUPABASE_URL: 'https://abc.supabase.co' }), null, oui));
     assertFalse(estLocal('https://abc.supabase.co'));
     assert(estLocal('http://127.0.0.1:54321'));
+});
+
+Deno.test('codeAcces : normalisé, alphabet sans symbole ambigu', () => {
+    assertEquals(v.codeAcces(' abcd-efgh '), 'ABCDEFGH');
+    assertEquals(v.codeAcces('ABCD EF23'), 'ABCDEF23');
+    assertEquals(v.codeAcces('ABCD-EFG0'), null);
+    assertEquals(v.codeAcces('ABCD-EFGI'), null);
+    assertEquals(v.codeAcces('ABCD-EFG'), null);
+    assertEquals(v.codeAcces(12345678), null);
+});
+
+Deno.test('courrielMotDePasseChange : fr / en, sans lien', () => {
+    const fr = courrielMotDePasseChange('a@b.sn', 'fr');
+    assertEquals([fr.a, fr.sujet], ['a@b.sn', 'Votre mot de passe DAARA a été changé']);
+    assertFalse(fr.html.includes('href'));
+    assertEquals(courrielMotDePasseChange('a@b.sn', 'en').sujet, 'Your DAARA password has been changed');
 });

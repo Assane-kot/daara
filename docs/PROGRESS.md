@@ -10,8 +10,8 @@
   vérification en 375 px et les configurations Auth / Turnstile du développeur. Sprint suivant : 2 — Membres et
   navigation (planification à faire).
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
-  de la daara), S2.4 (gestion des membres) et S2.5 (invitations, en 3 commits) faits. Suivante : S2.6 réinitialisation
-  assistée.
+  de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits) et S2.6 (réinitialisation assistée) faits. Suivante :
+  S2.7 Mon compte et sécurité.
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -58,7 +58,8 @@
     - sprint 4 (exports CSV / PDF) : neutraliser `= + - @` en tête de cellule (injection de formules) ;
     - sprint 12 : performance des politiques (`(select has_role(daara_id …))` dépend de la ligne).
   - À faire par le développeur avant la preview : déployer les Edge Functions et leurs secrets (`docs/deploiement.md`
-    §2.9 : APP_URL, ORIGINES_AUTORISEES, BREVO_API_KEY, EMAIL_EXPEDITEUR, TURNSTILE_SECRET), hooks et téléphone (§2.8) ;
+    §2.9 : APP_URL, ORIGINES_AUTORISEES, BREVO_API_KEY, EMAIL_EXPEDITEUR, TURNSTILE_SECRET ; `use-access-code` ajoutée
+    à la commande de déploiement), hooks et téléphone (§2.8) ;
     vérifier sur `daara-dev` que `verify_jwt` accepte les JWT (nouvelles clés de signature) et que le CORS ne répond
     qu'aux origines de l'application (en local, Kong ajoute un CORS ouvert).
   - CI : job `edge` jamais exécuté sur GitHub → vérifier le premier run (image Docker Deno épinglée par empreinte).
@@ -134,6 +135,32 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-09 — S2.6 Réinitialisation assistée (ADR-006 niveau 2)
+- Décisions (validées) : D1 la personne visée n'est admin dans aucune daara (ni super-admin) ; D2 risque résiduel
+  accepté (l'admin peut utiliser lui-même le code : sessions révoquées, journal, e-mail, TOTP jamais contourné), ADR-006.
+- Migration `codes_acces` : table (haché SHA-256 lié au compte, illisible et hors journal ; un code actif par compte
+  toutes daaras confondues), `creer_code_acces` (admin aal2, daara active, cible active autre que soi ; code `XXXX-XXXX`
+  sur 32 symboles, 40 bits ; verrou par compte), `consommer_code_acces(p_identifiant, p_code)` (service_role ; compte
+  retrouvé par la base ; 5 essais ; refus si membre désactivé ou devenu admin, auteur plus admin, daara suspendue ;
+  auteur = le membre). LLD corrigé (signature). 52 tests pgTAP (429 au total).
+- Edge Function `use-access-code` (Turnstile, réponse neutre `code_invalide`, `updateUserById` qui révoque les sessions,
+  e-mail de notification fr / en sans lien) ; 7 tests Deno de plus (34).
+- Front : Membres → « Réinitialiser l'accès » (membres actifs non admin ; confirmation ; modale avec le code affiché une
+  fois, Copier, WhatsApp) ; `/auth/code-acces` (identifiant, code, nouveau mot de passe, Turnstile → invitation à se
+  connecter) ; lien depuis la connexion.
+- Vérifié contre le runtime local : admin aal2 (TOTP calculé) → code → mauvais code / compte inconnu / rejeu →
+  `code_invalide` ; bon code → ancienne session refusée au rafraîchissement, ancien mot de passe refusé, nouveau OK,
+  e-mail reçu dans Mailpit, journal sans haché. Navigateur : page `/auth/code-acces` (succès, sombre, 375 px sans
+  débordement). Modale de l'admin vérifiée par les tests unitaires seulement. Piège : une nouvelle Edge Function n'est
+  servie qu'après `supabase stop` / `start` (redémarrer le conteneur ne suffit pas).
+- Audits : sécurité (0 critique, 0 important, 4 mineurs) et RLS (0 critique, 0 important, 4 mineurs), corrigés : mot de
+  passe accepté par la fonction mais refusé par Auth (lettre ASCII, 72 octets, aussi à l'inscription), création
+  concurrente par deux daaras (verrou), haché des codes exclu de la sauvegarde, super-admin non ciblable, message de
+  refus générique, LLD aligné ; acceptés et documentés (ADR-006) : oracle « admin ailleurs », code annulé par une autre
+  daara, code invalidable par un tiers (5 essais Turnstile). 12 cas pgTAP ajoutés. L'auditeur RLS a respecté le
+  garde-fou de transaction.
+- 209 tests unitaires ; chargement initial 149,3 kB transférés.
+
 ### 2026-10-09 — S2.5c Invitations : front
 - Connexion « E-mail ou téléphone » (`core/auth/identifiant.ts` : +221 par défaut pour 9 chiffres, même règle que les
   Edge Functions) ; `AuthService.connecter(identifiant)`, `accepterInvitation`, retour vers `/invitation` après

@@ -12,7 +12,8 @@ export const motDePasseValidateur: ValidatorFn = (controle: AbstractControl<stri
     if (!valeur) {
         return null;
     }
-    return valeur.length >= 8 && /\p{L}/u.test(valeur) && /\d/.test(valeur) ? null : { motDePasse: true };
+    // Lettre ASCII (règle `letters_digits` d'Auth) ; 72 octets au plus (bcrypt).
+    return valeur.length >= 8 && new TextEncoder().encode(valeur).length <= 72 && /[A-Za-z]/.test(valeur) && /\d/.test(valeur) ? null : { motDePasse: true };
 };
 
 /** Code à 6 chiffres (e-mail ou application d'authentification). */
@@ -23,6 +24,21 @@ export const codeValidateur: ValidatorFn = (controle: AbstractControl<string | n
     }
     return /^\d{6}$/.test(valeur) ? null : { code: true };
 };
+
+/** Code d'accès remis par l'admin (S2.6) : 8 caractères sans 0 / O / 1 / I, tiret et espaces tolérés. */
+export const codeAccesValidateur: ValidatorFn = (controle: AbstractControl<string | null>): ValidationErrors | null => {
+    const valeur = controle.value ?? '';
+    if (!valeur) {
+        return null;
+    }
+    return normaliserCodeAcces(valeur) ? null : { codeAcces: true };
+};
+
+/** Code d'accès normalisé (majuscules, sans tiret ni espace), ou null s'il est invalide. */
+export function normaliserCodeAcces(valeur: string): string | null {
+    const code = valeur.replace(/[\s-]/g, '').toUpperCase();
+    return /^[A-HJ-NP-Z2-9]{8}$/.test(code) ? code : null;
+}
 
 /** Identique au champ « confirmation » d'un autre contrôle du même groupe. */
 export function identiqueA(nomAutre: string): ValidatorFn {

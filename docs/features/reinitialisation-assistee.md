@@ -37,5 +37,16 @@ code annulé ; code haché) ; `consommer_code_acces` (service_role seulement ; 5
 Deno : validation, réponse neutre, contrôle Turnstile.
 Manuel : parcours complet avec un compte téléphone (ADR-009), sessions révoquées sur un second navigateur.
 
+## Réalisation (S2.6, 2026-10-09)
+- Migration `codes_acces` ; `consommer_code_acces(p_identifiant, p_code)` prend l'identifiant (la base retrouve le
+  compte) au lieu de `p_user` (LLD corrigé). Code `XXXX-XXXX` sur 32 symboles (A-Z sans I ni O, 2-9), saisie
+  normalisée (minuscules, espaces, tiret acceptés).
+- Décisions D1 (non admin dans aucune daara, ni super-admin) et D2 (risque résiduel accepté) : ADR-006, avec les
+  conséquences acceptées (code unique par compte toutes daaras confondues, code invalidable par un tiers).
+- Mot de passe : lettre ASCII exigée et 72 octets au plus (comme Auth), sinon un code serait consommé pour un mot de
+  passe refusé ensuite. Haché des codes exclu de la sauvegarde nocturne.
+- Écart : après le changement, l'écran invite à se connecter (pas de connexion automatique : aucun mot de passe gardé
+  en mémoire, et le TOTP éventuel est demandé normalement).
+
 ## Hors périmètre
 Envoi automatique du code par SMS / WhatsApp (offre payante, ADR-006 §5).

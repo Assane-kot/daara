@@ -40,7 +40,8 @@
         "parametres_general": "Paramètres généraux",
         "membres": "Membres",
         "invitation": "Invitation",
-        "invitations": "Invitations"
+        "invitations": "Invitations",
+        "code_acces": "Code de votre daara"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -67,7 +68,8 @@
             "code": "Saisissez les 6 chiffres du code.",
             "different": "Les deux mots de passe ne sont pas identiques.",
             "slug": "Lettres minuscules, chiffres et tirets uniquement (3 à 50 caractères).",
-            "identifiant": "Saisissez une adresse e-mail ou un numéro de téléphone valide."
+            "identifiant": "Saisissez une adresse e-mail ou un numéro de téléphone valide.",
+            "code_acces": "Saisissez les 8 caractères du code (par exemple ABCD-EFGH)."
         },
         "code": {
             "chiffre": "Chiffre {{n}} sur 6"
@@ -182,6 +184,26 @@
             "session_expiree": "Votre session a expiré. Reconnectez-vous.",
             "reseau": "Connexion impossible au serveur. Vérifiez votre connexion Internet.",
             "inattendue": "Une erreur inattendue est survenue. Réessayez."
+        },
+        "code_acces": {
+            "surtitre": "Accès",
+            "titre": "Code de votre daara",
+            "intro": "Saisissez le code remis par l’administrateur de votre daara, puis choisissez votre nouveau mot de passe.",
+            "code": "Code d’accès",
+            "aide_code": "8 caractères, par exemple ABCD-EFGH.",
+            "bouton": "Changer mon mot de passe",
+            "succes_titre": "Mot de passe changé",
+            "succes_message": "Connectez-vous avec votre nouveau mot de passe. Vos autres sessions ont été fermées.",
+            "se_connecter": "Se connecter",
+            "lien": "Vous avez un code de votre daara ?",
+            "retour": "Retour à la connexion",
+            "erreurs": {
+                "code_invalide": "Code invalide ou expiré. Vérifiez votre identifiant et le code, ou demandez un nouveau code à votre daara.",
+                "mot_de_passe_faible": "8 caractères minimum, avec au moins une lettre et un chiffre.",
+                "captcha": "La vérification anti-robot a échoué. Réessayez.",
+                "reseau": "Connexion impossible. Vérifiez votre réseau et réessayez.",
+                "inattendue": "Le mot de passe n’a pas pu être changé. Réessayez ou demandez un nouveau code à votre daara."
+            }
         }
     },
     "onboarding": {
@@ -369,7 +391,8 @@
             "passer_en": "Passer en {{role}}",
             "desactiver": "Désactiver",
             "reactiver": "Réactiver",
-            "confirmer_role": "Changer le rôle"
+            "confirmer_role": "Changer le rôle",
+            "reinitialiser": "Réinitialiser l’accès"
         },
         "confirmer": {
             "role_titre": "{{nom}} : passer en {{role}} ?",
@@ -378,7 +401,10 @@
             "retrograder_soi_message": "Vous perdrez vos droits d’administration de la daara et quitterez cet écran.",
             "desactiver_titre": "Désactiver {{nom}} ({{role}}) ?",
             "desactiver_message": "Le membre perd immédiatement l’accès à la daara. Ses données sont conservées ; vous pourrez le réactiver.",
-            "desactiver_soi_message": "Vous perdrez immédiatement l’accès à cet espace. Un autre administrateur pourra vous réactiver."
+            "desactiver_soi_message": "Vous perdrez immédiatement l’accès à cet espace. Un autre administrateur pourra vous réactiver.",
+            "code_titre": "Réinitialiser l’accès de {{nom}} ?",
+            "code_message": "Un code d’accès valable 24 h va être créé ; un code précédent sera annulé. {{nom}} l’utilisera pour choisir un nouveau mot de passe, et ses sessions ouvertes seront fermées.",
+            "code_bouton": "Créer le code"
         },
         "succes": {
             "role": "{{nom}} est maintenant {{role}}.",
@@ -391,11 +417,21 @@
             "dernier_admin": "La daara doit garder au moins un administrateur actif : nommez-en un autre d’abord.",
             "role_deja_attribue": "Cette personne a déjà ce rôle dans la daara.",
             "role_invalide": "Ce rôle ne peut pas être attribué ici.",
-            "inattendue": "L’action a échoué. Réessayez."
+            "inattendue": "L’action a échoué. Réessayez.",
+            "code_cible": "Cette personne ne peut pas recevoir de code d’accès."
         },
         "onglets": {
             "membres": "Membres",
             "invitations": "Invitations"
+        },
+        "code": {
+            "titre": "Code d’accès de {{nom}}",
+            "intro": "Transmettez ce code à {{nom}} par WhatsApp ou de vive voix. Il ne sera plus affiché.",
+            "validite": "Valable 24 h, une seule fois, sur la page « Vous avez un code de votre daara ? » de l’écran de connexion.",
+            "copier": "Copier le code",
+            "copie": "Code copié",
+            "whatsapp": "Envoyer par WhatsApp",
+            "message": "Votre code d’accès DAARA : {{code}} (valable 24 h). Choisissez votre nouveau mot de passe ici : {{lien}}"
         }
     },
     "invitations": {

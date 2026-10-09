@@ -2,13 +2,15 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { provideTranslateTesting } from '../../../../../testing/translate-testing';
 import { ConfirmDialogService } from '../../../../shared/ui/confirm-dialog/confirm-dialog.service';
+import { CodeAccesDialogService } from '../../components/code-acces-dialog';
 import { ErreurMembres, Membre, MembresService } from '../../data/membres.service';
 import { MembresPage } from './membres-page';
 
 describe('MembresPage', () => {
     let fixture: ComponentFixture<MembresPage>;
     let element: HTMLElement;
-    const service = { lister: vi.fn(), changerRole: vi.fn(), definirActif: vi.fn() };
+    const service = { lister: vi.fn(), changerRole: vi.fn(), definirActif: vi.fn(), creerCodeAcces: vi.fn() };
+    const codeAcces = { ouvrir: vi.fn() };
     const confirmation = { confirmer: vi.fn() };
 
     const m = (id: string, nom: string, role: Membre['role'], actif = true, moi = false): Membre => ({
@@ -56,6 +58,7 @@ describe('MembresPage', () => {
                 provideRouter([]),
                 { provide: MembresService, useValue: service },
                 { provide: ConfirmDialogService, useValue: confirmation },
+                { provide: CodeAccesDialogService, useValue: codeAcces },
             ],
         });
         fixture = TestBed.createComponent(MembresPage);
@@ -106,7 +109,30 @@ describe('MembresPage', () => {
 
     it('menu : rôles proposés autres que le rôle actuel, puis désactiver', async () => {
         const entrees = await menu('Ibou Sarr');
-        expect(entrees.map((e) => e.textContent!.trim())).toEqual(['Passer en Administrateur', 'Passer en Parent', 'Désactiver']);
+        expect(entrees.map((e) => e.textContent!.trim())).toEqual(['Passer en Administrateur', 'Passer en Parent', 'Réinitialiser l’accès', 'Désactiver']);
+    });
+
+    it('réinitialiser l’accès : confirmation, code créé puis affiché dans la modale', async () => {
+        confirmation.confirmer.mockResolvedValue(true);
+        service.creerCodeAcces.mockResolvedValue('ABCD-EFGH');
+        const entrees = await menu('Élodie Faye');
+        entrees.find((e) => e.textContent!.includes('Réinitialiser'))!.click();
+        await fixture.whenStable();
+
+        expect(service.creerCodeAcces).toHaveBeenCalledWith(membres[3]);
+        expect(codeAcces.ouvrir).toHaveBeenCalledWith({ nom: 'Élodie Faye', code: 'ABCD-EFGH', telephone: null });
+    });
+
+    it('réinitialiser l’accès : refus de la base affiché, jamais pour soi-même', async () => {
+        confirmation.confirmer.mockResolvedValue(true);
+        service.creerCodeAcces.mockRejectedValue(new ErreurMembres('membres.erreurs.code_cible'));
+        (await menu('Élodie Faye')).find((e) => e.textContent!.includes('Réinitialiser'))!.click();
+        await fixture.whenStable();
+        expect(element.querySelector('[role=alert]')?.textContent).toContain('ne peut pas recevoir de code d’accès');
+        expect(codeAcces.ouvrir).not.toHaveBeenCalled();
+
+        document.querySelectorAll('.cdk-overlay-container').forEach((e) => (e.innerHTML = ''));
+        expect((await menu('Awa Diop')).some((e) => e.textContent!.includes('Réinitialiser'))).toBe(false);
     });
 
     it('passer en parent : sans confirmation, message de succès, liste rechargée', async () => {

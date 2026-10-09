@@ -80,7 +80,21 @@ export function jeton(valeur: unknown): string | null {
     return typeof valeur === 'string' && JETON.test(valeur) ? valeur : null;
 }
 
-/** Mot de passe DAARA (ADR-006) : 8 à 72 caractères (limite bcrypt), au moins une lettre et un chiffre. */
+/** Code d'accès (S2.6) : majuscules, sans espaces ni tirets ; 8 caractères de l'alphabet sans 0 / O / 1 / I. */
+export function codeAcces(valeur: unknown): string | null {
+    if (typeof valeur !== 'string') {
+        return null;
+    }
+    const c = valeur.replace(/[\s-]/g, '').toUpperCase();
+    return /^[A-HJ-NP-Z2-9]{8}$/.test(c) ? c : null;
+}
+
+/**
+ * Mot de passe DAARA (ADR-006) : 8 caractères au moins, 72 octets au plus (limite bcrypt), une lettre ASCII et un chiffre
+ * (règle `letters_digits` d'Auth : sinon un code d'accès serait consommé pour un mot de passe qu'Auth refuse).
+ */
 export function motDePasse(valeur: unknown): string | null {
-    return typeof valeur === 'string' && valeur.length >= 8 && valeur.length <= 72 && /\p{L}/u.test(valeur) && /[0-9]/.test(valeur) ? valeur : null;
+    return typeof valeur === 'string' && valeur.length >= 8 && new TextEncoder().encode(valeur).length <= 72 && /[A-Za-z]/.test(valeur) && /[0-9]/.test(valeur)
+        ? valeur
+        : null;
 }

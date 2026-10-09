@@ -88,6 +88,18 @@ export class MembresService {
         await this.apres(membre, error);
     }
 
+    /**
+     * Code d'accès pour un membre actif non admin (S2.6, RPC `creer_code_acces`) : renvoyé en clair une seule fois
+     * (`XXXX-XXXX`), le précédent est annulé.
+     */
+    async creerCodeAcces(membre: Membre): Promise<string> {
+        const { data, error } = await this.sb.rpc('creer_code_acces', { p_membership: membre.id });
+        if (error || !data) {
+            throw error?.code === '22023' ? new ErreurMembres('membres.erreurs.code_cible') : erreurMembres(error ?? {});
+        }
+        return data;
+    }
+
     /** Ses propres rôles ont changé : menus et guards suivent (un admin qui se retire perd l'écran). */
     private async apres(membre: Membre, error: { code?: string; message?: string } | null): Promise<void> {
         if (error) {

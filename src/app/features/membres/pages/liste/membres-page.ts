@@ -12,6 +12,7 @@ import { Badge, BadgeVariante } from '../../../../shared/ui/badge/badge';
 import { ConfirmDialogService } from '../../../../shared/ui/confirm-dialog/confirm-dialog.service';
 import { EmptyState } from '../../../../shared/ui/empty-state/empty-state';
 import { Skeleton } from '../../../../shared/ui/skeleton/skeleton';
+import { CodeAccesDialogService } from '../../components/code-acces-dialog';
 import { ErreurMembres, Membre, MembresService, ROLES_ATTRIBUABLES } from '../../data/membres.service';
 
 export type FiltreEtat = 'actifs' | 'desactives' | 'tous';
@@ -32,6 +33,7 @@ export const VARIANTE_ROLE: Record<RoleMembre, BadgeVariante> = { admin: 'second
 export class MembresPage implements OnInit {
     private readonly service = inject(MembresService);
     private readonly confirmation = inject(ConfirmDialogService);
+    private readonly codeAcces = inject(CodeAccesDialogService);
     private readonly translate = inject(TranslateService);
     private readonly router = inject(Router);
     private readonly langue = inject(LanguageService).langue;
@@ -89,6 +91,36 @@ export class MembresPage implements OnInit {
     /** Rôles proposés pour un membre : les rôles attribuables autres que le sien (aucun pour un apprenant). */
     protected rolesPossibles(membre: Membre): readonly RoleMembre[] {
         return membre.role === 'apprenant' ? [] : ROLES_ATTRIBUABLES.filter((r) => r !== membre.role);
+    }
+
+    /** Réinitialisation assistée (S2.6) : membre actif, autre que soi, sans rôle admin dans la daara (la base revérifie). */
+    protected reinitialisable(membre: Membre): boolean {
+        return (
+            membre.actif && !membre.moi && membre.role !== 'admin' && !this.membres().some((m) => m.userId === membre.userId && m.role === 'admin' && m.actif)
+        );
+    }
+
+    protected async reinitialiser(membre: Membre): Promise<void> {
+        const params = { nom: this.nom(membre) };
+        const confirme = await this.confirmation.confirmer({
+            titre: this.translate.instant('membres.confirmer.code_titre', params),
+            message: this.translate.instant('membres.confirmer.code_message', params),
+            libelleConfirmer: this.translate.instant('membres.confirmer.code_bouton'),
+        });
+        if (!confirme) {
+            return;
+        }
+        this.enCours.set(membre.id);
+        this.erreur.set(null);
+        this.succes.set(null);
+        try {
+            const code = await this.service.creerCodeAcces(membre);
+            void this.codeAcces.ouvrir({ nom: params.nom, code, telephone: membre.telephone });
+        } catch (erreur) {
+            this.erreur.set(erreur instanceof ErreurMembres ? erreur.cle : 'membres.erreurs.inattendue');
+        } finally {
+            this.enCours.set(null);
+        }
     }
 
     protected async changerRole(membre: Membre, role: RoleMembre): Promise<void> {

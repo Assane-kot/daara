@@ -232,13 +232,15 @@ Objectif : connexion téléphone + mot de passe, **aucune** inscription publique
    Supabase : ne pas les créer.
 2. Déploiement (après `db push`) :
    ```powershell
-   npx supabase functions deploy invite-member invitation-apercu accept-invitation --project-ref <ref>
+   npx supabase functions deploy invite-member invitation-apercu accept-invitation use-access-code --project-ref <ref>
    ```
-   Les réglages `verify_jwt` sont lus dans `supabase/config.toml` (invite-member : JWT exigé ; les deux autres : publiques).
+   Les réglages `verify_jwt` sont lus dans `supabase/config.toml` (invite-member : JWT exigé ; les autres : publiques, protégées par Turnstile ou par le jeton).
 3. Vérifier sur `daara-dev` :
    - `OPTIONS` vers une fonction avec `Origin: https://exemple.invalide` → **pas** d'en-tête `Access-Control-Allow-Origin` ;
    - invitation par e-mail → e-mail reçu (Brevo), lien `/invitation#…` ;
-   - invitation par téléphone → acceptation → connexion par téléphone (S2.5c).
+   - invitation par téléphone → acceptation → connexion par téléphone (S2.5c) ;
+   - code d'accès (S2.6) : Membres → « Réinitialiser l'accès » → `/auth/code-acces` → mot de passe changé, ancienne
+     session fermée, e-mail de notification reçu si le compte a une adresse.
 
 ## 3. En-têtes de sécurité (`public/_headers`)
 

@@ -1,0 +1,98 @@
+<div class="auth-carte">
+    <p class="auth-surtitre">{{ 'auth.code_acces.surtitre' | translate }}</p>
+
+    @if (succes()) {
+        <h1 class="auth-titre">{{ 'auth.code_acces.succes_titre' | translate }}</h1>
+        <p class="auth-intro" role="status">{{ 'auth.code_acces.succes_message' | translate }}</p>
+        <a class="btn-auth" routerLink="/auth/connexion">{{ 'auth.code_acces.se_connecter' | translate }}</a>
+    } @else {
+        <h1 class="auth-titre">{{ 'auth.code_acces.titre' | translate }}</h1>
+        <p class="auth-intro">{{ 'auth.code_acces.intro' | translate }}</p>
+
+        <form class="auth-form" [formGroup]="form" (ngSubmit)="valider()" novalidate>
+            <app-form-field [label]="'auth.champs.identifiant' | translate" [aide]="'auth.champs.aide_identifiant' | translate">
+                <div class="auth-champ-icone">
+                    <icon-mail />
+                    <input
+                        appFormControl
+                        class="form-input"
+                        type="text"
+                        formControlName="identifiant"
+                        autocomplete="username"
+                        autocapitalize="none"
+                        spellcheck="false"
+                    />
+                </div>
+            </app-form-field>
+
+            <app-form-field [label]="'auth.code_acces.code' | translate" [aide]="'auth.code_acces.aide_code' | translate">
+                <input
+                    appFormControl
+                    class="form-input font-mono tracking-widest uppercase"
+                    type="text"
+                    formControlName="code"
+                    autocomplete="one-time-code"
+                    autocapitalize="characters"
+                    spellcheck="false"
+                    maxlength="12"
+                />
+            </app-form-field>
+
+            <app-form-field [label]="'auth.champs.nouveau_mot_de_passe' | translate" [aide]="'auth.champs.aide_mot_de_passe' | translate">
+                <div class="auth-champ-icone">
+                    <icon-lock-dots />
+                    <input
+                        appFormControl
+                        class="form-input pr-12"
+                        [type]="voirMotDePasse() ? 'text' : 'password'"
+                        formControlName="motDePasse"
+                        autocomplete="new-password"
+                    />
+                    <button
+                        type="button"
+                        class="auth-voir"
+                        [attr.aria-label]="(voirMotDePasse() ? 'auth.champs.masquer_mot_de_passe' : 'auth.champs.afficher_mot_de_passe') | translate"
+                        [attr.aria-pressed]="voirMotDePasse()"
+                        (click)="voirMotDePasse.set(!voirMotDePasse())"
+                    >
+                        @if (voirMotDePasse()) {
+                            <icon-eye-off class="h-[18px] w-[18px]" />
+                        } @else {
+                            <icon-eye class="h-[18px] w-[18px]" />
+                        }
+                    </button>
+                </div>
+            </app-form-field>
+
+            <app-form-field [label]="'auth.champs.confirmation_mot_de_passe' | translate">
+                <div class="auth-champ-icone">
+                    <icon-lock-dots />
+                    <input
+                        appFormControl
+                        class="form-input"
+                        [type]="voirMotDePasse() ? 'text' : 'password'"
+                        formControlName="confirmation"
+                        autocomplete="new-password"
+                    />
+                </div>
+            </app-form-field>
+
+            <app-turnstile (jeton)="captcha.set($event)" />
+
+            @if (erreur(); as erreur) {
+                <div class="auth-erreur" role="alert">{{ erreur | translate }}</div>
+            }
+
+            <button class="btn-auth" type="submit" [disabled]="envoi()">
+                @if (envoi()) {
+                    <span class="auth-spinner" aria-hidden="true"></span>
+                }
+                {{ 'auth.code_acces.bouton' | translate }}
+            </button>
+        </form>
+
+        <p class="auth-bas">
+            <a class="auth-lien" routerLink="/auth/connexion">{{ 'auth.code_acces.retour' | translate }}</a>
+        </p>
+    }
+</div>

@@ -53,6 +53,29 @@ export function courrielInvitation(email: string, d: DonneesInvitation): Courrie
     return { a: email, sujet: t.sujet(daara), texte, html };
 }
 
+const TEXTES_CODE = {
+    fr: {
+        sujet: 'Votre mot de passe DAARA a été changé',
+        corps: 'Le mot de passe de votre compte DAARA vient d’être changé avec un code d’accès remis par votre daara. Vos autres sessions ont été fermées.',
+        alerte: 'Si vous n’êtes pas à l’origine de ce changement, contactez votre daara sans attendre.',
+    },
+    en: {
+        sujet: 'Your DAARA password has been changed',
+        corps: 'The password of your DAARA account has just been changed with an access code given by your daara. Your other sessions have been signed out.',
+        alerte: 'If you did not make this change, contact your daara right away.',
+    },
+} as const;
+
+/** Notification après une réinitialisation par code d'accès (S2.6, ADR-006 niveau 2). Aucune donnée saisie par un tiers. */
+export function courrielMotDePasseChange(email: string, langue: Langue): Courriel {
+    const t = TEXTES_CODE[langue];
+    const html = `<!doctype html><html lang="${langue}"><body style="font-family:Arial,sans-serif;color:#1f2937;line-height:1.5">
+<p>${echapperHtml(t.corps)}</p>
+<p><strong>${echapperHtml(t.alerte)}</strong></p>
+</body></html>`;
+    return { a: email, sujet: t.sujet, texte: `${t.corps}\n\n${t.alerte}\n`, html };
+}
+
 /** Message WhatsApp pré-rempli (lien `wa.me` construit par le front). */
 export function messageWhatsapp(d: DonneesInvitation): string {
     const t = TEXTES[d.langue];

@@ -166,6 +166,16 @@
                     </button>
                 }
             }
+            @if (reinitialisable(membre)) {
+                <button
+                    cdkMenuItem
+                    type="button"
+                    class="flex min-h-11 w-full items-center rounded-md px-3 text-left font-semibold hover:bg-primary/10 hover:text-primary focus:bg-primary/10"
+                    (cdkMenuItemTriggered)="reinitialiser(membre)"
+                >
+                    {{ 'membres.actions.reinitialiser' | translate }}
+                </button>
+            }
             <button
                 cdkMenuItem
                 type="button"
