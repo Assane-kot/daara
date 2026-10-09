@@ -47,7 +47,8 @@
         "compte_profil": "My profile",
         "compte_mot_de_passe": "Password",
         "compte_securite": "Account security",
-        "structure_annees": "School years"
+        "structure_annees": "School years",
+        "structure_matieres": "Subjects"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -606,7 +607,8 @@
     "structure": {
         "titre": "School structure",
         "onglets": {
-            "annees": "Years"
+            "annees": "Years",
+            "matieres": "Subjects"
         },
         "enregistrer": "Save",
         "modifier": "Edit",
@@ -660,7 +662,7 @@
         "erreurs": {
             "chargement": "The school structure could not be loaded.",
             "droits": "Only an administrator who confirmed their identity can change the structure.",
-            "doublon": "This label or order is already used.",
+            "doublon": "This value is already used (label, name, code or order).",
             "dates": "The end date must follow the start date (a year lasts 18 months at most).",
             "donnee_invalide": "A value is invalid.",
             "periode_hors_annee": "Terms must stay within the dates of the year.",
@@ -668,7 +670,32 @@
             "annee_active": "The active year cannot be deleted: make another year active first.",
             "autre_daara": "Item from another daara.",
             "inattendue": "The action failed. Try again.",
-            "periode_cloturee": "Closed term: reopen it before editing or deleting it."
+            "periode_cloturee": "Closed term: reopen it before editing or deleting it.",
+            "utilisee": "Item used elsewhere (for example a subject taught in a class): archive it instead."
+        },
+        "matieres": {
+            "nouvelle": "New subject",
+            "modifier": "Edit the subject",
+            "nom": "Name",
+            "code": "Code",
+            "aide_code": "Short and unique: letters, digits, hyphen (e.g. MATH, AR, COR).",
+            "type": "Type",
+            "types": {
+                "scolaire": "School",
+                "coran": "Quran",
+                "religieux": "Religious"
+            },
+            "voir_archivees": "Show archived subjects",
+            "archivee": "Archived",
+            "archiver": "Archive",
+            "desarchiver": "Unarchive",
+            "archivee_ok": "Subject archived: it is no longer offered in classes.",
+            "desarchivee": "Subject unarchived.",
+            "supprimee": "Subject deleted.",
+            "confirmer_suppression": "Delete the subject {{nom}}?",
+            "confirmer_suppression_message": "It will be removed from the catalogue. A subject used in a class cannot be deleted: archive it.",
+            "vide_titre": "No subject",
+            "vide_message": "Create the subjects taught in your daara (school, Quran, religious)."
         }
     }
 }

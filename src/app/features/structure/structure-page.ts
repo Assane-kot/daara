@@ -1,16 +1,23 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { CurrentDaaraService } from '../../core/daara/current-daara.service';
+import { RoleMembre } from '../../core/daara/daara.model';
 import { PageHeader } from '../../shared/ui/page-header/page-header';
 
-/** Onglets de la structure scolaire (sprint 3) : Années (S3.1) ; Matières (S3.2) et Classes (S3.3) à venir. */
+const ONGLETS: readonly { route: string; cle: string; roles: readonly RoleMembre[] }[] = [
+    { route: 'annees', cle: 'structure.onglets.annees', roles: ['admin'] },
+    { route: 'matieres', cle: 'structure.onglets.matieres', roles: ['admin', 'enseignant'] },
+];
+
+/** Onglets de la structure scolaire (sprint 3) filtrés par rôle : Années (S3.1, admin), Matières (S3.2) ; Classes (S3.3). */
 @Component({
     selector: 'app-structure-page',
     imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, PageHeader],
     template: `
         <app-page-header [titre]="'structure.titre' | translate" />
         <nav class="mb-5 flex gap-2 overflow-x-auto border-b border-white-light dark:border-night-border" [attr.aria-label]="'structure.titre' | translate">
-            @for (onglet of onglets; track onglet.route) {
+            @for (onglet of onglets(); track onglet.route) {
                 <a
                     [routerLink]="onglet.route"
                     routerLinkActive="border-primary! text-primary"
@@ -26,5 +33,6 @@ import { PageHeader } from '../../shared/ui/page-header/page-header';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StructurePage {
-    protected readonly onglets = [{ route: 'annees', cle: 'structure.onglets.annees' }] as const;
+    private readonly courante = inject(CurrentDaaraService);
+    protected readonly onglets = computed(() => ONGLETS.filter((o) => o.roles.some((r) => this.courante.roles().includes(r))));
 }

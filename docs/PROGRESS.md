@@ -12,7 +12,9 @@
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
-- Sprint 3 — Structure scolaire : S3.0 (conception) et S3.1 (années, périodes) faits. Suivante : S3.2 matières.
+- Sprint 3 — Structure scolaire : S3.0 (conception), S3.1 (années, périodes) et S3.2 (matières) faits. Suivante :
+  S3.3 classes et affectations. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+  sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -63,6 +65,13 @@
     vérifier sur `daara-dev` que `verify_jwt` accepte les JWT (nouvelles clés de signature) et que le CORS ne répond
     qu'aux origines de l'application (en local, Kong ajoute un CORS ouvert).
   - CI : job `edge` jamais exécuté sur GitHub → vérifier le premier run (image Docker Deno épinglée par empreinte).
+  - À l'audit de fin de sprint 3 (audits par story arrêtés à partir de S3.2, décision du développeur du 2026-10-09) :
+    - audit RLS de S3.2 non fait (interrompu) ; audits complets de S3.3 et S3.4 ;
+    - libellés des années et périodes (S3.1) : forme NFC et espace insécable en tête / fin acceptés, comme corrigé pour
+      `matieres` (S3.2) ; `id` choisi par le client à l'insertion (`annees_scolaires`, `periodes`) ;
+    - S3.3 : refuser en base l'affectation d'une matière archivée (trigger de `classe_matieres`, droits en tête) ;
+    - tests pgTAP de `matieres` à compléter : suppression par l'enseignant, admin aal1 en update / delete, parent,
+      module désactivé en update / delete.
   - Audit RLS S3.1 (2026-10-09) : la contrainte « caractères interdits » du socle (`daaras`, `profiles`, `invitations`)
     laisse passer U+061C (marque de lettre arabe), U+034F, U+180E, U+2028, U+2029 ; `texte_sur` (S3.1) les refuse →
     aligner les contraintes du socle sur `texte_sur` dans une migration (avant les libellés en arabe).
@@ -95,6 +104,10 @@
    tag `s1` sur `develop`.
 3. Sprint 2 : planification faite (2026-10-04). Commencer par S2.0 (spike téléphone sans SMS → ADR-009 confirmé ou
    alternative présentée au développeur), puis S2.1 à S2.7 dans l'ordre, un commit par story.
+
+### Décision de méthode (2026-10-09)
+- Audits `auditeur-securite` et `auditeur-rls` en **fin de sprint** sur l'ensemble des stories, plus après chaque story
+  (économie de tokens) ; par story : tests, vérification dans le navigateur, commit. CLAUDE.md (étape 5) mis à jour.
 
 ### Décisions de planification du sprint 3 (validées le 2026-10-09)
 - Découpage : S3.0 conception, S3.1 années et périodes, S3.2 matières, S3.3 classes et affectations, S3.4 `data-table`
@@ -157,6 +170,22 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-09 — S3.2 Matières
+- Migration `matieres` (module `structure`) : enum `type_matiere`, table `matieres` (nom NFC sans blanc autour, unique
+  sans casse ni formes compatibles ; code `^[A-Z0-9_-]{1,10}$` unique ; archivage), `daara_id_immuable` (trigger
+  réutilisable), journal, droits par colonne (`created_by` illisible, `id` et `daara_id` non choisis / modifiés par le
+  client), politiques admin aal2 + module ; `texte_sur` complétée (caractères Hangul invisibles). 25 tests pgTAP (519).
+- Front : onglet Matières (code proposé à partir du nom, création, modification, archivage, suppression d'une matière
+  inutilisée, « Afficher les archivées ») ; Structure ouverte à l'enseignant en lecture seule (menu, onglets filtrés par
+  rôle, Années réservées à l'admin) ; redirection par défaut vers Matières (une redirection s'évalue avant les guards :
+  les rôles ne sont pas encore chargés).
+- Vérifié dans le navigateur : admin (code « EDUC » proposé, doublon refusé dans la modale, archivage) ; enseignant
+  (onglet Matières seul, aucune action).
+- Audit sécurité (fait avant la décision de reporter les audits) : 0 critique, 0 important ; corrigés : noms
+  indiscernables (NFD, espace insécable, Hangul), `id` choisi par le client ; reportés à l'audit de fin de sprint (voir
+  « Problèmes ouverts »).
+- 234 tests unitaires ; chargement initial 150,6 kB transférés.
+
 ### 2026-10-09 — S3.1 Années scolaires et périodes
 - Migration `annees_periodes` (module `structure`) : `texte_sur` (texte affichable, réutilisé par la suite),
   `annees_scolaires` (libellé unique, 18 mois au plus, une seule active, `active` hors des droits), `periodes` (ordre

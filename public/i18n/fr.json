@@ -47,7 +47,8 @@
         "compte_profil": "Mon profil",
         "compte_mot_de_passe": "Mot de passe",
         "compte_securite": "Sécurité du compte",
-        "structure_annees": "Années scolaires"
+        "structure_annees": "Années scolaires",
+        "structure_matieres": "Matières"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -606,7 +607,8 @@
     "structure": {
         "titre": "Structure scolaire",
         "onglets": {
-            "annees": "Années"
+            "annees": "Années",
+            "matieres": "Matières"
         },
         "enregistrer": "Enregistrer",
         "modifier": "Modifier",
@@ -660,7 +662,7 @@
         "erreurs": {
             "chargement": "La structure scolaire n’a pas pu être chargée.",
             "droits": "Seul un administrateur ayant confirmé son identité peut modifier la structure.",
-            "doublon": "Ce libellé ou cet ordre est déjà utilisé.",
+            "doublon": "Cette valeur est déjà utilisée (libellé, nom, code ou ordre).",
             "dates": "La date de fin doit suivre la date de début (une année dure 18 mois au plus).",
             "donnee_invalide": "Une valeur saisie est invalide.",
             "periode_hors_annee": "Les périodes doivent rester dans les dates de l’année.",
@@ -668,7 +670,32 @@
             "annee_active": "L’année active ne peut pas être supprimée : rendez d’abord une autre année active.",
             "autre_daara": "Élément d’une autre daara.",
             "inattendue": "L’action a échoué. Réessayez.",
-            "periode_cloturee": "Période clôturée : rouvrez-la avant de la modifier ou de la supprimer."
+            "periode_cloturee": "Période clôturée : rouvrez-la avant de la modifier ou de la supprimer.",
+            "utilisee": "Élément utilisé ailleurs (par exemple une matière enseignée dans une classe) : archivez-le plutôt."
+        },
+        "matieres": {
+            "nouvelle": "Nouvelle matière",
+            "modifier": "Modifier la matière",
+            "nom": "Nom",
+            "code": "Code",
+            "aide_code": "Court et unique : lettres, chiffres, tiret (ex. MATH, AR, COR).",
+            "type": "Type",
+            "types": {
+                "scolaire": "Scolaire",
+                "coran": "Coran",
+                "religieux": "Religieux"
+            },
+            "voir_archivees": "Afficher les matières archivées",
+            "archivee": "Archivée",
+            "archiver": "Archiver",
+            "desarchiver": "Désarchiver",
+            "archivee_ok": "Matière archivée : elle n’est plus proposée dans les classes.",
+            "desarchivee": "Matière désarchivée.",
+            "supprimee": "Matière supprimée.",
+            "confirmer_suppression": "Supprimer la matière {{nom}} ?",
+            "confirmer_suppression_message": "Elle sera supprimée du catalogue. Une matière utilisée dans une classe ne peut pas être supprimée : archivez-la.",
+            "vide_titre": "Aucune matière",
+            "vide_message": "Créez les matières enseignées dans votre daara (scolaires, Coran, religieuses)."
         }
     }
 }

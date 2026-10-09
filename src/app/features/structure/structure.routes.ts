@@ -2,18 +2,28 @@ import { Routes } from '@angular/router';
 import { moduleGuard, roleGuard } from '../../core/daara/daara.guards';
 import { StructurePage } from './structure-page';
 
-/** `/d/:slug/structure` (sprint 3, module `structure`, ADR-008) : la base revérifie chaque écriture (admin aal2). */
+/**
+ * `/d/:slug/structure` (sprint 3, module `structure`, ADR-008) : admin (écriture) et enseignant (lecture) ; Années
+ * réservées à l'admin. La base revérifie chaque écriture (admin aal2).
+ */
 export const STRUCTURE_ROUTES: Routes = [
     {
         path: '',
         component: StructurePage,
-        canActivate: [moduleGuard('structure'), roleGuard(['admin'])],
+        canActivate: [moduleGuard('structure'), roleGuard(['admin', 'enseignant'])],
         children: [
-            { path: '', pathMatch: 'full', redirectTo: 'annees' },
+            // Onglet ouvert aux deux rôles (une redirection s'évalue avant les guards : rôles pas encore chargés).
+            { path: '', pathMatch: 'full', redirectTo: 'matieres' },
             {
                 path: 'annees',
                 title: 'titres.structure_annees',
+                canActivate: [roleGuard(['admin'])],
                 loadComponent: () => import('./pages/annees-page').then((m) => m.AnneesPage),
+            },
+            {
+                path: 'matieres',
+                title: 'titres.structure_matieres',
+                loadComponent: () => import('./pages/matieres-page').then((m) => m.MatieresPage),
             },
         ],
     },

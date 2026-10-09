@@ -70,7 +70,7 @@ Planification validée le 2026-10-09 (LLD §3.3, §4 ; spec `structure-scolaire.
 commit par story.
 - [x] S3.0 Conception : LLD §3.3 et §4 détaillés, spec, plan du sprint
 - [x] S3.1 Années scolaires et périodes : une année active (`activer_annee`), modèles trimestres / semestres, clôture et réouverture
-- [ ] S3.2 Matières : catalogue de la daara (code, type), archivage
+- [x] S3.2 Matières : catalogue de la daara (code, type), archivage
 - [ ] S3.3 Classes et affectations : `classes`, `classe_matieres` (coefficient, enseignant), `teaches_class`, `enseignants_daara`
 - [ ] S3.4 Composant `data-table` (pagination, tri, recherche serveur) appliqué aux matières, classes et membres (`rechercher_membres`)
 Reporté : « Préparer la rentrée » (copie de l'année précédente), avant la deuxième année des pilotes.

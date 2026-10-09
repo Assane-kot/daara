@@ -51,6 +51,8 @@ export function erreurStructure(erreur: { code?: string; message?: string } | nu
             return new ErreurStructure('structure.erreurs.droits');
         case '23505':
             return new ErreurStructure('structure.erreurs.doublon');
+        case '23503':
+            return new ErreurStructure('structure.erreurs.utilisee');
         case '23514':
             if (MESSAGES_METIER.has(message)) {
                 return new ErreurStructure(`structure.erreurs.${message}`);

@@ -35,7 +35,8 @@ Langue de travail : français. Réponses concises.
 2. Migration + RLS + tests pgTAP → `supabase db reset` + `supabase test db`.
 3. `npm run db:types` (génère et formate `src/app/core/supabase/database.types.ts`)
 4. Code Angular (skill feature-angular, composants via skill composant-vristo).
-5. Agent `auditeur-securite` (+ `auditeur-rls` si nouvelles tables) → corriger.
+5. Audits `auditeur-securite` (+ `auditeur-rls` si nouvelles tables) **en fin de sprint** (décision du 2026-10-09),
+   sur l'ensemble des stories du sprint → corriger avant la clôture.
 6. Mettre à jour `docs/PROGRESS.md`, cocher la story dans `docs/SPRINTS.md`, puis donner au développeur
    les commandes git et le message de commit.
 

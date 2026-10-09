@@ -281,6 +281,47 @@ export type Database = {
                     },
                 ];
             };
+            matieres: {
+                Row: {
+                    archivee: boolean;
+                    code: string;
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    id: string;
+                    nom: string;
+                    type: Database['public']['Enums']['type_matiere'];
+                };
+                Insert: {
+                    archivee?: boolean;
+                    code: string;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id: string;
+                    id?: string;
+                    nom: string;
+                    type?: Database['public']['Enums']['type_matiere'];
+                };
+                Update: {
+                    archivee?: boolean;
+                    code?: string;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id?: string;
+                    id?: string;
+                    nom?: string;
+                    type?: Database['public']['Enums']['type_matiere'];
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'matieres_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             memberships: {
                 Row: {
                     actif: boolean;
@@ -549,6 +590,7 @@ export type Database = {
         Enums: {
             module_daara: 'structure' | 'absences' | 'notes' | 'bulletins' | 'coran_cahier' | 'coran_recitations' | 'coran_nafar' | 'notifications';
             role_membre: 'admin' | 'enseignant' | 'parent' | 'apprenant';
+            type_matiere: 'scolaire' | 'coran' | 'religieux';
         };
         CompositeTypes: {
             [_ in never]: never;
@@ -659,6 +701,7 @@ export const Constants = {
         Enums: {
             module_daara: ['structure', 'absences', 'notes', 'bulletins', 'coran_cahier', 'coran_recitations', 'coran_nafar', 'notifications'],
             role_membre: ['admin', 'enseignant', 'parent', 'apprenant'],
+            type_matiere: ['scolaire', 'coran', 'religieux'],
         },
     },
 } as const;
