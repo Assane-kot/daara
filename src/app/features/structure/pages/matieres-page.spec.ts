@@ -12,7 +12,7 @@ import { MatieresPage } from './matieres-page';
 describe('MatieresPage', () => {
     let fixture: ComponentFixture<MatieresPage>;
     let element: HTMLElement;
-    const service = { lister: vi.fn(), archiver: vi.fn(), supprimer: vi.fn() };
+    const service = { page: vi.fn(), archiver: vi.fn(), supprimer: vi.fn() };
     const confirmation = { confirmer: vi.fn() };
     const dialogue = { ouvrir: vi.fn() };
     const roles = signal<RoleMembre[]>(['admin']);
@@ -27,12 +27,16 @@ describe('MatieresPage', () => {
         await new Promise((r) => setTimeout(r));
         await fixture.whenStable();
     }
+    // Cartes (< 640 px) : même contenu que le tableau, plus simple à lire dans les tests.
     const boutons = () => [...element.querySelectorAll('li button')].map((b) => b.textContent!.trim());
 
     beforeEach(() => {
         vi.resetAllMocks();
         roles.set(['admin']);
-        service.lister.mockResolvedValue(matieres);
+        service.page.mockImplementation((_r: unknown, avecArchivees: boolean) => {
+            const lignes = matieres.filter((m) => avecArchivees || !m.archivee);
+            return Promise.resolve({ lignes, total: lignes.length });
+        });
         TestBed.configureTestingModule({
             providers: [
                 provideTranslateTesting(),
@@ -49,6 +53,7 @@ describe('MatieresPage', () => {
         expect(element.querySelectorAll('li').length).toBe(1);
         expect(boutons()).toEqual(['Modifier', 'Archiver', 'Supprimer']);
         (element.querySelector('input[type=checkbox]') as HTMLInputElement).click();
+        await new Promise((r) => setTimeout(r));
         await fixture.whenStable();
         expect(element.querySelectorAll('li').length).toBe(2);
         expect(element.textContent).toContain('Archivée');

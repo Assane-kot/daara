@@ -40,7 +40,7 @@ select lives_ok($$ insert into public.matieres (daara_id, nom, code, type) value
     ('00000000-0000-0000-0000-0000000b000a', 'Mathématiques', 'MATH', 'scolaire') $$,
     'admin aal2 : crée une matière');
 reset role;
-update public.matieres set id = '00000000-0000-0000-0000-00000000b100' where code = 'MATH';
+update public.matieres set id = '00000000-0000-0000-0000-00000000b100' where code = 'MATH' and daara_id = '00000000-0000-0000-0000-0000000b000a';
 set local role authenticated;
 select throws_ok($$ insert into public.matieres (daara_id, nom, code) values
     ('00000000-0000-0000-0000-0000000b000a', 'Mathe' || chr(769) || 'matiques', 'MATH3') $$, '23514', null,

@@ -372,7 +372,6 @@
         "reessayer": "Réessayer",
         "vous": "vous",
         "sans_nom": "Membre sans nom",
-        "compte": "{{n}} membre(s) affiché(s) sur {{total}}",
         "filtres": {
             "recherche": "Rechercher un nom ou un téléphone",
             "role": "Filtrer par rôle",
@@ -702,7 +701,8 @@
             "confirmer_suppression": "Supprimer la matière {{nom}} ?",
             "confirmer_suppression_message": "Elle sera supprimée du catalogue. Une matière utilisée dans une classe ne peut pas être supprimée : archivez-la.",
             "vide_titre": "Aucune matière",
-            "vide_message": "Créez les matières enseignées dans votre daara (scolaires, Coran, religieuses)."
+            "vide_message": "Créez les matières enseignées dans votre daara (scolaires, Coran, religieuses).",
+            "rechercher": "Rechercher une matière (nom, code)"
         },
         "classes": {
             "annee": "Année scolaire",
@@ -723,7 +723,9 @@
             "vide_titre": "Aucune classe",
             "vide_message": "Créez les classes de cette année.",
             "sans_annee_titre": "Aucune année scolaire",
-            "sans_annee_message": "Créez d’abord une année scolaire (onglet Années)."
+            "sans_annee_message": "Créez d’abord une année scolaire (onglet Années).",
+            "rechercher": "Rechercher une classe (nom, niveau)",
+            "matieres": "Matières"
         },
         "affectations": {
             "titre": "Matières enseignées",
@@ -742,5 +744,14 @@
             "vide_titre": "Aucune matière",
             "vide_message": "Ajoutez les matières enseignées dans cette classe."
         }
+    },
+    "table": {
+        "erreur": "Les données n’ont pas pu être chargées.",
+        "reessayer": "Réessayer",
+        "precedent": "Précédent",
+        "suivant": "Suivant",
+        "plage": "{{debut}}–{{fin}} sur {{total}}",
+        "vide_titre": "Aucun résultat",
+        "vide_message": "Modifiez la recherche ou les filtres."
     }
 }

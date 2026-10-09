@@ -3,11 +3,10 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { CurrentDaaraService } from '../../../core/daara/current-daara.service';
 import { RoleMembre } from '../../../core/daara/daara.model';
 import { SupabaseService } from '../../../core/supabase/supabase.service';
+import { PageTable, RequeteTable } from '../../../shared/ui/data-table/data-table';
 
 /** Rôles qu'un admin peut attribuer au sprint 2 (comptes apprenants : sprint 4). */
 export const ROLES_ATTRIBUABLES: readonly RoleMembre[] = ['admin', 'enseignant', 'parent'];
-
-const ORDRE_ROLES: readonly RoleMembre[] = ['admin', 'enseignant', 'parent', 'apprenant'];
 
 /** Une ligne de `memberships` : une personne qui a deux rôles dans la daara apparaît deux fois. */
 export interface Membre {
@@ -55,27 +54,39 @@ export class MembresService {
     private readonly auth = inject(AuthService);
     private readonly courante = inject(CurrentDaaraService);
 
-    async lister(): Promise<Membre[]> {
-        const { data, error } = await this.sb
-            .from('memberships')
-            .select('id, user_id, role, actif, nom_affiche, created_at, profiles(nom, prenom, telephone)')
-            .eq('daara_id', this.daaraId());
+    /**
+     * Page de membres pour `data-table` (S3.4, RPC `rechercher_membres`) : recherche sans accents sur le nom et le
+     * téléphone, filtres rôle et état, tri rôle (par défaut) / nom / ancienneté, pagination et total côté serveur.
+     */
+    async page(r: RequeteTable, role: RoleMembre | '', etat: 'actifs' | 'desactives' | 'tous'): Promise<PageTable<Membre>> {
+        const tri = r.tri && ['nom', 'depuis'].includes(r.tri.cle) ? `${r.tri.desc ? '-' : ''}${r.tri.cle}` : 'role';
+        const { data, error } = await this.sb.rpc('rechercher_membres', {
+            p_daara: this.daaraId(),
+            p_texte: r.recherche,
+            // null = tous les rôles (les types générés ne connaissent pas les paramètres facultatifs d'une RPC).
+            p_role: (role || null) as RoleMembre,
+            p_etat: etat,
+            p_tri: tri,
+            p_offset: r.page * r.taille,
+            p_limite: r.taille,
+        });
         if (error) {
             throw erreurMembres(error);
         }
         const moi = this.auth.user()?.id;
-        const membres: Membre[] = data.map((m) => ({
-            id: m.id,
-            userId: m.user_id,
-            role: m.role,
-            actif: m.actif,
-            nom: m.nom_affiche ?? (m.profiles ? `${m.profiles.prenom} ${m.profiles.nom}`.trim() : ''),
-            telephone: m.profiles?.telephone ?? null,
-            depuis: m.created_at,
-            moi: m.user_id === moi,
-        }));
-        // Ordre stable : par rôle, puis par nom (les dates de création peuvent être identiques).
-        return membres.sort((a, b) => ORDRE_ROLES.indexOf(a.role) - ORDRE_ROLES.indexOf(b.role) || a.nom.localeCompare(b.nom));
+        return {
+            lignes: data.map((m) => ({
+                id: m.id,
+                userId: m.user_id,
+                role: m.role,
+                actif: m.actif,
+                nom: m.nom,
+                telephone: m.telephone,
+                depuis: m.depuis,
+                moi: m.user_id === moi,
+            })),
+            total: Number(data[0]?.total ?? 0),
+        };
     }
 
     async changerRole(membre: Membre, role: RoleMembre): Promise<void> {

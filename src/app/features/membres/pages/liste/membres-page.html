@@ -1,29 +1,26 @@
-@if (chargement()) {
-    <div class="panel"><app-skeleton [lignes]="6" [avecTitre]="true" /></div>
-} @else if (erreurChargement()) {
-    <div class="panel grid gap-4">
-        <div class="rounded-md border border-danger/30 bg-danger-light p-3.5 text-danger-strong dark:bg-danger-dark-light dark:text-danger-soft" role="alert">
-            {{ 'membres.erreurs.chargement' | translate }}
+<div class="panel">
+    @if (erreur(); as erreur) {
+        <div
+            class="mb-4 rounded-md border border-danger/30 bg-danger-light p-3.5 text-danger-strong dark:bg-danger-dark-light dark:text-danger-soft"
+            role="alert"
+        >
+            {{ erreur | translate }}
         </div>
-        <div>
-            <button type="button" class="btn btn-outline-primary" (click)="charger()">{{ 'membres.reessayer' | translate }}</button>
+    }
+    @if (succes(); as succes) {
+        <div class="mb-4 rounded-md border border-primary/30 bg-primary/10 p-3.5 text-black dark:text-white-light" role="status">
+            {{ succes.cle | translate: succes.params }}
         </div>
-    </div>
-} @else {
-    <div class="panel">
-        <!-- Filtres -->
-        <div class="mb-4 grid gap-3 sm:grid-cols-[1fr_auto_auto]">
-            <label class="relative mb-0!">
-                <span class="sr-only">{{ 'membres.filtres.recherche' | translate }}</span>
-                <input
-                    type="search"
-                    class="form-input ltr:pl-10 rtl:pr-10"
-                    [placeholder]="'membres.filtres.recherche' | translate"
-                    [value]="recherche()"
-                    (input)="saisieRecherche($event)"
-                />
-                <icon-search class="pointer-events-none absolute top-1/2 h-5 w-5 -translate-y-1/2 text-muted ltr:left-3 rtl:right-3 dark:text-night-muted" />
-            </label>
+    }
+
+    <app-data-table
+        [colonnes]="colonnes"
+        [chargeur]="chargeur"
+        rechercheLibelle="membres.filtres.recherche"
+        titreVide="membres.vide.titre"
+        messageVide="membres.vide.message"
+    >
+        <div filtres class="contents">
             <label class="mb-0!">
                 <span class="sr-only">{{ 'membres.filtres.role' | translate }}</span>
                 <select class="form-select" [value]="filtreRole()" (change)="choixRole($event)">
@@ -43,99 +40,52 @@
             </label>
         </div>
 
-        @if (erreur(); as erreur) {
-            <div
-                class="mb-4 rounded-md border border-danger/30 bg-danger-light p-3.5 text-danger-strong dark:bg-danger-dark-light dark:text-danger-soft"
-                role="alert"
-            >
-                {{ erreur | translate }}
-            </div>
-        }
-        @if (succes(); as succes) {
-            <div class="mb-4 rounded-md border border-primary/30 bg-primary/10 p-3.5 text-black dark:text-white-light" role="status">
-                {{ succes.cle | translate: succes.params }}
-            </div>
-        }
+        <ng-template appCellule="nom" let-membre>
+            <span class="font-semibold text-black dark:text-white-light">{{ nom(membre) }}</span>
+            @if (membre.moi) {
+                <span class="text-muted dark:text-night-muted"> ({{ 'membres.vous' | translate }})</span>
+            }
+            @if (membre.telephone) {
+                <span class="block text-xs text-muted dark:text-night-muted">{{ membre.telephone }}</span>
+            }
+        </ng-template>
+        <ng-template appCellule="role" let-membre>
+            <app-badge [variante]="varianteRole(membre.role)">{{ 'roles.' + membre.role | translate }}</app-badge>
+        </ng-template>
+        <ng-template appCellule="etat" let-membre>
+            <app-badge [variante]="membre.actif ? 'success' : 'dark'">{{
+                (membre.actif ? 'membres.etat.actif' : 'membres.etat.desactive') | translate
+            }}</app-badge>
+        </ng-template>
+        <ng-template appCellule="depuis" let-membre>{{ date(membre.depuis) }}</ng-template>
+        <ng-template appCellule="actions" let-membre>
+            <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: membre }" />
+        </ng-template>
 
-        <p class="mt-0 mb-3 text-sm text-muted dark:text-night-muted" aria-live="polite">
-            {{ 'membres.compte' | translate: { n: visibles().length, total: membres().length } }}
-        </p>
-
-        @if (visibles().length === 0) {
-            <app-empty-state [titre]="'membres.vide.titre' | translate" [message]="'membres.vide.message' | translate" />
-        } @else {
-            <!-- Tableau (≥ 640 px) -->
-            <div class="table-responsive hidden sm:block">
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">{{ 'membres.colonnes.nom' | translate }}</th>
-                            <th scope="col">{{ 'membres.colonnes.role' | translate }}</th>
-                            <th scope="col">{{ 'membres.colonnes.etat' | translate }}</th>
-                            <th scope="col">{{ 'membres.colonnes.depuis' | translate }}</th>
-                            <th scope="col" class="ltr:text-right rtl:text-left">
-                                <span class="sr-only">{{ 'membres.colonnes.actions' | translate }}</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (membre of visibles(); track membre.id) {
-                            <tr>
-                                <td>
-                                    <span class="font-semibold text-black dark:text-white-light">{{ nom(membre) }}</span>
-                                    @if (membre.moi) {
-                                        <span class="text-muted dark:text-night-muted"> ({{ 'membres.vous' | translate }})</span>
-                                    }
-                                    @if (membre.telephone) {
-                                        <span class="block text-xs text-muted dark:text-night-muted">{{ membre.telephone }}</span>
-                                    }
-                                </td>
-                                <td>
-                                    <app-badge [variante]="variante[membre.role]">{{ 'roles.' + membre.role | translate }}</app-badge>
-                                </td>
-                                <td>
-                                    <app-badge [variante]="membre.actif ? 'success' : 'dark'">{{
-                                        (membre.actif ? 'membres.etat.actif' : 'membres.etat.desactive') | translate
-                                    }}</app-badge>
-                                </td>
-                                <td class="whitespace-nowrap">{{ date(membre.depuis) }}</td>
-                                <td class="ltr:text-right rtl:text-left">
-                                    <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: membre }" />
-                                </td>
-                            </tr>
+        <ng-template appCarte let-membre>
+            <div class="flex items-start gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="m-0 truncate font-semibold text-black dark:text-white-light">
+                        {{ nom(membre) }}
+                        @if (membre.moi) {
+                            <span class="font-normal text-muted dark:text-night-muted"> ({{ 'membres.vous' | translate }})</span>
                         }
-                    </tbody>
-                </table>
+                    </p>
+                    @if (membre.telephone) {
+                        <p class="m-0 text-xs text-muted dark:text-night-muted">{{ membre.telephone }}</p>
+                    }
+                    <div class="mt-2 flex flex-wrap gap-1.5">
+                        <app-badge [variante]="varianteRole(membre.role)">{{ 'roles.' + membre.role | translate }}</app-badge>
+                        <app-badge [variante]="membre.actif ? 'success' : 'dark'">{{
+                            (membre.actif ? 'membres.etat.actif' : 'membres.etat.desactive') | translate
+                        }}</app-badge>
+                    </div>
+                </div>
+                <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: membre }" />
             </div>
-
-            <!-- Cartes (< 640 px) -->
-            <ul class="m-0 grid list-none gap-3 p-0 sm:hidden">
-                @for (membre of visibles(); track membre.id) {
-                    <li class="flex items-start gap-3 rounded-md border border-white-light p-3 dark:border-night-border">
-                        <div class="min-w-0 flex-1">
-                            <p class="m-0 truncate font-semibold text-black dark:text-white-light">
-                                {{ nom(membre) }}
-                                @if (membre.moi) {
-                                    <span class="font-normal text-muted dark:text-night-muted"> ({{ 'membres.vous' | translate }})</span>
-                                }
-                            </p>
-                            @if (membre.telephone) {
-                                <p class="m-0 text-xs text-muted dark:text-night-muted">{{ membre.telephone }}</p>
-                            }
-                            <div class="mt-2 flex flex-wrap gap-1.5">
-                                <app-badge [variante]="variante[membre.role]">{{ 'roles.' + membre.role | translate }}</app-badge>
-                                <app-badge [variante]="membre.actif ? 'success' : 'dark'">{{
-                                    (membre.actif ? 'membres.etat.actif' : 'membres.etat.desactive') | translate
-                                }}</app-badge>
-                            </div>
-                        </div>
-                        <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: membre }" />
-                    </li>
-                }
-            </ul>
-        }
-    </div>
-}
+        </ng-template>
+    </app-data-table>
+</div>
 
 <!-- Menu d'actions d'un membre (CDK Menu : clavier, Échap, focus restauré). -->
 <ng-template #actions let-membre>

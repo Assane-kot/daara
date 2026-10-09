@@ -161,6 +161,7 @@ export type Database = {
                     id: string;
                     niveau: string | null;
                     nom: string;
+                    recherche: string | null;
                     titulaire_id: string | null;
                 };
                 Insert: {
@@ -171,6 +172,7 @@ export type Database = {
                     id?: string;
                     niveau?: string | null;
                     nom: string;
+                    recherche?: never;
                     titulaire_id?: string | null;
                 };
                 Update: {
@@ -181,6 +183,7 @@ export type Database = {
                     id?: string;
                     niveau?: string | null;
                     nom?: string;
+                    recherche?: never;
                     titulaire_id?: string | null;
                 };
                 Relationships: [
@@ -393,6 +396,7 @@ export type Database = {
                     daara_id: string;
                     id: string;
                     nom: string;
+                    recherche: string | null;
                     type: Database['public']['Enums']['type_matiere'];
                 };
                 Insert: {
@@ -403,6 +407,7 @@ export type Database = {
                     daara_id: string;
                     id?: string;
                     nom: string;
+                    recherche?: never;
                     type?: Database['public']['Enums']['type_matiere'];
                 };
                 Update: {
@@ -413,6 +418,7 @@ export type Database = {
                     daara_id?: string;
                     id?: string;
                     nom?: string;
+                    recherche?: never;
                     type?: Database['public']['Enums']['type_matiere'];
                 };
                 Relationships: [
@@ -697,8 +703,30 @@ export type Database = {
             modules_valides: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: boolean };
             normaliser_code_acces: { Args: { p_code: string }; Returns: string };
             prerequis_module: { Args: { p_module: Database['public']['Enums']['module_daara'] }; Returns: Database['public']['Enums']['module_daara'][] };
+            rechercher_membres: {
+                Args: {
+                    p_daara: string;
+                    p_etat: string;
+                    p_limite: number;
+                    p_offset: number;
+                    p_role: Database['public']['Enums']['role_membre'];
+                    p_texte: string;
+                    p_tri: string;
+                };
+                Returns: {
+                    actif: boolean;
+                    depuis: string;
+                    id: string;
+                    nom: string;
+                    role: Database['public']['Enums']['role_membre'];
+                    telephone: string;
+                    total: number;
+                    user_id: string;
+                }[];
+            };
             retirer_facteurs: { Args: { p_motif: string; p_user: string }; Returns: number };
             revoquer_invitation: { Args: { p_invitation: string }; Returns: undefined };
+            sans_accents: { Args: { p_texte: string }; Returns: string };
             session_suffisante: { Args: Record<PropertyKey, never>; Returns: boolean };
             teaches_class: { Args: { p_classe: string }; Returns: boolean };
             texte_sur: { Args: { p_texte: string }; Returns: boolean };

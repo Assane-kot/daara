@@ -12,7 +12,7 @@ import { ClasseDetailPage } from './classe-detail-page';
 import { ClassesPage } from './classes-page';
 
 const roles = signal<RoleMembre[]>(['admin']);
-const service = { annees: vi.fn(), enseignants: vi.fn(), lister: vi.fn(), detail: vi.fn(), supprimer: vi.fn() };
+const service = { annees: vi.fn(), enseignants: vi.fn(), page: vi.fn(), detail: vi.fn(), supprimer: vi.fn() };
 const matieresService = { lister: vi.fn() };
 const dialogues = { classe: vi.fn(), affectation: vi.fn() };
 
@@ -48,14 +48,14 @@ function configurer(): void {
 describe('ClassesPage', () => {
     beforeEach(() => {
         configurer();
-        service.lister.mockResolvedValue([{ id: 'c1', nom: 'CE1 A', niveau: 'CE1', titulaireId: 'e1', nbMatieres: 3 }]);
+        service.page.mockResolvedValue({ lignes: [{ id: 'c1', nom: 'CE1 A', niveau: 'CE1', titulaireId: 'e1', nbMatieres: 3 }], total: 1 });
     });
 
     it('année active choisie par défaut ; titulaire et nombre de matières affichés', async () => {
         const fixture = TestBed.createComponent(ClassesPage);
         await stable(fixture);
         const element = fixture.nativeElement as HTMLElement;
-        expect(service.lister).toHaveBeenCalledWith('a1');
+        expect(service.page.mock.calls[0][0]).toBe('a1');
         expect(element.querySelector('li')?.textContent).toContain('Titulaire : Modou Fall');
         expect(element.querySelector('li')?.textContent).toContain('3 matière(s)');
         expect(element.textContent).toContain('Nouvelle classe');
@@ -70,7 +70,7 @@ describe('ClassesPage', () => {
         select.value = 'a2';
         select.dispatchEvent(new Event('change'));
         await stable(fixture);
-        expect(service.lister).toHaveBeenLastCalledWith('a2');
+        expect(service.page.mock.lastCall?.[0]).toBe('a2');
         expect(element.querySelectorAll('li button').length).toBe(0);
         expect(element.textContent).not.toContain('Nouvelle classe');
     });

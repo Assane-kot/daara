@@ -9,7 +9,7 @@ import { MembresPage } from './membres-page';
 describe('MembresPage', () => {
     let fixture: ComponentFixture<MembresPage>;
     let element: HTMLElement;
-    const service = { lister: vi.fn(), changerRole: vi.fn(), definirActif: vi.fn(), creerCodeAcces: vi.fn() };
+    const service = { page: vi.fn(), changerRole: vi.fn(), definirActif: vi.fn(), creerCodeAcces: vi.fn() };
     const codeAcces = { ouvrir: vi.fn() };
     const confirmation = { confirmer: vi.fn() };
 
@@ -51,7 +51,14 @@ describe('MembresPage', () => {
 
     beforeEach(async () => {
         vi.resetAllMocks();
-        service.lister.mockResolvedValue(membres);
+        // Le service simule la RPC rechercher_membres : filtres rôle / état, recherche sans accents.
+        service.page.mockImplementation((r: { recherche: string }, role: string, etat: string) => {
+            const sans = (t: string) => t.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+            const lignes = membres.filter(
+                (m) => (!role || m.role === role) && (etat === 'tous' || (etat === 'actifs') === m.actif) && sans(m.nom).includes(sans(r.recherche)),
+            );
+            return Promise.resolve({ lignes, total: lignes.length });
+        });
         TestBed.configureTestingModule({
             providers: [
                 provideTranslateTesting(),
@@ -71,7 +78,7 @@ describe('MembresPage', () => {
     it('affiche les membres actifs par défaut, avec « (vous) »', () => {
         expect(noms()).toEqual(['Awa Diop', 'Ibou Sarr', 'Élodie Faye']);
         expect(element.textContent).toContain('(vous)');
-        expect(element.textContent).toContain('3 membre(s) affiché(s) sur 4');
+        expect(element.textContent).toContain('1–3 sur 3');
     });
 
     it('filtre par état, par rôle et par recherche sans accents', async () => {
@@ -87,6 +94,7 @@ describe('MembresPage', () => {
         const recherche = element.querySelector('input[type=search]') as HTMLInputElement;
         recherche.value = 'elodie';
         recherche.dispatchEvent(new Event('input'));
+        await new Promise((r) => setTimeout(r, 350));
         await fixture.whenStable();
         expect(noms()).toEqual(['Élodie Faye']);
     });
@@ -95,16 +103,17 @@ describe('MembresPage', () => {
         const recherche = element.querySelector('input[type=search]') as HTMLInputElement;
         recherche.value = 'zzz';
         recherche.dispatchEvent(new Event('input'));
+        await new Promise((r) => setTimeout(r, 350));
         await fixture.whenStable();
         expect(element.textContent).toContain('Aucun membre ne correspond');
     });
 
     it('échec du chargement : message et Réessayer', async () => {
-        service.lister.mockRejectedValueOnce(new Error('réseau'));
+        service.page.mockRejectedValueOnce(new Error('réseau'));
         fixture = TestBed.createComponent(MembresPage);
         element = fixture.nativeElement as HTMLElement;
         await fixture.whenStable();
-        expect(element.querySelector('[role=alert]')?.textContent).toContain('n’a pas pu être chargée');
+        expect(element.querySelector('[role=alert]')?.textContent).toContain('n’ont pas pu être chargées');
     });
 
     it('menu : rôles proposés autres que le rôle actuel, puis désactiver', async () => {
@@ -144,7 +153,7 @@ describe('MembresPage', () => {
         expect(confirmation.confirmer).not.toHaveBeenCalled();
         expect(service.changerRole).toHaveBeenCalledWith(membres[1], 'parent');
         expect(element.querySelector('[role=status]')?.textContent).toContain('Ibou Sarr est maintenant Parent');
-        expect(service.lister).toHaveBeenCalledTimes(2);
+        expect(service.page).toHaveBeenCalledTimes(2);
     });
 
     it('promouvoir admin demande une confirmation ; annulation sans effet', async () => {

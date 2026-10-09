@@ -151,7 +151,7 @@ select set_eq(
           and has_function_privilege('authenticated', p.oid, 'execute')
           and not exists (select 1 from pg_depend d where d.objid = p.oid and d.deptype = 'e')
     $$,
-    array['accepter_invitation', 'activer_annee', 'basculer_module', 'changer_role', 'creer_code_acces', 'creer_daara', 'creer_invitation', 'definir_actif', 'definir_modules', 'enseignants_daara', 'has_role', 'is_member', 'is_platform_admin', 'libelle_valide', 'membres_administres', 'module_actif', 'revoquer_invitation', 'session_suffisante', 'teaches_class', 'texte_sur'],
+    array['accepter_invitation', 'activer_annee', 'basculer_module', 'changer_role', 'creer_code_acces', 'creer_daara', 'creer_invitation', 'definir_actif', 'definir_modules', 'enseignants_daara', 'has_role', 'is_member', 'is_platform_admin', 'libelle_valide', 'membres_administres', 'module_actif', 'rechercher_membres', 'revoquer_invitation', 'sans_accents', 'session_suffisante', 'teaches_class', 'texte_sur'],
     'Seules les fonctions de la liste blanche sont exécutables par authenticated'
 );
 

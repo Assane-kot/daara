@@ -1,17 +1,15 @@
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ROUTES_AUTH } from '../../../../core/auth/auth.service';
 import { RoleMembre } from '../../../../core/daara/daara.model';
 import { LanguageService } from '../../../../core/i18n/language.service';
 import { IconHorizontalDots } from '../../../../shared/icon/icon-horizontal-dots';
-import { IconSearch } from '../../../../shared/icon/icon-search';
 import { Badge, BadgeVariante } from '../../../../shared/ui/badge/badge';
 import { ConfirmDialogService } from '../../../../shared/ui/confirm-dialog/confirm-dialog.service';
-import { EmptyState } from '../../../../shared/ui/empty-state/empty-state';
-import { Skeleton } from '../../../../shared/ui/skeleton/skeleton';
+import { CarteTable, CelluleTable, ColonneTable, DataTable, PageTable, RequeteTable } from '../../../../shared/ui/data-table/data-table';
 import { CodeAccesDialogService } from '../../components/code-acces-dialog';
 import { ErreurMembres, Membre, MembresService, ROLES_ATTRIBUABLES } from '../../data/membres.service';
 
@@ -20,17 +18,17 @@ export type FiltreEtat = 'actifs' | 'desactives' | 'tous';
 export const VARIANTE_ROLE: Record<RoleMembre, BadgeVariante> = { admin: 'secondary', enseignant: 'primary', parent: 'info', apprenant: 'dark' };
 
 /**
- * `/d/:slug/membres` (S2.4) : liste des membres, recherche et filtres locaux (le `data-table` serveur arrive au
- * sprint 3), changement de rôle, désactivation / réactivation. Admin uniquement (`roleGuard`), la base revérifie.
+ * `/d/:slug/membres` (S2.4, `data-table` S3.4) : liste paginée côté serveur (recherche sans accents, filtres rôle et
+ * état, tri), changement de rôle, désactivation / réactivation. Admin uniquement (`roleGuard`), la base revérifie.
  * Tableau à partir de 640 px, cartes en dessous.
  */
 @Component({
     selector: 'app-membres-page',
-    imports: [NgTemplateOutlet, TranslatePipe, Skeleton, EmptyState, Badge, CdkMenuTrigger, CdkMenu, CdkMenuItem, IconHorizontalDots, IconSearch],
+    imports: [NgTemplateOutlet, TranslatePipe, Badge, CdkMenuTrigger, CdkMenu, CdkMenuItem, IconHorizontalDots, DataTable, CelluleTable, CarteTable],
     templateUrl: './membres-page.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MembresPage implements OnInit {
+export class MembresPage {
     private readonly service = inject(MembresService);
     private readonly confirmation = inject(ConfirmDialogService);
     private readonly codeAcces = inject(CodeAccesDialogService);
@@ -38,46 +36,29 @@ export class MembresPage implements OnInit {
     private readonly router = inject(Router);
     private readonly langue = inject(LanguageService).langue;
 
-    protected readonly membres = signal<Membre[]>([]);
-    protected readonly chargement = signal(true);
-    protected readonly erreurChargement = signal(false);
     protected readonly enCours = signal<string | null>(null);
     protected readonly erreur = signal<string | null>(null);
     protected readonly succes = signal<{ cle: string; params: Record<string, string> } | null>(null);
 
-    protected readonly recherche = signal('');
     protected readonly filtreRole = signal<RoleMembre | ''>('');
     protected readonly filtreEtat = signal<FiltreEtat>('actifs');
     protected readonly roles: readonly RoleMembre[] = ['admin', 'enseignant', 'parent', 'apprenant'];
     protected readonly etats: readonly FiltreEtat[] = ['actifs', 'desactives', 'tous'];
+    protected readonly colonnes: readonly ColonneTable[] = [
+        { cle: 'nom', libelle: 'membres.colonnes.nom', triable: true },
+        { cle: 'role', libelle: 'membres.colonnes.role' },
+        { cle: 'etat', libelle: 'membres.colonnes.etat' },
+        { cle: 'depuis', libelle: 'membres.colonnes.depuis', triable: true, classe: 'whitespace-nowrap' },
+        { cle: 'actions', libelle: 'membres.colonnes.actions', libelleMasque: true, classe: 'ltr:text-right rtl:text-left' },
+    ];
+    /** Chargeur du tableau : filtres de l'écran + requête du tableau (pagination, tri, recherche serveur). */
+    protected readonly chargeur = (r: RequeteTable): Promise<PageTable<Membre>> => this.service.page(r, this.filtreRole(), this.filtreEtat());
+    private readonly table = viewChild(DataTable);
     protected readonly variante = VARIANTE_ROLE;
 
-    protected readonly visibles = computed(() => {
-        const texte = normaliser(this.recherche());
-        const role = this.filtreRole();
-        const etat = this.filtreEtat();
-        return this.membres().filter(
-            (m) =>
-                (!role || m.role === role) &&
-                (etat === 'tous' || (etat === 'actifs') === m.actif) &&
-                (!texte || normaliser(`${m.nom} ${m.telephone ?? ''}`).includes(texte)),
-        );
-    });
-
-    ngOnInit(): void {
-        void this.charger();
-    }
-
-    protected async charger(): Promise<void> {
-        this.chargement.set(true);
-        this.erreurChargement.set(false);
-        try {
-            this.membres.set(await this.service.lister());
-        } catch {
-            this.erreurChargement.set(true);
-        } finally {
-            this.chargement.set(false);
-        }
+    /** Contexte des gabarits de cellule non typé (`let-membre`) : indexation passée par une méthode typée. */
+    protected varianteRole(role: RoleMembre): BadgeVariante {
+        return VARIANTE_ROLE[role];
     }
 
     protected nom(membre: Membre): string {
@@ -95,9 +76,8 @@ export class MembresPage implements OnInit {
 
     /** Réinitialisation assistée (S2.6) : membre actif, autre que soi, sans rôle admin dans la daara (la base revérifie). */
     protected reinitialisable(membre: Membre): boolean {
-        return (
-            membre.actif && !membre.moi && membre.role !== 'admin' && !this.membres().some((m) => m.userId === membre.userId && m.role === 'admin' && m.actif)
-        );
+        // Une personne admin par une autre ligne de la daara (ou ailleurs) est refusée par la base (cible_invalide).
+        return membre.actif && !membre.moi && membre.role !== 'admin';
     }
 
     protected async reinitialiser(membre: Membre): Promise<void> {
@@ -179,7 +159,7 @@ export class MembresPage implements OnInit {
                 return;
             }
             this.succes.set({ cle: succes, params });
-            this.membres.set(await this.service.lister());
+            await this.table()?.recharger();
         } catch (erreur) {
             this.erreur.set(erreur instanceof ErreurMembres ? erreur.cle : 'membres.erreurs.inattendue');
         } finally {
@@ -187,20 +167,13 @@ export class MembresPage implements OnInit {
         }
     }
 
-    protected saisieRecherche(evenement: Event): void {
-        this.recherche.set((evenement.target as HTMLInputElement).value);
-    }
-
     protected choixRole(evenement: Event): void {
         this.filtreRole.set((evenement.target as HTMLSelectElement).value as RoleMembre | '');
+        void this.table()?.recharger(true);
     }
 
     protected choixEtat(evenement: Event): void {
         this.filtreEtat.set((evenement.target as HTMLSelectElement).value as FiltreEtat);
+        void this.table()?.recharger(true);
     }
-}
-
-/** Recherche insensible à la casse et aux accents. */
-function normaliser(texte: string): string {
-    return texte.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim();
 }

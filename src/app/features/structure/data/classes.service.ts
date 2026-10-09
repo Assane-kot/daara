@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { CurrentDaaraService } from '../../../core/daara/current-daara.service';
 import { SupabaseService } from '../../../core/supabase/supabase.service';
+import { PageTable, RequeteTable, motifIlike, sansAccents } from '../../../shared/ui/data-table/data-table';
 import { ErreurStructure, erreurStructure } from './annees.service';
 import { TypeMatiere } from './matieres.service';
 
@@ -103,6 +104,29 @@ export class ClassesService {
             titulaireId: c.titulaire_id,
             nbMatieres: c.classe_matieres.length,
         }));
+    }
+
+    /** Page des classes d'une année pour `data-table` : recherche sur le nom et le niveau, tri nom / niveau (S3.4). */
+    async page(anneeId: string, r: RequeteTable): Promise<PageTable<ClasseResume>> {
+        // Pas d'agrégat count(*) embarqué : il exige le droit de lecture sur toute la table (droits par colonne ici).
+        let q = this.sb.from('classes').select('id, nom, niveau, titulaire_id, classe_matieres(id)', { count: 'exact' }).eq('annee_id', anneeId);
+        if (r.recherche) {
+            // Colonne générée en base : nom et niveau en minuscules, sans accents.
+            q = q.ilike('recherche', motifIlike(sansAccents(r.recherche)));
+        }
+        const tri = r.tri && ['nom', 'niveau'].includes(r.tri.cle) ? r.tri : { cle: 'nom', desc: false };
+        const debut = r.page * r.taille;
+        const { data, error, count } = await q
+            .order(tri.cle, { ascending: !tri.desc, nullsFirst: false })
+            .order('id')
+            .range(debut, debut + r.taille - 1);
+        if (error) {
+            throw erreurStructure(error);
+        }
+        return {
+            lignes: data.map((c) => ({ id: c.id, nom: c.nom, niveau: c.niveau, titulaireId: c.titulaire_id, nbMatieres: c.classe_matieres.length })),
+            total: count ?? 0,
+        };
     }
 
     async detail(id: string): Promise<ClasseDetail> {

@@ -22,7 +22,8 @@ src/app/
 │   ├── notifications/   notification-center.service.ts, push.service.ts
 │   └── errors/          error-handler.ts (console + Sentry), sentry.ts (chargement différé, nettoyage des données
 │                        personnelles), messages utilisateur (sprint 1)
-├── shared/ui/           page-header, empty-state, badge, skeleton, form-field, confirm-dialog (S0.4) ; data-table (S3), stat-card
+├── shared/ui/           page-header, empty-state, badge, skeleton, form-field, confirm-dialog (S0.4) ; data-table (S3.4 :
+│                        chargeur serveur, cellules `appCellule`, cartes `appCarte` sous 640 px, filtres projetés), stat-card
 ├── layouts/             auth-layout, app-layout (menu selon rôle), layout.service.ts (état de la sidebar)
 └── features/
     ├── auth/            connexion, inscription, mot de passe, acceptation d'invitation
@@ -348,7 +349,8 @@ nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `au
 | `retirer_facteurs(p_user, p_motif)` → nombre (S2.7) | procédure super-admin (`docs/exploitation.md`) : supprime les facteurs TOTP, les sessions et jetons de rafraîchissement ; journal : ligne « plateforme » (daara nulle) avec motif et opérateur, ligne sans motif dans chaque daara où l'utilisateur est membre actif | exécutable par **aucun** rôle de l'API : SQL Editor (`postgres`) uniquement ; un jeton déjà émis reste valable 1 h au plus |
 | `activer_annee(p_annee)` (S3.1) | rend l'année active et désactive l'autre, en une transaction (verrou de la daara) | admin `aal2` ; module `structure` actif |
 | `enseignants_daara(p_daara)` → (user_id, prenom, nom, actif) (S3.3) | noms des enseignants et admins de la daara (titulaire, enseignant d'une matière) : l'enseignant ne lit pas les profils de ses collègues | `has_role(p_daara, [admin, enseignant])` ; membres désactivés : nom figé (`nom_affiche`) |
-| `rechercher_membres(p_daara, p_texte, p_role, p_etat, p_tri, p_offset, p_limite)` → (lignes, total) (S3.4) | liste paginée des membres pour `data-table` : recherche sans accents (`unaccent`) sur le nom et le téléphone | admin `aal2` ; limite ≤ 100 |
+| `rechercher_membres(p_daara, p_texte, p_role, p_etat, p_tri, p_offset, p_limite)` → lignes (id, user_id, role, actif, nom, telephone, depuis, total) (S3.4) | liste paginée des membres pour `data-table` : recherche sans accents (`unaccent`) sur le nom et le téléphone (actifs seulement), filtres rôle / état, tri `role` / `nom` / `depuis` (± ), total par fenêtre ; nom figé et pas de téléphone pour un désactivé | admin `aal2` ; limite ≤ 100, texte ≤ 100, paramètres contrôlés (`22023 parametre_invalide`) |
+| `sans_accents(texte)` (S3.4) | minuscules sans accents (`unaccent` à dictionnaire explicite, immuable) ; colonnes générées `matieres.recherche` (nom + code) et `classes.recherche` (nom + niveau), filtrées par `ilike` côté client | fonction pure, exécutable par `authenticated` (colonnes générées) |
 | `avant_creation_utilisateur(event)` (S2.5, ADR-009) | hook Auth `before_user_created` : refuse toute inscription publique par téléphone (les comptes téléphone naissent par `accept-invitation`, API d'administration, non soumise au hook) | exécutable par `supabase_auth_admin` uniquement |
 | `basculer_module(p_daara, p_module, p_actif)` → `module_daara[]` (S2.2) | active ou désactive un module à partir de l'état en base (écran Modules : pas d'écrasement entre deux admins) ; s'appuie sur `definir_modules` | admin `aal2` ; verrou des lignes de la daara |
 | `definir_modules(p_daara, p_modules module_daara[])` → `module_daara[]` (sprint 2, ADR-008) | fixe les modules actifs de la daara | `security definer` ; `has_role(p_daara, admin)` en `aal2` ; prérequis ajoutés ; refus (`23514`, `module_requis`) de désactiver un prérequis d'un module actif ; journalisé |

@@ -372,7 +372,6 @@
         "reessayer": "Try again",
         "vous": "you",
         "sans_nom": "Unnamed member",
-        "compte": "{{n}} member(s) shown out of {{total}}",
         "filtres": {
             "recherche": "Search a name or phone number",
             "role": "Filter by role",
@@ -702,7 +701,8 @@
             "confirmer_suppression": "Delete the subject {{nom}}?",
             "confirmer_suppression_message": "It will be removed from the catalogue. A subject used in a class cannot be deleted: archive it.",
             "vide_titre": "No subject",
-            "vide_message": "Create the subjects taught in your daara (school, Quran, religious)."
+            "vide_message": "Create the subjects taught in your daara (school, Quran, religious).",
+            "rechercher": "Search a subject (name, code)"
         },
         "classes": {
             "annee": "School year",
@@ -723,7 +723,9 @@
             "vide_titre": "No class",
             "vide_message": "Create the classes of this year.",
             "sans_annee_titre": "No school year",
-            "sans_annee_message": "First create a school year (Years tab)."
+            "sans_annee_message": "First create a school year (Years tab).",
+            "rechercher": "Search a class (name, level)",
+            "matieres": "Subjects"
         },
         "affectations": {
             "titre": "Subjects taught",
@@ -742,5 +744,14 @@
             "vide_titre": "No subject",
             "vide_message": "Add the subjects taught in this class."
         }
+    },
+    "table": {
+        "erreur": "The data could not be loaded.",
+        "reessayer": "Try again",
+        "precedent": "Previous",
+        "suivant": "Next",
+        "plage": "{{debut}}–{{fin}} of {{total}}",
+        "vide_titre": "No result",
+        "vide_message": "Change the search or the filters."
     }
 }

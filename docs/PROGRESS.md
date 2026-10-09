@@ -12,8 +12,8 @@
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
-- Sprint 3 — Structure scolaire : S3.0 (conception), S3.1 (années, périodes), S3.2 (matières) et S3.3 (classes, affectations)
-  faits. Suivante : S3.4 `data-table`. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 3 — Structure scolaire : S3.0 à S3.4 faits : **code du sprint 3 terminé**. Suivant : audit de fin de sprint
+  (sécurité + RLS sur S3.1 à S3.4), corrections, puis bilan du sprint 3. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -66,6 +66,8 @@
     qu'aux origines de l'application (en local, Kong ajoute un CORS ouvert).
   - CI : job `edge` jamais exécuté sur GitHub → vérifier le premier run (image Docker Deno épinglée par empreinte).
   - À l'audit de fin de sprint 3 (audits par story arrêtés à partir de S3.2, décision du développeur du 2026-10-09) :
+    - S3.4 : `rechercher_membres` (security definer, recherche et tri), `sans_accents` et colonnes générées exposées,
+      motifs `ilike` construits côté client (`motifIlike`) ;
     - audit RLS de S3.2 non fait (interrompu) ; audits complets de S3.3 et S3.4 (S3.3 : `teaches_class`,
       `enseignants_daara` exposée aux enseignants, triggers `classes_coherentes` / `classe_matieres_coherentes`) ;
     - libellés des années et périodes (S3.1) : forme NFC et espace insécable en tête / fin acceptés, comme corrigé pour
@@ -88,7 +90,7 @@
       par les garde-fous ; promotion en admin d'un compte sans facteur = même risque que l'invitation admin (qui
       détient le mot de passe enrôle le TOTP en premier) → même correction ;
     - ~~S2.7 : membre désactivé de sa seule daara sur l'onboarding~~ → message « accès désactivé » (S2.7) ;
-    - sprint 3 : liste des membres sans pagination (limite de 1 000 lignes de PostgREST) → `data-table` ;
+    - ~~sprint 3 : liste des membres sans pagination~~ → `data-table` + `rechercher_membres` (S3.4) ;
     - sprint 12 (CDP) : supprimer le compte du dernier admin d'une daara est refusé par le garde-fou → procédure.
   - Audit S2.3 (2026-10-05), points pour information :
     - fichiers du bucket `logos` d'une daara supprimée non effacés par la cascade (le Storage interdit le `delete` SQL)
@@ -170,6 +172,24 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-09 — S3.4 Composant `data-table`
+- `shared/ui/data-table` : chargeur serveur (page, taille, tri, recherche), cellules projetées (`appCellule`), cartes
+  sous 640 px (`appCarte`), filtres de l'écran projetés (`[filtres]`), recherche différée (300 ms) et réponses périmées
+  ignorées, `aria-sort`, pagination « x–y sur total », états chargement / erreur (Réessayer) / vide, `recharger()`.
+- Migration `recherche_membres` : extension `unaccent` (schéma `extensions`), RPC `rechercher_membres` (admin aal2 ;
+  recherche sans accents, filtres, tri, pagination, total), `sans_accents` (enveloppe immuable) et colonnes générées
+  `recherche` sur `matieres` et `classes`. 13 tests pgTAP (566).
+- Appliqué : Membres (recherche serveur sans accents, filtres rôle / état, tri nom / ancienneté ; le contrôle « admin
+  ailleurs » de la réinitialisation est laissé à la base), Matières (recherche nom / code, tri, archivées), Classes
+  (année, recherche nom / niveau, tri).
+- Vérifié dans le navigateur : Membres (recherche « ndiaye », tri décroissant), Matières (22 matières : pages 1–20 et
+  21–22 ; « EDUC », « francais » trouvent « Éducation islamique », « Français »), Classes (« etoile » trouve « Étoile
+  CE1 »), cartes en 375 px. Constat corrigé : `ilike` seul tient compte des accents → colonnes `recherche`.
+- Pièges : un contexte de gabarit `let-x` n'est pas typé (indexer un `Record` par `x.role` échoue en gabarits stricts →
+  méthode typée) ; une colonne générée et une contrainte `check` s'évaluent avec les droits de l'écrivain (fonction
+  exécutable par `authenticated`) ; ESLint ne lit pas un gabarit construit avec `${…}`.
+- Pas d'audit (fin de sprint). 242 tests unitaires ; chargement initial 150,7 kB transférés.
+
 ### 2026-10-09 — S3.3 Classes et affectations
 - Migration `classes` (module `structure`) : `libelle_valide` (texte court NFC sans blanc autour), `est_enseignant_de`,
   `ecrivain_structure` (droits en tête des triggers), `classes` (nom unique dans l'année sans casse, niveau libre,

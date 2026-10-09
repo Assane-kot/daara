@@ -7,13 +7,7 @@ import { Membre, MembresService, erreurMembres } from './membres.service';
 describe('MembresService', () => {
     let service: MembresService;
     const auth = { user: vi.fn(), rechargerDaaraCourante: vi.fn() };
-    let resultat: { data: unknown; error: unknown };
-    const requete = {
-        select: vi.fn(() => requete),
-        eq: vi.fn(() => requete),
-        then: (resoudre: (valeur: unknown) => unknown) => resoudre(resultat),
-    };
-    const client = { from: vi.fn(() => requete), rpc: vi.fn() };
+    const client = { rpc: vi.fn() };
 
     const membre = (moi: boolean): Membre => ({ id: 'm-1', userId: 'u-1', role: 'admin', actif: true, nom: 'Awa Diop', telephone: null, depuis: '', moi });
 
@@ -40,39 +34,29 @@ describe('MembresService', () => {
         service = TestBed.inject(MembresService);
     });
 
-    it('liste les membres de la daara : nom du profil, ou nom figé d’un membre désactivé', async () => {
-        resultat = {
+    it('page de membres : paramètres de la RPC (tri, filtres, pagination) et « moi »', async () => {
+        client.rpc.mockResolvedValueOnce({
             data: [
-                {
-                    id: 'm-1',
-                    user_id: 'u-1',
-                    role: 'admin',
-                    actif: true,
-                    nom_affiche: null,
-                    created_at: 't1',
-                    profiles: { prenom: 'Awa', nom: 'Diop', telephone: '77' },
-                },
-                { id: 'm-2', user_id: 'u-2', role: 'parent', actif: false, nom_affiche: 'Fatou Ndiaye', created_at: 't2', profiles: null },
-                {
-                    id: 'm-3',
-                    user_id: 'u-3',
-                    role: 'enseignant',
-                    actif: true,
-                    nom_affiche: null,
-                    created_at: 't3',
-                    profiles: { prenom: '', nom: '', telephone: null },
-                },
+                { id: 'm-1', user_id: 'u-1', role: 'admin', actif: true, nom: 'Awa Diop', telephone: '77', depuis: 't1', total: 12 },
+                { id: 'm-2', user_id: 'u-2', role: 'parent', actif: false, nom: 'Fatou Ndiaye', telephone: null, depuis: 't2', total: 12 },
             ],
             error: null,
-        };
-        const membres = await service.lister();
+        });
+        const page = await service.page({ page: 2, taille: 5, tri: { cle: 'nom', desc: true }, recherche: 'awa' }, '', 'tous');
 
-        expect(requete.eq).toHaveBeenCalledWith('daara_id', 'd-1');
-        // Trié par rôle puis par nom.
-        expect(membres.map((m) => [m.nom, m.moi, m.telephone])).toEqual([
-            ['Awa Diop', true, '77'],
-            ['', false, null],
-            ['Fatou Ndiaye', false, null],
+        expect(client.rpc).toHaveBeenCalledWith('rechercher_membres', {
+            p_daara: 'd-1',
+            p_texte: 'awa',
+            p_role: null,
+            p_etat: 'tous',
+            p_tri: '-nom',
+            p_offset: 10,
+            p_limite: 5,
+        });
+        expect(page.total).toBe(12);
+        expect(page.lignes.map((m) => [m.nom, m.moi])).toEqual([
+            ['Awa Diop', true],
+            ['Fatou Ndiaye', false],
         ]);
     });
 

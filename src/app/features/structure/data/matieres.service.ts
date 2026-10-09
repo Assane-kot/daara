@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { CurrentDaaraService } from '../../../core/daara/current-daara.service';
 import { Database } from '../../../core/supabase/database.types';
 import { SupabaseService } from '../../../core/supabase/supabase.service';
+import { PageTable, RequeteTable, motifIlike, sansAccents } from '../../../shared/ui/data-table/data-table';
 import { ErreurStructure, erreurStructure } from './annees.service';
 
 export type TypeMatiere = Database['public']['Enums']['type_matiere'];
@@ -45,6 +46,28 @@ export class MatieresService {
             throw erreurStructure(error);
         }
         return data;
+    }
+
+    /** Page du catalogue pour `data-table` : recherche sur le nom et le code, tri nom / code / type (S3.4). */
+    async page(r: RequeteTable, avecArchivees: boolean): Promise<PageTable<Matiere>> {
+        let q = this.sb.from('matieres').select('id, nom, code, type, archivee', { count: 'exact' }).eq('daara_id', this.daaraId());
+        if (!avecArchivees) {
+            q = q.eq('archivee', false);
+        }
+        if (r.recherche) {
+            // Colonne générée en base : nom et code en minuscules, sans accents.
+            q = q.ilike('recherche', motifIlike(sansAccents(r.recherche)));
+        }
+        const tri = r.tri && ['nom', 'code', 'type'].includes(r.tri.cle) ? r.tri : { cle: 'nom', desc: false };
+        const debut = r.page * r.taille;
+        const { data, error, count } = await q
+            .order(tri.cle, { ascending: !tri.desc })
+            .order('id')
+            .range(debut, debut + r.taille - 1);
+        if (error) {
+            throw erreurStructure(error);
+        }
+        return { lignes: data, total: count ?? 0 };
     }
 
     async creer(s: SaisieMatiere): Promise<void> {
