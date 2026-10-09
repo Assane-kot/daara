@@ -66,10 +66,14 @@ Livrable : l'admin invite un enseignant (e-mail) et un parent (téléphone), cha
 ne voit aucun écran scolaire ; un parent récupère son accès avec le code de l'admin.
 
 ## Sprint 3 — Structure scolaire
-- [ ] Années scolaires (une active), périodes, clôture
-- [ ] Classes, matières, `classe_matieres` (coefficients, enseignant)
-- [ ] Helper `teaches_class`, tests
-- [ ] Composant `data-table` (pagination, tri, recherche serveur)
+Planification validée le 2026-10-09 (LLD §3.3, §4 ; spec `structure-scolaire.md`). Module `structure` (ADR-008). Un
+commit par story.
+- [x] S3.0 Conception : LLD §3.3 et §4 détaillés, spec, plan du sprint
+- [ ] S3.1 Années scolaires et périodes : une année active (`activer_annee`), modèles trimestres / semestres, clôture et réouverture
+- [ ] S3.2 Matières : catalogue de la daara (code, type), archivage
+- [ ] S3.3 Classes et affectations : `classes`, `classe_matieres` (coefficient, enseignant), `teaches_class`, `enseignants_daara`
+- [ ] S3.4 Composant `data-table` (pagination, tri, recherche serveur) appliqué aux matières, classes et membres (`rechercher_membres`)
+Reporté : « Préparer la rentrée » (copie de l'année précédente), avant la deuxième année des pilotes.
 Livrable : l'admin configure son année complète.
 
 ## Sprint 4 — Apprenants et parents

@@ -54,7 +54,8 @@ src/app/
   ├── dashboard                    tous
   ├── compte                       tous : profil, langue, mot de passe, appareils TOTP (sprint 2)
   ├── membres                      admin (membres, invitations en attente)
-  ├── structure/...                admin
+  ├── structure/...                admin (écriture), enseignant (lecture) ; moduleGuard('structure') :
+  │                                annees (admin), matieres, classes, classes/:id (sprint 3)
   ├── apprenants/...               admin, enseignant (lecture)
   ├── absences                     admin, enseignant
   ├── evaluations/...              admin, enseignant
@@ -171,14 +172,22 @@ Colonnes ajoutées au sprint 2 :
 
 Table `notifications` : reportée au sprint 5 (module Notifications, ADR-008).
 
-### 3.3 Structure scolaire (sprint 3)
-| Table | Colonnes principales | Contraintes |
+### 3.3 Structure scolaire (sprint 3, module `structure`, détaillé le 2026-10-09)
+Toutes : `id uuid`, `daara_id` (fk `daaras` cascade, index), `created_at`, `created_by` (défaut `auth.uid()`), RLS, journal
+(`audit_trigger`), textes avec la contrainte « caractères interdits » du socle. Spec : `docs/features/structure-scolaire.md`.
+
+| Table | Colonnes | Contraintes |
 |---|---|---|
-| `annees_scolaires` | daara_id, libelle, date_debut, date_fin, active | une seule active par daara (index partiel unique) |
-| `periodes` | daara_id, annee_id, libelle, ordre, date_debut, date_fin, cloturee | période clôturée = notes verrouillées |
-| `classes` | daara_id, annee_id, nom, niveau, titulaire_id | unique (annee_id, nom) |
-| `matieres` | daara_id, nom, code, type (`scolaire`/`coran`/`religieux`) | unique (daara_id, code) |
-| `classe_matieres` | daara_id, classe_id, matiere_id, coefficient, enseignant_id | unique (classe_id, matiere_id) |
+| `annees_scolaires` | libelle text (1-20), date_debut date, date_fin date, active bool (défaut false) | unique (daara_id, libelle) ; `date_fin > date_debut` et durée ≤ 18 mois ; une seule active par daara (index unique partiel `where active`) ; `active` non modifiable directement (RPC `activer_annee`) ; suppression refusée si active (trigger) |
+| `periodes` | annee_id (fk cascade), libelle text (1-40), ordre smallint (1-12), date_debut, date_fin, cloturee bool (défaut false) | unique (annee_id, ordre) ; `date_fin > date_debut` ; dates comprises dans l'année et sans chevauchement avec les autres périodes de l'année (trigger `periodes_coherentes`) ; index (daara_id), (annee_id) |
+| `matieres` | nom text (1-80), code text (1-10, `^[A-Z0-9_-]+$`), type `type_matiere` (`scolaire`, `coran`, `religieux`), archivee bool (défaut false) | unique (daara_id, code) ; catalogue de la daara (pas par année) ; suppression refusée si utilisée (fk `restrict` depuis `classe_matieres`) |
+| `classes` | annee_id (fk cascade), nom text (1-50), niveau text null (≤ 50), titulaire_id uuid null (fk `auth.users` set null) | unique (annee_id, nom) ; index (daara_id), (annee_id) ; titulaire = membre actif `enseignant` ou `admin` de la daara (trigger, à l'écriture) |
+| `classe_matieres` | classe_id (fk cascade), matiere_id (fk `restrict`), coefficient numeric(4,2) (défaut 1, 0,5-20), enseignant_id uuid null (fk `auth.users` set null) | unique (classe_id, matiere_id) ; index (daara_id), (matiere_id), (enseignant_id) ; enseignant = membre actif `enseignant` ou `admin` de la daara (trigger) |
+
+Triggers : `meme_daara` (année d'une période ou d'une classe, classe et matière d'une affectation : même `daara_id`,
+sinon `23514 autre_daara`) ; `daara_id` immuable sur les 5 tables ; `periodes_coherentes` ; `membre_enseignant`
+(titulaire, enseignant) ; `annee_active_protegee` (suppression). Les tables des sprints suivants (inscriptions,
+évaluations, absences) référenceront ces tables en `restrict`.
 
 ### 3.4 Apprenants (sprint 4)
 | Table | Colonnes principales | Contraintes |
@@ -222,8 +231,8 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 | memberships | L ; E S au sprint 2 (gestion des membres) | L (soi + enseignants de sa daara) | L (soi) | L (soi) |
 | invitations | L E S | — | — | — |
 | codes_acces | L (métadonnées, sans `code_hash`) | — | — | — |
-| annees / periodes / classes / matieres | L E S | L | L | L |
-| classe_matieres | L E S | L | — | — |
+| annees_scolaires / periodes / matieres (module `structure`) | L E S | L | L | L |
+| classes / classe_matieres (module `structure`) | L E S | L | — (sprint 4 : classes de ses enfants) | — (sprint 4 : sa classe) |
 | apprenants | L E S | L (ses classes) | L (les siens) | L (soi) |
 | parent_links | L E S | — | L (soi) | — |
 | absences | L E S | L E (ses classes) | L (les siens) | L (soi) |
@@ -242,7 +251,7 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 | `is_member(daara_id)` | membre actif de la daara et `session_suffisante()` |
 | `has_role(daara_id, roles[])` | membre actif avec un des rôles et `session_suffisante()` ; pour `admin`, exige `aal2` dans tous les cas (ADR-006) |
 | `is_parent_of(apprenant_id)` | lien dans `parent_links` |
-| `teaches_class(classe_id)` | enseignant affecté à la classe (titulaire ou classe_matieres) |
+| `teaches_class(classe_id)` (S3.3) | membre actif `enseignant` de la daara (`has_role`), titulaire de la classe ou affecté à une de ses `classe_matieres` ; faux si le module `structure` est inactif |
 | `membres_administres()` → setof uuid | membres **actifs** des daaras dont l'appelant est admin actif (`aal2`) ; lecture des profils via `id in (select membres_administres())`, évalué une fois par requête. Un membre désactivé n'est plus lisible (minimisation) |
 | `is_platform_admin()` | présent dans `platform_admins` **et** session en `aal2` (ADR-006) |
 | `module_actif(daara_id, module)` | module activé pour la daara (ADR-008), faux pour un non-membre (sauf super-admin) ; à partir du sprint 11, et permis par son offre |
@@ -305,6 +314,15 @@ droits de l'appelant après verrou (un admin désactivé entre-temps n'agit plus
 Erreurs des RPC membres : `42501 admin_aal2_requis` (aussi pour un membership inconnu ou d'une autre daara : pas
 d'oracle), `22023 role_invalide`, `23505 role_deja_attribue`, `23514 dernier_admin`.
 
+### Structure scolaire (sprint 3) : politiques
+| Table | Lecture | Écriture (insert / update / delete) |
+|---|---|---|
+| `annees_scolaires`, `periodes`, `matieres` | `is_member(daara_id)` et `module_actif(daara_id, 'structure')` | `has_role(daara_id, admin)` et module actif, `with check` identique (le `daara_id` écrit est vérifié) ; `annees_scolaires.active` exclue des droits par colonne |
+| `classes`, `classe_matieres` | `has_role(daara_id, [admin, enseignant])` et module actif | admin et module actif, comme ci-dessus |
+Une politique par opération et par profil. Erreurs : `42501` (droits, RLS), `23505` (doublon : libellé, ordre, code,
+nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `autre_daara`, `enseignant_invalide`,
+`annee_active`), `23503` (matière utilisée).
+
 ### Fonctions RPC
 | Fonction | Rôle | Sécurité |
 |---|---|---|
@@ -320,6 +338,9 @@ d'oracle), `22023 role_invalide`, `23505 role_deja_attribue`, `23514 dernier_adm
 | `creer_code_acces(p_membership)` → code en clair `XXXX-XXXX` (affiché une fois) | réinitialisation assistée (ADR-006 niveau 2 ; remplace l'Edge Function `reset-access` : aucun privilège service_role requis) | admin `aal2` ; daara active ; cible membre actif de la même daara, autre que l'appelant, **admin dans aucune daara** (S2.6, décision D1) ; erreurs `42501 admin_aal2_requis` / `daara_suspendue`, `22023 cible_invalide` ; haché SHA-256 lié au compte ; code de 8 caractères (alphabet sans 0/O/1/l/I) tiré par `gen_random_bytes` ; ancien code annulé ; journalisé |
 | `consommer_code_acces(p_identifiant, p_code)` → (user_id, email, langue) (S2.6) | vérifie et consomme le code du compte désigné par son identifiant (e-mail confirmé ou téléphone confirmé, retrouvé par la base : pas de recherche dans l'API d'administration) ; renvoie le compte et son e-mail confirmé (notification) ou aucune ligne, sans dire pourquoi | **service_role uniquement** (Edge `use-access-code`) ; code normalisé (majuscules, sans tiret) ; 5 essais faux puis code invalidé ; expiré / utilisé / annulé → rien ; refusé aussi si, depuis la création, le membre a été désactivé ou est devenu admin, si l'auteur n'est plus admin actif ou si la daara est suspendue ; auteur = le membre (`definir_auteur`) |
 | `retirer_facteurs(p_user, p_motif)` → nombre (S2.7) | procédure super-admin (`docs/exploitation.md`) : supprime les facteurs TOTP, les sessions et jetons de rafraîchissement ; journal : ligne « plateforme » (daara nulle) avec motif et opérateur, ligne sans motif dans chaque daara où l'utilisateur est membre actif | exécutable par **aucun** rôle de l'API : SQL Editor (`postgres`) uniquement ; un jeton déjà émis reste valable 1 h au plus |
+| `activer_annee(p_annee)` (S3.1) | rend l'année active et désactive l'autre, en une transaction (verrou de la daara) | admin `aal2` ; module `structure` actif |
+| `enseignants_daara(p_daara)` → (user_id, prenom, nom, actif) (S3.3) | noms des enseignants et admins de la daara (titulaire, enseignant d'une matière) : l'enseignant ne lit pas les profils de ses collègues | `has_role(p_daara, [admin, enseignant])` ; membres désactivés : nom figé (`nom_affiche`) |
+| `rechercher_membres(p_daara, p_texte, p_role, p_etat, p_tri, p_offset, p_limite)` → (lignes, total) (S3.4) | liste paginée des membres pour `data-table` : recherche sans accents (`unaccent`) sur le nom et le téléphone | admin `aal2` ; limite ≤ 100 |
 | `avant_creation_utilisateur(event)` (S2.5, ADR-009) | hook Auth `before_user_created` : refuse toute inscription publique par téléphone (les comptes téléphone naissent par `accept-invitation`, API d'administration, non soumise au hook) | exécutable par `supabase_auth_admin` uniquement |
 | `basculer_module(p_daara, p_module, p_actif)` → `module_daara[]` (S2.2) | active ou désactive un module à partir de l'état en base (écran Modules : pas d'écrasement entre deux admins) ; s'appuie sur `definir_modules` | admin `aal2` ; verrou des lignes de la daara |
 | `definir_modules(p_daara, p_modules module_daara[])` → `module_daara[]` (sprint 2, ADR-008) | fixe les modules actifs de la daara | `security definer` ; `has_role(p_daara, admin)` en `aal2` ; prérequis ajoutés ; refus (`23514`, `module_requis`) de désactiver un prérequis d'un module actif ; journalisé |

@@ -11,7 +11,8 @@
   navigation (planification à faire).
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
-  terminé**. Suivant : bilan du sprint 2, puis planification du sprint 3.
+  terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
+- Sprint 3 — Structure scolaire : planifié (S3.0, 2026-10-09). Suivante : S3.1 années scolaires et périodes.
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -92,6 +93,18 @@
 3. Sprint 2 : planification faite (2026-10-04). Commencer par S2.0 (spike téléphone sans SMS → ADR-009 confirmé ou
    alternative présentée au développeur), puis S2.1 à S2.7 dans l'ordre, un commit par story.
 
+### Décisions de planification du sprint 3 (validées le 2026-10-09)
+- Découpage : S3.0 conception, S3.1 années et périodes, S3.2 matières, S3.3 classes et affectations, S3.4 `data-table`
+  (matières, classes, membres) ; « Préparer la rentrée » reportée avant la deuxième année des pilotes.
+- Matières : catalogue de la daara, réutilisé d'une année à l'autre (archivage plutôt que suppression).
+- Périodes : saisie libre + modèles « 3 trimestres » / « 2 semestres » ; une période clôturée peut être rouverte par
+  l'admin (journalisé).
+- Lecture : admin et enseignant lisent toute la structure (enseignant sans écriture) ; parents et apprenants : années,
+  périodes, matières seulement ; classes et affectations de leurs enfants au sprint 4 (matrice LLD §4 modifiée).
+- Niveau d'une classe : texte libre avec suggestions.
+- Écritures directes sous RLS (admin aal2 + module) sauf l'année active (RPC) ; noms des enseignants par
+  `enseignants_daara` ; recherche des membres sans accents par `rechercher_membres` (extension `unaccent`).
+
 ### Décisions de planification du sprint 2 (validées le 2026-10-04)
 - Identifiant sans e-mail : téléphone + mot de passe, sans SMS, compte créé seulement sur invitation (ADR-009,
   acceptée le 2026-10-05 après le spike S2.0 : fournisseur SMS factice + hook `before_user_created`).
@@ -141,6 +154,52 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-09 — Bilan du sprint 2 (Membres et navigation)
+**Objectif** : chaque profil accède à son espace et ne voit que ses modules ; l'admin invite, gère ses membres et
+paramètre sa daara ; un parent sans e-mail se connecte et récupère son accès. **Atteint en local** (navigateur, pgTAP,
+runtime Edge local). Mise en ligne : après les configurations du développeur (`docs/deploiement.md` §2.8, §2.9).
+
+| Story | État |
+|---|---|
+| S2.0 Spike téléphone sans SMS (ADR-009) | Fait : fournisseur factice + hook `before_user_created` |
+| S2.1 Navigation par daara | Fait |
+| S2.2 Modules activables (ADR-008) | Fait |
+| S2.3 Paramètres de la daara (logo) | Fait |
+| S2.4 Gestion des membres | Fait |
+| S2.5 Invitations (3 commits : base, Edge Functions, front) | Fait |
+| S2.6 Réinitialisation assistée (code de la daara) | Fait |
+| S2.7 Mon compte et sécurité | Fait |
+
+**Livrable** « l'admin invite un enseignant (e-mail) et un parent (téléphone), chacun voit son menu ; une daara coranique
+ne voit aucun écran scolaire ; un parent récupère son accès avec le code de l'admin » : vérifié en local.
+
+**Chiffres** : 446 tests pgTAP (123 au sprint 1) ; 222 tests unitaires (122) ; 34 tests Deno (nouveau) ; 4 Edge
+Functions ; chargement initial 150,5 kB transférés (142) ; aucun paquet npm ajouté ; 2 ADR (008, 009) ; 10 commits.
+
+**Audits** : 0 critique sur l'ensemble ; importants trouvés et corrigés avant chaque commit, entre autres : lecture du nom
+figé des collègues désactivés, admin retiré qui revenait par ses invitations, haché du jeton dans le journal, quotas
+contournables, `module_actif` oracle de configuration, reconnexion automatique en boucle, profil modifiable en aal1,
+session du téléphone perdu laissée ouverte après retrait de l'appareil.
+
+**Ce qui a bien marché** :
+- découper les grosses stories (S2.5 en 3 commits) : commits relisibles, audits ciblés ;
+- auditer avec deux agents (sécurité + RLS) dès qu'une table change : chacun trouve ce que l'autre ne voit pas ;
+- le parcours dans le navigateur trouve encore des bugs que les tests ne voient pas (second appareil TOTP refusé à la
+  connexion, `app-page-header` qui ne projetait pas le bouton) ;
+- les fonctions pures des Edge Functions (`logique.ts`, dépendances injectées) se testent sans runtime.
+
+**À améliorer** :
+- garde-fou de transaction pour l'auditeur RLS : respecté depuis S2.5a (deux incidents avant) ;
+- tester plus tôt les chemins à plusieurs éléments (deux appareils, deux daaras) : les bugs du sprint étaient là ;
+- outillage : les commandes de vérification en heredoc échouent parfois dans le shell (passer par des scripts) ;
+- vélocité : le sprint entier tient encore en quelques jours de session ; le goulot reste côté développeur
+  (configurations cloud, validations, premier run de la CI).
+
+**Pièges à retenir** : une nouvelle Edge Function n'est servie qu'après `supabase stop` / `start` ; Kong ajoute un CORS
+ouvert en local ; le Storage renvoie le vrai code dans `statusCode` ; `enable_signup = false` coupe aussi la connexion
+par téléphone ; le claim `aal2` survit au retrait d'un facteur jusqu'à l'expiration du JWT (1 h) ; Auth exige une lettre
+ASCII (`letters_digits`) et 72 octets au plus ; `whenStable()` n'attend pas des promesses enchaînées dans les tests.
+
 ### 2026-10-09 — S2.7 Mon compte et sécurité
 - Décisions (validées) : D1 fonction SQL `retirer_facteurs` pour la procédure super-admin (`docs/exploitation.md`) ; D2
   changement de mot de passe : code de réauthentification par e-mail, reconnexion pour un compte téléphone.
