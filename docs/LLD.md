@@ -57,11 +57,11 @@ src/app/
   ├── membres                      admin (membres, invitations en attente)
   ├── structure/...                admin (écriture), enseignant (lecture) ; moduleGuard('structure') :
   │                                annees (admin), matieres, classes, classes/:id (sprint 3)
-  ├── apprenants/...               admin, enseignant (lecture)
+  ├── apprenants/...               admin, enseignant (lecture) : liste, :id (fiche), import (admin) (sprint 4)
   ├── absences                     admin, enseignant
   ├── evaluations/...              admin, enseignant
   ├── bulletins/...                admin (gestion), parent/apprenant (consultation)
-  ├── enfants/:apprenantId/...     parent
+  ├── enfants                      parent : « Mes enfants » (sprint 4) ; :apprenantId/... (sprints 5+)
   ├── coran/...                    admin, enseignant, apprenant
   └── parametres                   admin : onglets Général (nom, logo, langue, barème) et Modules (ADR-008)
 /plateforme/...                    super-admin
@@ -198,12 +198,21 @@ client sur une table à droits par colonne (refusé par Postgres) : compter les 
 par le client. Les tables des sprints suivants (inscriptions,
 évaluations, absences) référenceront ces tables en `restrict`.
 
-### 3.4 Apprenants (sprint 4)
-| Table | Colonnes principales | Contraintes |
+### 3.4 Apprenants (sprint 4, détaillé le 2026-10-09 ; ADR-010)
+Socle (pas un module), sauf `inscriptions` (module `structure`, elle référence les classes). Mêmes conventions que §3.3
+(`created_by` illisible, droits par colonne, `daara_id` immuable, droits contrôlés en tête des triggers security
+definer, libellés `libelle_valide`). Journal **sans valeurs** (`audit_trigger_colonnes` : colonnes modifiées seulement,
+ADR-010). Spec : `docs/features/apprenants.md`.
+
+| Table | Colonnes | Contraintes |
 |---|---|---|
-| `apprenants` | daara_id, matricule, nom, prenom, date_naissance, sexe, photo_path, user_id (optionnel), statut | matricule unique par daara |
-| `inscriptions` | daara_id, apprenant_id, classe_id, annee_id, date_inscription | unique (apprenant_id, annee_id) |
-| `parent_links` | daara_id, parent_user_id, apprenant_id, lien (père/mère/tuteur) | unique (parent_user_id, apprenant_id) |
+| `apprenants` | matricule text (généré), nom, prenom (`libelle_valide`, 100), date_naissance date null, sexe `sexe_apprenant` null (`F`, `M`), statut `statut_apprenant` (`inscrit`, `parti` ; défaut `inscrit`), photo_path text null, user_id uuid null (sprint 9), recherche (générée : `sans_accents(nom prenom matricule)`), updated_at | unique (daara_id, matricule) ; matricule `^[0-9]{4}-[0-9]{4,}$` attribué par trigger (`compteurs_matricule(daara_id, annee, dernier)`, verrou) et non modifiable ; date_naissance entre 1950 et aujourd'hui ; photo_path = `<daara_id>/apprenants/<id>.webp` |
+| `inscriptions` | apprenant_id (fk cascade), classe_id (fk `restrict` : une classe avec inscrits ne se supprime pas), annee_id (copiée de la classe par trigger), date_inscription date (défaut aujourd'hui) | unique (apprenant_id, annee_id) ; même daara (apprenant, classe) ; élève `parti` non inscriptible ; changer de classe = update de classe_id dans la même année |
+| `parent_links` | parent_user_id (fk `auth.users` cascade), apprenant_id (fk cascade), lien `lien_parent` (`pere`, `mere`, `tuteur`) | unique (parent_user_id, apprenant_id) ; parent = membre actif `parent` de la daara (trigger) ; créé par l'admin ou par l'acceptation d'une invitation (S4.3) |
+| `compteurs_matricule` | daara_id, annee smallint, dernier integer | pk (daara_id, annee) ; aucun accès client (écrit par le trigger) |
+
+`invitations` (S4.3) : + `apprenant_id` null (fk cascade), `lien` `lien_parent` null — seulement pour le rôle `parent` ;
+`accepter_invitation_pour` crée le `parent_links` correspondant.
 
 ### 3.5 Vie scolaire et évaluations (sprints 5-7)
 | Table | Colonnes principales | Contraintes |
@@ -242,8 +251,9 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 | codes_acces | L (métadonnées, sans `code_hash`) | — | — | — |
 | annees_scolaires / periodes / matieres (module `structure`) | L E S | L | L | L |
 | classes / classe_matieres (module `structure`) | L E S | L | — (sprint 4 : classes de ses enfants) | — (sprint 4 : sa classe) |
-| apprenants | L E S | L (ses classes) | L (les siens) | L (soi) |
-| parent_links | L E S | — | L (soi) | — |
+| apprenants (sprint 4) | L E S | L (élèves inscrits dans ses classes) | L (ses enfants) | — (sprint 9) |
+| inscriptions (sprint 4, module `structure`) | L E S | L (ses classes) | L (ses enfants) | — |
+| parent_links (sprint 4) | L E S | — | L (les siens) | — |
 | absences | L E S | L E (ses classes) | L (les siens) | L (soi) |
 | evaluations | L E S | L E (ses classe_matieres) | L publiées | L publiées |
 | notes | L E S | L E (ses évaluations, période ouverte) | L (les siens) | L (soi) |
@@ -259,7 +269,8 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 | `session_suffisante()` (sprint 2) | session `aal2`, **ou** utilisateur sans facteur TOTP vérifié (lecture de `auth.mfa_factors`) : qui a activé la double authentification doit l'utiliser pour tout accès à une daara et pour modifier son profil (`profiles_update_soi`, S2.7 ; exécutable par `authenticated` depuis, ne renseigne que sur sa propre session) |
 | `is_member(daara_id)` | membre actif de la daara et `session_suffisante()` |
 | `has_role(daara_id, roles[])` | membre actif avec un des rôles et `session_suffisante()` ; pour `admin`, exige `aal2` dans tous les cas (ADR-006) |
-| `is_parent_of(apprenant_id)` | lien dans `parent_links` |
+| `is_parent_of(apprenant_id)` (S4.3) | lien dans `parent_links` pour `auth.uid()`, membre actif `parent` de la daara de l'enfant, `session_suffisante()` |
+| `enseigne_apprenant(apprenant_id)` (S4.2) | enseignant actif qui `teaches_class` la classe d'une inscription de l'enfant (année active ou toutes années : toutes) |
 | `teaches_class(classe_id)` (S3.3) | membre actif `enseignant` de la daara (`has_role`), titulaire de la classe ou affecté à une de ses `classe_matieres` ; faux si le module `structure` est inactif |
 | `membres_administres()` → setof uuid | membres **actifs** des daaras dont l'appelant est admin actif (`aal2`) ; lecture des profils via `id in (select membres_administres())`, évalué une fois par requête. Un membre désactivé n'est plus lisible (minimisation) |
 | `is_platform_admin()` | présent dans `platform_admins` **et** session en `aal2` (ADR-006) |
@@ -332,6 +343,15 @@ Une politique par opération et par profil. Erreurs : `42501` (droits, RLS), `23
 nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `autre_daara`, `enseignant_invalide`,
 `annee_active`), `23503` (matière utilisée).
 
+### Apprenants (sprint 4) : politiques
+| Table | Lecture | Écriture |
+|---|---|---|
+| `apprenants` | admin (`has_role`) ; enseignant si `enseigne_apprenant(id)` ; parent si `is_parent_of(id)` | admin aal2 (insert / update / delete, `with check` identique) ; matricule, `daara_id`, `user_id` hors droits |
+| `inscriptions` | admin ; enseignant si `teaches_class(classe_id)` ; parent si `is_parent_of(apprenant_id)` ; module `structure` | admin aal2 + module |
+| `parent_links` | admin ; parent si `parent_user_id = auth.uid()` | admin aal2 ; acceptation d'invitation (RPC) |
+| `classes` (ajout S4.3) | parent : classes d'une inscription de ses enfants | — |
+| `storage.objects`, bucket `photos` | admin ; enseignant / parent de l'enfant du chemin (`enseigne_apprenant`, `is_parent_of` sur le 3e segment) | admin aal2 ; nom `<daara_id>/apprenants/<apprenant_id>.webp` |
+
 ### Fonctions RPC
 | Fonction | Rôle | Sécurité |
 |---|---|---|
@@ -351,6 +371,7 @@ nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `au
 | `enseignants_daara(p_daara)` → (user_id, prenom, nom, actif) (S3.3) | noms des enseignants et admins de la daara (titulaire, enseignant d'une matière) : l'enseignant ne lit pas les profils de ses collègues | `has_role(p_daara, [admin, enseignant])` + module ; désactivés : nom figé (`nom_affiche`), tous pour l'admin, pour un enseignant seulement ceux encore titulaires ou enseignants d'une classe (audit de fin de sprint 3) |
 | `rechercher_membres(p_daara, p_texte, p_role, p_etat, p_tri, p_offset, p_limite)` → lignes (id, user_id, role, actif, nom, telephone, depuis, total) (S3.4) | liste paginée des membres pour `data-table` : recherche sans accents (`unaccent`) sur le nom et le téléphone (actifs seulement), filtres rôle / état, tri `role` / `nom` / `depuis` (± ), total par fenêtre ; nom figé et pas de téléphone pour un désactivé | admin `aal2` ; limite ≤ 100, texte ≤ 100, paramètres contrôlés (`22023 parametre_invalide`) |
 | `sans_accents(texte)` (S3.4) | minuscules sans accents (`unaccent` à dictionnaire explicite, immuable) ; colonnes générées `matieres.recherche` (nom + code) et `classes.recherche` (nom + niveau), filtrées par `ilike` côté client | fonction pure, exécutable par `authenticated` (colonnes générées) |
+| `importer_apprenants(p_daara, p_lignes jsonb, p_classe uuid null)` → jsonb `{ crees, erreurs[] }` (S4.4) | import CSV : valide toutes les lignes (nom, prénom, date, sexe, classe de la daara), **tout ou rien**, 500 lignes au plus ; erreurs renvoyées par ligne et par champ sans rien écrire | admin aal2 ; journal sans valeurs |
 | `avant_creation_utilisateur(event)` (S2.5, ADR-009) | hook Auth `before_user_created` : refuse toute inscription publique par téléphone (les comptes téléphone naissent par `accept-invitation`, API d'administration, non soumise au hook) | exécutable par `supabase_auth_admin` uniquement |
 | `basculer_module(p_daara, p_module, p_actif)` → `module_daara[]` (S2.2) | active ou désactive un module à partir de l'état en base (écran Modules : pas d'écrasement entre deux admins) ; s'appuie sur `definir_modules` | admin `aal2` ; verrou des lignes de la daara |
 | `definir_modules(p_daara, p_modules module_daara[])` → `module_daara[]` (sprint 2, ADR-008) | fixe les modules actifs de la daara | `security definer` ; `has_role(p_daara, admin)` en `aal2` ; prérequis ajoutés ; refus (`23514`, `module_requis`) de désactiver un prérequis d'un module actif ; journalisé |
@@ -370,7 +391,7 @@ nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `au
 | Bucket | Chemin | Accès |
 |---|---|---|
 | `logos` (sprint 2) | `{daara_id}/logo.{png,jpg,webp}` | public en lecture ; écriture admin `aal2` ; 512 Ko max ; PNG, JPEG, WebP uniquement (pas de SVG : script possible) ; créé par migration |
-| `photos` | `{daara_id}/apprenants/{apprenant_id}.jpg` | membres de la daara (staff) + parent concerné |
+| `photos` (sprint 4, ADR-010) | `{daara_id}/apprenants/{apprenant_id}.webp` | **privé**, URL signées (1 h) ; lecture admin, enseignants de l'enfant, parents de l'enfant ; écriture admin aal2 ; 1 Mo, WebP / JPEG / PNG ; ré-encodée 512 px sans EXIF dans le navigateur |
 | `bulletins` | `{daara_id}/{periode_id}/{apprenant_id}.pdf` | admin ; parent/apprenant si publié |
 Politiques sur `storage.objects` : premier segment du chemin = daara dont l'utilisateur est membre.
 URLs signées à durée courte pour les fichiers privés.

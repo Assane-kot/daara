@@ -12,8 +12,8 @@
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
-- Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous). Suivant :
-  planification du sprint 4 (apprenants et parents). **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
+- Sprint 4 — Apprenants et parents : planifié (S4.0, 2026-10-09). Suivante : S4.1 fiches apprenants. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -54,9 +54,8 @@
       le fixer avec `set_config(…, true)` dans une seule fonction interne, après vérification de l'auteur ;
     - sprint 2 : le claim `aal2` reste valable jusqu'à l'expiration du JWT (1 h) après retrait d'un facteur TOTP →
       révoquer les sessions dans la procédure de retrait (journalisée) ;
-    - AVANT le sprint 5 (ADR) : `audit_trigger` copie les lignes entières, sans durée de conservation, et les
-      lignes d'une daara ou d'un utilisateur supprimés restent (effacement CDP) → colonnes exclues ou diff,
-      purge planifiée et purge à la suppression d'une daara ;
+    - ~~AVANT le sprint 5 (ADR) : journal des données d'enfants~~ → ADR-010 (journal sans valeurs pour les tables
+      d'enfants) ; reste au sprint 12 : purge planifiée (1 an) et purge à la suppression d'une daara / d'un enfant ;
     - sprint 4 (exports CSV / PDF) : neutraliser `= + - @` en tête de cellule (injection de formules) ;
     - sprint 12 : performance des politiques (`(select has_role(daara_id …))` dépend de la ligne).
   - À faire par le développeur avant la preview : déployer les Edge Functions et leurs secrets (`docs/deploiement.md`
@@ -100,6 +99,14 @@
    tag `s1` sur `develop`.
 3. Sprint 2 : planification faite (2026-10-04). Commencer par S2.0 (spike téléphone sans SMS → ADR-009 confirmé ou
    alternative présentée au développeur), puis S2.1 à S2.7 dans l'ordre, un commit par story.
+
+### Décisions de planification du sprint 4 (validées le 2026-10-09)
+- Découpage S4.0 à S4.6 (dont S4.5 démarrage guidé et S4.6 revue ergonomique) ; audit unique en fin de sprint.
+- Matricule généré par la base (`AAAA-NNNN`), non modifiable ; photo facultative, bucket privé, URL signées ; données
+  minimales (nom, prénom, date de naissance, sexe, statut) ; journal sans valeurs, conservation 1 an (ADR-010) ;
+  comptes apprenants reportés au sprint 9 ; import CSV analysé dans le navigateur, sans paquet, tout ou rien.
+- **Exigence d'ergonomie** du développeur : toutes les fonctionnalités « très, très faciles à utiliser » → règles
+  `.claude/rules/ux.md`, appliquées et vérifiées à chaque story.
 
 ### Décision de méthode (2026-10-09)
 - Audits `auditeur-securite` et `auditeur-rls` en **fin de sprint** sur l'ensemble des stories, plus après chaque story
