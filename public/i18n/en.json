@@ -26,7 +26,8 @@
         "changer_daara": "Switch daara",
         "membres": "Members",
         "parametres": "Settings",
-        "structure": "Structure"
+        "structure": "Structure",
+        "eleves": "Students"
     },
     "titres": {
         "tableau_de_bord": "Dashboard",
@@ -50,7 +51,9 @@
         "structure_annees": "School years",
         "structure_matieres": "Subjects",
         "structure_classes": "Classes",
-        "structure_classe": "Class"
+        "structure_classe": "Class",
+        "apprenants": "Students",
+        "apprenant": "Student record"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -753,5 +756,61 @@
         "plage": "{{debut}}–{{fin}} of {{total}}",
         "vide_titre": "No result",
         "vide_message": "Change the search or the filters."
+    },
+    "apprenants": {
+        "titre": "Students",
+        "ajouter": "Add a student",
+        "ajouter_premier": "Add the first student",
+        "modifier": "Edit the record",
+        "enregistrer": "Save",
+        "enregistrer_et_ajouter": "Save and add another",
+        "ajoutes": "{{n}} student(s) added. Enter the next one.",
+        "enregistre": "Record saved.",
+        "rechercher": "Search a student (name, first name, ID)",
+        "eleve": "Student",
+        "matricule": "Student ID",
+        "date_naissance": "Date of birth",
+        "sexe": "Sex",
+        "statut": "Status",
+        "facultatif": "Optional.",
+        "non_renseignee": "Not provided",
+        "sexes": {
+            "F": "Girl",
+            "M": "Boy",
+            "non_precise": "Not specified"
+        },
+        "statuts": {
+            "inscrit": "Enrolled",
+            "parti": "Left the daara",
+            "inscrit_pluriel": "Enrolled students",
+            "parti_pluriel": "Students who left",
+            "tous": "All students"
+        },
+        "vide_titre": "No student",
+        "vide_message": "Add your students one by one, or import a list.",
+        "retour": "Back to students",
+        "photo_de": "Photo of {{nom}}",
+        "ajouter_photo": "Add a photo",
+        "changer_photo": "Change the photo",
+        "retirer_photo": "Remove the photo",
+        "photo_ok": "Photo saved.",
+        "photo_retiree": "Photo removed.",
+        "marquer_parti": "Left the daara",
+        "reinscrire": "Re-enrol",
+        "parti_ok": "Student marked as left: kept in the history.",
+        "reinscrit_ok": "Student re-enrolled.",
+        "supprimer": "Delete the record",
+        "confirmer_suppression": "Delete the record of {{nom}}?",
+        "confirmer_suppression_message": "The record and its photo will be deleted permanently. For a student who leaves, prefer “Left the daara”.",
+        "erreurs": {
+            "chargement": "The record could not be loaded.",
+            "introuvable": "This student cannot be found.",
+            "droits": "Only an administrator who confirmed their identity can manage students.",
+            "donnee_invalide": "A value is invalid (name, first name or date of birth).",
+            "utilise": "This student has linked data: mark them as left instead.",
+            "photo_illisible": "This image cannot be read: choose a JPEG, PNG or WebP photo.",
+            "photo": "The photo could not be saved. Try again.",
+            "inattendue": "The action failed. Try again."
+        }
     }
 }

@@ -13,7 +13,7 @@
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
 - Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
-- Sprint 4 — Apprenants et parents : planifié (S4.0, 2026-10-09). Suivante : S4.1 fiches apprenants. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 4 — Apprenants et parents : S4.0 (conception) et S4.1 (fiches) faits. Suivante : S4.2 inscriptions. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -173,6 +173,22 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-09 — S4.1 Fiches apprenants
+- Migration `apprenants` (socle, ADR-010) : enums `sexe_apprenant` / `statut_apprenant`, `apprenants` (matricule
+  `AAAA-NNNN` attribué par trigger via `compteurs_matricule`, non fourni ni modifiable par le client ; recherche sans
+  accents ; photo_path contraint ; `user_id` réservé au sprint 9), `ecrivain_admin` (droits en tête des triggers),
+  `audit_trigger_colonnes` (journal sans valeurs), bucket privé `photos` (1 Mo) et politiques admin
+  (`photo_apprenant_administree`). Lecture admin seulement (enseignants S4.2, parents S4.3). 22 tests pgTAP (599).
+- Front : menu « Élèves », `/d/:slug/apprenants` (`data-table` : recherche, statut, tri ; état vide avec « Ajouter le
+  premier élève » — nouvelle option `actionVide` du `data-table`), modale avec « Enregistrer et ajouter un autre » (nom
+  de famille gardé pour une fratrie), fiche (photo ré-encodée 512 px, URL signée 1 h ; « A quitté la daara » /
+  « Réinscrire » ; suppression confirmée qui oriente vers « parti »).
+- Vérifié dans le navigateur : liste vide → premier élève, saisie en série (2 élèves, matricules 2026-0001 / 0002),
+  photo JPEG 900 px → 512 px affichée par URL signée, élève marqué parti, fiche en 375 px.
+- Piège : une colonne `not null` remplie par un trigger BEFORE doit avoir une valeur par défaut, sinon les types
+  générés l'exigent à l'insertion (`matricule default ''`).
+- 244 tests unitaires ; chargement initial 150,8 kB transférés.
+
 ### 2026-10-09 — Audit de fin de sprint 3 et bilan du sprint 3 (Structure scolaire)
 **Audit** (un seul agent `auditeur-securite`, mode économe, à la demande du développeur) : 0 critique, **1 important**
 corrigé — `enseignants_daara` rendait à un enseignant le nom figé de tous ses collègues désactivés (lecture retirée en

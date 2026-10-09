@@ -61,6 +61,65 @@ export type Database = {
                     },
                 ];
             };
+            apprenants: {
+                Row: {
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    date_naissance: string | null;
+                    id: string;
+                    matricule: string;
+                    nom: string;
+                    photo_path: string | null;
+                    prenom: string;
+                    recherche: string | null;
+                    sexe: Database['public']['Enums']['sexe_apprenant'] | null;
+                    statut: Database['public']['Enums']['statut_apprenant'];
+                    updated_at: string;
+                    user_id: string | null;
+                };
+                Insert: {
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id: string;
+                    date_naissance?: string | null;
+                    id?: string;
+                    matricule?: string;
+                    nom: string;
+                    photo_path?: string | null;
+                    prenom: string;
+                    recherche?: never;
+                    sexe?: Database['public']['Enums']['sexe_apprenant'] | null;
+                    statut?: Database['public']['Enums']['statut_apprenant'];
+                    updated_at?: string;
+                    user_id?: string | null;
+                };
+                Update: {
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id?: string;
+                    date_naissance?: string | null;
+                    id?: string;
+                    matricule?: string;
+                    nom?: string;
+                    photo_path?: string | null;
+                    prenom?: string;
+                    recherche?: never;
+                    sexe?: Database['public']['Enums']['sexe_apprenant'] | null;
+                    statut?: Database['public']['Enums']['statut_apprenant'];
+                    updated_at?: string;
+                    user_id?: string | null;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'apprenants_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             audit_log: {
                 Row: {
                     action: string;
@@ -240,6 +299,32 @@ export type Database = {
                 Relationships: [
                     {
                         foreignKeyName: 'codes_acces_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
+            compteurs_matricule: {
+                Row: {
+                    annee: number;
+                    daara_id: string;
+                    dernier: number;
+                };
+                Insert: {
+                    annee: number;
+                    daara_id: string;
+                    dernier?: number;
+                };
+                Update: {
+                    annee?: number;
+                    daara_id?: string;
+                    dernier?: number;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'compteurs_matricule_daara_id_fkey';
                         columns: ['daara_id'];
                         isOneToOne: false;
                         referencedRelation: 'daaras';
@@ -645,6 +730,7 @@ export type Database = {
                 Returns: Database['public']['Enums']['module_daara'][];
             };
             ecrire_modules: { Args: { p_actifs: Database['public']['Enums']['module_daara'][]; p_daara: string }; Returns: undefined };
+            ecrivain_admin: { Args: { p_daara: string }; Returns: undefined };
             ecrivain_structure: { Args: { p_daara: string }; Returns: undefined };
             enseignants_daara: {
                 Args: { p_daara: string };
@@ -702,6 +788,7 @@ export type Database = {
             module_actif: { Args: { p_daara: string; p_module: Database['public']['Enums']['module_daara'] }; Returns: boolean };
             modules_valides: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: boolean };
             normaliser_code_acces: { Args: { p_code: string }; Returns: string };
+            photo_apprenant_administree: { Args: { p_nom: string }; Returns: boolean };
             prerequis_module: { Args: { p_module: Database['public']['Enums']['module_daara'] }; Returns: Database['public']['Enums']['module_daara'][] };
             rechercher_membres: {
                 Args: {
@@ -734,6 +821,8 @@ export type Database = {
         Enums: {
             module_daara: 'structure' | 'absences' | 'notes' | 'bulletins' | 'coran_cahier' | 'coran_recitations' | 'coran_nafar' | 'notifications';
             role_membre: 'admin' | 'enseignant' | 'parent' | 'apprenant';
+            sexe_apprenant: 'F' | 'M';
+            statut_apprenant: 'inscrit' | 'parti';
             type_matiere: 'scolaire' | 'coran' | 'religieux';
         };
         CompositeTypes: {
@@ -845,6 +934,8 @@ export const Constants = {
         Enums: {
             module_daara: ['structure', 'absences', 'notes', 'bulletins', 'coran_cahier', 'coran_recitations', 'coran_nafar', 'notifications'],
             role_membre: ['admin', 'enseignant', 'parent', 'apprenant'],
+            sexe_apprenant: ['F', 'M'],
+            statut_apprenant: ['inscrit', 'parti'],
             type_matiere: ['scolaire', 'coran', 'religieux'],
         },
     },

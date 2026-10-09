@@ -26,7 +26,8 @@
         "changer_daara": "Changer de daara",
         "membres": "Membres",
         "parametres": "Paramètres",
-        "structure": "Structure"
+        "structure": "Structure",
+        "eleves": "Élèves"
     },
     "titres": {
         "tableau_de_bord": "Tableau de bord",
@@ -50,7 +51,9 @@
         "structure_annees": "Années scolaires",
         "structure_matieres": "Matières",
         "structure_classes": "Classes",
-        "structure_classe": "Classe"
+        "structure_classe": "Classe",
+        "apprenants": "Élèves",
+        "apprenant": "Fiche élève"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -753,5 +756,61 @@
         "plage": "{{debut}}–{{fin}} sur {{total}}",
         "vide_titre": "Aucun résultat",
         "vide_message": "Modifiez la recherche ou les filtres."
+    },
+    "apprenants": {
+        "titre": "Élèves",
+        "ajouter": "Ajouter un élève",
+        "ajouter_premier": "Ajouter le premier élève",
+        "modifier": "Modifier la fiche",
+        "enregistrer": "Enregistrer",
+        "enregistrer_et_ajouter": "Enregistrer et ajouter un autre",
+        "ajoutes": "{{n}} élève(s) ajouté(s). Saisissez le suivant.",
+        "enregistre": "Fiche enregistrée.",
+        "rechercher": "Rechercher un élève (nom, prénom, matricule)",
+        "eleve": "Élève",
+        "matricule": "Matricule",
+        "date_naissance": "Date de naissance",
+        "sexe": "Sexe",
+        "statut": "Statut",
+        "facultatif": "Facultatif.",
+        "non_renseignee": "Non renseignée",
+        "sexes": {
+            "F": "Fille",
+            "M": "Garçon",
+            "non_precise": "Non précisé"
+        },
+        "statuts": {
+            "inscrit": "Inscrit",
+            "parti": "A quitté la daara",
+            "inscrit_pluriel": "Élèves inscrits",
+            "parti_pluriel": "Élèves partis",
+            "tous": "Tous les élèves"
+        },
+        "vide_titre": "Aucun élève",
+        "vide_message": "Ajoutez vos élèves un par un, ou importez une liste.",
+        "retour": "Retour aux élèves",
+        "photo_de": "Photo de {{nom}}",
+        "ajouter_photo": "Ajouter une photo",
+        "changer_photo": "Changer la photo",
+        "retirer_photo": "Retirer la photo",
+        "photo_ok": "Photo enregistrée.",
+        "photo_retiree": "Photo retirée.",
+        "marquer_parti": "A quitté la daara",
+        "reinscrire": "Réinscrire",
+        "parti_ok": "Élève marqué comme parti : il reste dans l’historique.",
+        "reinscrit_ok": "Élève réinscrit.",
+        "supprimer": "Supprimer la fiche",
+        "confirmer_suppression": "Supprimer la fiche de {{nom}} ?",
+        "confirmer_suppression_message": "La fiche et sa photo seront supprimées définitivement. Pour un élève qui part, préférez « A quitté la daara ».",
+        "erreurs": {
+            "chargement": "La fiche n’a pas pu être chargée.",
+            "introuvable": "Cet élève est introuvable.",
+            "droits": "Seul un administrateur ayant confirmé son identité peut gérer les élèves.",
+            "donnee_invalide": "Une valeur est invalide (nom, prénom ou date de naissance).",
+            "utilise": "Cet élève a des données liées : marquez-le plutôt comme parti.",
+            "photo_illisible": "Cette image ne peut pas être lue : choisissez une photo JPEG, PNG ou WebP.",
+            "photo": "La photo n’a pas pu être enregistrée. Réessayez.",
+            "inattendue": "L’action a échoué. Réessayez."
+        }
     }
 }

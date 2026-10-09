@@ -11,6 +11,7 @@ import {
     contentChildren,
     inject,
     input,
+    output,
     signal,
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -120,6 +121,11 @@ export class CarteTable {
             <app-skeleton [lignes]="5" />
         } @else if (total() === 0) {
             <app-empty-state [titre]="titreVide() | translate" [message]="messageVide() | translate" />
+            @if (actionVide() && !recherche()) {
+                <div class="mt-2 text-center">
+                    <button type="button" class="btn btn-primary" (click)="actionVideClic.emit()">{{ actionVide()! | translate }}</button>
+                </div>
+            }
         } @else {
             <div [attr.aria-busy]="chargement()" [class.opacity-60]="chargement()">
                 <div class="table-responsive hidden sm:block">
@@ -211,6 +217,9 @@ export class DataTable<T> implements OnInit, OnDestroy {
     readonly rechercheLibelle = input<string | null>(null);
     readonly titreVide = input('table.vide_titre');
     readonly messageVide = input('table.vide_message');
+    /** Libellé (clé) d'un bouton proposé quand la liste est vide sans recherche (ergonomie : guider). */
+    readonly actionVide = input<string | null>(null);
+    readonly actionVideClic = output<void>();
 
     private readonly cellules = contentChildren(CelluleTable);
     protected readonly carte = contentChild(CarteTable);
