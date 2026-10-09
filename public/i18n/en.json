@@ -16,7 +16,8 @@
         "fil_ariane": "Breadcrumb",
         "compte": {
             "menu": "My account",
-            "deconnexion": "Sign out"
+            "deconnexion": "Sign out",
+            "mon_compte": "My account"
         },
         "navigation_mobile": "Main navigation"
     },
@@ -41,7 +42,10 @@
         "membres": "Members",
         "invitation": "Invitation",
         "invitations": "Invitations",
-        "code_acces": "Code from your daara"
+        "code_acces": "Code from your daara",
+        "compte_profil": "My profile",
+        "compte_mot_de_passe": "Password",
+        "compte_securite": "Account security"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -69,7 +73,8 @@
             "different": "The two passwords do not match.",
             "slug": "Lowercase letters, digits and hyphens only (3 to 50 characters).",
             "identifiant": "Enter a valid email address or phone number.",
-            "code_acces": "Enter the 8 characters of the code (for example ABCD-EFGH)."
+            "code_acces": "Enter the 8 characters of the code (for example ABCD-EFGH).",
+            "nom_pris": "This name is already used by one of your devices."
         },
         "code": {
             "chiffre": "Digit {{n}} of 6"
@@ -253,7 +258,8 @@
             },
             "aide_prerequis": "Modules required by your choice will be added automatically.",
             "modifiable": "Can be changed at any time in Settings → Modules."
-        }
+        },
+        "acces_desactive": "Your access to a daara has been deactivated. Contact its administrator to restore it. You can also create your own daara below."
     },
     "navigation": {
         "daara_inaccessible": "This daara is not accessible with your account.",
@@ -541,5 +547,58 @@
             "inattendue": "An unexpected error occurred. Please try again."
         },
         "ignorer": "Ignore this invitation"
+    },
+    "compte": {
+        "titre": "My account",
+        "onglets": {
+            "profil": "Profile",
+            "mot_de_passe": "Password",
+            "securite": "Security"
+        },
+        "enregistrer": "Save",
+        "profil": {
+            "identifiant": "Sign-in identifier",
+            "telephone": "Contact phone",
+            "aide_telephone": "Optional. Your daara uses it to reach you; it does not change your sign-in identifier.",
+            "langue": "Language",
+            "aide_langue": "Language of the app and of the emails you receive.",
+            "succes": "Profile saved."
+        },
+        "mot_de_passe": {
+            "bouton": "Change password",
+            "code": "Code received by email",
+            "code_envoye": "To confirm it is you, we sent a code to {{email}}. Enter it, then confirm.",
+            "reconnexion": "For your security, sign out and sign in again before changing your password.",
+            "succes": "Password changed."
+        },
+        "securite": {
+            "titre": "Two-factor authentication",
+            "intro": "Add an authenticator app (Google Authenticator, Microsoft Authenticator…): a code will be asked at each sign-in.",
+            "intro_admin": "Required for administrators. Register a second device so you do not lose access if you lose your phone.",
+            "aucun": "No device registered.",
+            "ajoute_le": "Added on {{date}}",
+            "retirer": "Remove",
+            "dernier_admin": "An administrator keeps at least one device: add another one before removing this one.",
+            "nom_appareil": "Name of the new device",
+            "aide_nom": "For example “Personal phone” or “Tablet”.",
+            "ajouter": "Add a device",
+            "ajout_titre": "Adding “{{nom}}”",
+            "ajoute": "Device added. You can use either one to sign in.",
+            "retire": "Device removed; your other sessions have been signed out. If the device was lost or stolen, also change your password.",
+            "confirmer_titre": "Remove “{{nom}}”?",
+            "confirmer_message": "This device will no longer be usable to sign in, and your other open sessions (on other devices or browsers) will be signed out.",
+            "confirmer_dernier": "This is your last device: two-factor authentication will be turned off for your account, and your other open sessions will be signed out.",
+            "premier_appareil": "First device"
+        },
+        "erreurs": {
+            "chargement": "Your information could not be loaded.",
+            "enregistrement": "Saving failed. Try again.",
+            "donnee_invalide": "A value is invalid (characters not allowed).",
+            "reauthentification": "A confirmation is needed. Try again.",
+            "code_reauthentification": "Invalid or expired code. Try again to receive a new one.",
+            "retrait": "The device could not be removed. Try again.",
+            "aal2_requis": "Sign in again with your two-factor code, then try again.",
+            "sessions": "The device was removed, but your other sessions could not be signed out. Change your password to sign them out."
+        }
     }
 }

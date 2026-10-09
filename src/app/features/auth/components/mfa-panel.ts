@@ -28,6 +28,8 @@ export class MfaPanel implements OnInit {
 
     /** Faux : vérification uniquement (réinitialisation du mot de passe). */
     readonly enrolementAutorise = input(true);
+    /** Ajout d'un appareil depuis Mon compte (S2.7) : enrôlement même si un facteur vérifié existe, sous ce nom. */
+    readonly nomAppareil = input<string | null>(null);
     readonly mode = output<ModeMfa>();
     readonly valide = output<void>();
 
@@ -53,11 +55,12 @@ export class MfaPanel implements OnInit {
         this.chargement.set(true);
         this.erreurChargement.set(null);
         try {
-            this.factorId = await this.auth.facteurTotpVerifie();
+            const nomAppareil = this.nomAppareil();
+            this.factorId = nomAppareil ? null : await this.auth.facteurTotpVerifie();
             if (this.factorId || !this.enrolementAutorise()) {
                 this.modeCourant.set('verification');
             } else {
-                const enrolement = await this.auth.demarrerEnrolement();
+                const enrolement = await this.auth.demarrerEnrolement(nomAppareil ?? undefined);
                 this.factorId = enrolement.factorId;
                 this.enrolement.set(enrolement);
                 this.modeCourant.set('enrolement');

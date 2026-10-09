@@ -69,12 +69,8 @@ select results_eq(
     array['enseignant'],
     'facteur vérifié + aal1 : ses memberships restent lisibles'
 );
-select throws_ok(
-    $$ select public.session_suffisante() $$,
-    '42501',
-    null,
-    'session_suffisante non appelable en RPC'
-);
+-- Exécutable par authenticated depuis S2.7 (politique profiles_update_soi) : ne renseigne que sur la session de l'appelant.
+select is(public.session_suffisante(), false, 'facteur vérifié + aal1 : session_suffisante renvoie faux à l''appelant');
 
 -- Même enseignant en aal2 : accès normal.
 select tests.connecter('00000000-0000-0000-0000-0000000002a1', 'aal2');

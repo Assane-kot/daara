@@ -198,8 +198,11 @@ export class AuthService {
         return data.all.find((f) => f.factor_type === 'totp' && f.status === 'verified')?.id ?? null;
     }
 
-    /** Démarre un enrôlement ; les enrôlements abandonnés (non vérifiés) sont d'abord supprimés. */
-    async demarrerEnrolement(): Promise<EnrolementTotp> {
+    /**
+     * Démarre un enrôlement ; les enrôlements abandonnés (non vérifiés) sont d'abord supprimés. `nomAppareil` : second
+     * appareil ajouté depuis Mon compte (S2.7) ; le nom doit être unique pour l'utilisateur.
+     */
+    async demarrerEnrolement(nomAppareil?: string): Promise<EnrolementTotp> {
         const { data: facteurs, error: erreurListe } = await this.sb.auth.mfa.listFactors();
         if (erreurListe) {
             throw erreurListe;
@@ -212,7 +215,7 @@ export class AuthService {
         }
         const { data, error } = await this.sb.auth.mfa.enroll({
             factorType: 'totp',
-            friendlyName: `DAARA ${new Date().toISOString()}`,
+            friendlyName: nomAppareil ?? `DAARA ${new Date().toISOString()}`,
         });
         if (error) {
             throw error;
@@ -220,12 +223,27 @@ export class AuthService {
         return { factorId: data.id, qrCode: data.totp.qr_code, secret: data.totp.secret };
     }
 
-    /** Vérifie un code TOTP (enrôlement ou connexion) : la session passe en `aal2`. */
+    /**
+     * Vérifie un code TOTP : la session passe en `aal2`. Enrôlement : le facteur en cours. Connexion : le code peut venir
+     * de n'importe quel appareil enregistré (second appareil, S2.7) ; chaque facteur vérifié est essayé.
+     */
     async verifierTotp(factorId: string, code: string): Promise<void> {
-        const { error } = await this.sb.auth.mfa.challengeAndVerify({ factorId, code });
-        if (error) {
-            throw error;
+        const { data } = await this.sb.auth.mfa.listFactors();
+        const verifies = (data?.all ?? []).filter((f) => f.factor_type === 'totp' && f.status === 'verified').map((f) => f.id);
+        const candidats = verifies.includes(factorId) ? [factorId, ...verifies.filter((id) => id !== factorId)] : [factorId];
+        let derniere: unknown = null;
+        for (const id of candidats) {
+            const { error } = await this.sb.auth.mfa.challengeAndVerify({ factorId: id, code });
+            if (!error) {
+                return;
+            }
+            derniere = error;
+            // Seul un code refusé justifie d'essayer l'appareil suivant (pas une limite de fréquence ni le réseau).
+            if (!isAuthError(error) || error.code !== 'mfa_verification_failed') {
+                break;
+            }
         }
+        throw derniere;
     }
 
     // ---------------------------------------------------------------------------------------------------------
@@ -250,6 +268,16 @@ export class AuthService {
             promesse.catch(() => (this.daaras = null));
         }
         return this.daaras.promesse;
+    }
+
+    /** Vrai si l'utilisateur a au moins un membership désactivé (message « accès désactivé » à l'onboarding, S2.7). */
+    async aUnAccesDesactive(): Promise<boolean> {
+        const userId = (await this.sessionActuelle())?.user.id;
+        if (!userId) {
+            return false;
+        }
+        const { count, error } = await this.sb.from('memberships').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('actif', false);
+        return !error && (count ?? 0) > 0;
     }
 
     /** Rôles actifs de l'utilisateur, toutes daaras confondues. */

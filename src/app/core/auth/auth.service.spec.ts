@@ -119,6 +119,29 @@ describe('AuthService', () => {
         expect(client.auth.verifyOtp).toHaveBeenNthCalledWith(2, { email: 'awa@test.local', token: '654321', type: 'recovery' });
     });
 
+    it('connexion avec un second appareil : chaque facteur vérifié est essayé, seulement si le code est refusé', async () => {
+        const auth = creer();
+        client.auth.mfa.listFactors.mockResolvedValue({
+            data: {
+                all: [
+                    { id: 'f1', factor_type: 'totp', status: 'verified' },
+                    { id: 'f2', factor_type: 'totp', status: 'verified' },
+                ],
+            },
+            error: null,
+        });
+        client.auth.mfa.challengeAndVerify
+            .mockResolvedValueOnce({ error: new AuthError('x', 422, 'mfa_verification_failed') })
+            .mockResolvedValueOnce({ error: null });
+        await auth.verifierTotp('f1', '123456');
+        expect(client.auth.mfa.challengeAndVerify).toHaveBeenNthCalledWith(2, { factorId: 'f2', code: '123456' });
+
+        client.auth.mfa.challengeAndVerify.mockClear();
+        client.auth.mfa.challengeAndVerify.mockResolvedValueOnce({ error: new AuthError('x', 429, 'over_request_rate_limit') });
+        await expect(auth.verifierTotp('f1', '123456')).rejects.toBeInstanceOf(AuthError);
+        expect(client.auth.mfa.challengeAndVerify).toHaveBeenCalledTimes(1);
+    });
+
     it("supprime les enrôlements abandonnés avant d'en démarrer un nouveau", async () => {
         const auth = creer();
         client.auth.mfa.listFactors.mockResolvedValue({

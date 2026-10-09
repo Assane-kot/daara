@@ -40,6 +40,9 @@ export function messageValidation(erreurs: ValidationErrors): MessageChamp {
     if (erreurs['code']) {
         return { cle: 'formulaire.erreurs.code' };
     }
+    if (erreurs['nomPris']) {
+        return { cle: 'formulaire.erreurs.nom_pris' };
+    }
     if (erreurs['codeAcces']) {
         return { cle: 'formulaire.erreurs.code_acces' };
     }

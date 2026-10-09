@@ -157,6 +157,10 @@ conformité CDP, à citer dans la politique de confidentialité).
    |---|---|---|
    | Confirm signup | `Votre code DAARA / Your DAARA code` | `supabase/templates/confirmation.html` |
    | Reset password | `Réinitialisation DAARA / DAARA password reset` | `supabase/templates/recovery.html` |
+   | Magic link | `Votre code de connexion DAARA / Your DAARA sign-in code` | `supabase/templates/magic_link.html` |
+   | Change email address | `Changement d'adresse DAARA / DAARA email change` | `supabase/templates/email_change.html` |
+   | Reauthentication | `Confirmez votre identité DAARA / Confirm it is you` | `supabase/templates/reauthentication.html` |
+   | Invite user | `Votre code DAARA / Your DAARA code` | `supabase/templates/invite.html` |
 
    Les modèles n'utilisent que `{{ .Token }}` et `{{ .Data.langue }}`, jamais le nom saisi par l'utilisateur.
    Après chaque modification d'un modèle dans le dépôt, le recopier dans les deux projets.

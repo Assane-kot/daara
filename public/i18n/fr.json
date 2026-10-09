@@ -16,7 +16,8 @@
         "fil_ariane": "Fil d’Ariane",
         "compte": {
             "menu": "Mon compte",
-            "deconnexion": "Se déconnecter"
+            "deconnexion": "Se déconnecter",
+            "mon_compte": "Mon compte"
         },
         "navigation_mobile": "Navigation principale"
     },
@@ -41,7 +42,10 @@
         "membres": "Membres",
         "invitation": "Invitation",
         "invitations": "Invitations",
-        "code_acces": "Code de votre daara"
+        "code_acces": "Code de votre daara",
+        "compte_profil": "Mon profil",
+        "compte_mot_de_passe": "Mot de passe",
+        "compte_securite": "Sécurité du compte"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -69,7 +73,8 @@
             "different": "Les deux mots de passe ne sont pas identiques.",
             "slug": "Lettres minuscules, chiffres et tirets uniquement (3 à 50 caractères).",
             "identifiant": "Saisissez une adresse e-mail ou un numéro de téléphone valide.",
-            "code_acces": "Saisissez les 8 caractères du code (par exemple ABCD-EFGH)."
+            "code_acces": "Saisissez les 8 caractères du code (par exemple ABCD-EFGH).",
+            "nom_pris": "Ce nom est déjà utilisé par un de vos appareils."
         },
         "code": {
             "chiffre": "Chiffre {{n}} sur 6"
@@ -253,7 +258,8 @@
             },
             "aide_prerequis": "Les modules requis par votre choix seront ajoutés automatiquement.",
             "modifiable": "Modifiable à tout moment dans Paramètres → Modules."
-        }
+        },
+        "acces_desactive": "Votre accès à une daara a été désactivé. Contactez son administrateur pour le rétablir. Vous pouvez aussi créer votre propre daara ci-dessous."
     },
     "navigation": {
         "daara_inaccessible": "Cette daara n’est pas accessible avec votre compte.",
@@ -541,5 +547,58 @@
             "inattendue": "Une erreur inattendue est survenue. Réessayez."
         },
         "ignorer": "Ignorer cette invitation"
+    },
+    "compte": {
+        "titre": "Mon compte",
+        "onglets": {
+            "profil": "Profil",
+            "mot_de_passe": "Mot de passe",
+            "securite": "Sécurité"
+        },
+        "enregistrer": "Enregistrer",
+        "profil": {
+            "identifiant": "Identifiant de connexion",
+            "telephone": "Téléphone de contact",
+            "aide_telephone": "Facultatif. Il sert à votre daara pour vous joindre ; il ne change pas votre identifiant de connexion.",
+            "langue": "Langue",
+            "aide_langue": "Langue de l’application et des e-mails que vous recevez.",
+            "succes": "Profil enregistré."
+        },
+        "mot_de_passe": {
+            "bouton": "Changer le mot de passe",
+            "code": "Code reçu par e-mail",
+            "code_envoye": "Pour confirmer qu’il s’agit bien de vous, nous avons envoyé un code à {{email}}. Saisissez-le puis validez.",
+            "reconnexion": "Pour votre sécurité, déconnectez-vous puis reconnectez-vous avant de changer votre mot de passe.",
+            "succes": "Mot de passe changé."
+        },
+        "securite": {
+            "titre": "Double authentification",
+            "intro": "Ajoutez une application d’authentification (Google Authenticator, Microsoft Authenticator…) : un code vous sera demandé à chaque connexion.",
+            "intro_admin": "Obligatoire pour les administrateurs. Enregistrez un second appareil pour ne pas perdre l’accès si vous perdez votre téléphone.",
+            "aucun": "Aucun appareil enregistré.",
+            "ajoute_le": "Ajouté le {{date}}",
+            "retirer": "Retirer",
+            "dernier_admin": "Un administrateur garde au moins un appareil : ajoutez-en un autre avant de retirer celui-ci.",
+            "nom_appareil": "Nom du nouvel appareil",
+            "aide_nom": "Par exemple « Téléphone personnel » ou « Tablette ».",
+            "ajouter": "Ajouter un appareil",
+            "ajout_titre": "Ajout de « {{nom}} »",
+            "ajoute": "Appareil ajouté. Vous pouvez utiliser l’un ou l’autre pour vous connecter.",
+            "retire": "Appareil retiré ; vos autres sessions ont été fermées. Si l’appareil a été perdu ou volé, changez aussi votre mot de passe.",
+            "confirmer_titre": "Retirer « {{nom}} » ?",
+            "confirmer_message": "Cet appareil ne pourra plus servir à vous connecter, et vos autres sessions ouvertes (sur d’autres appareils ou navigateurs) seront fermées.",
+            "confirmer_dernier": "C’est votre dernier appareil : la double authentification sera désactivée pour votre compte, et vos autres sessions ouvertes seront fermées.",
+            "premier_appareil": "Premier appareil"
+        },
+        "erreurs": {
+            "chargement": "Vos informations n’ont pas pu être chargées.",
+            "enregistrement": "L’enregistrement a échoué. Réessayez.",
+            "donnee_invalide": "Une valeur saisie est invalide (caractères non autorisés).",
+            "reauthentification": "Une confirmation est nécessaire. Réessayez.",
+            "code_reauthentification": "Code invalide ou expiré. Réessayez pour en recevoir un nouveau.",
+            "retrait": "L’appareil n’a pas pu être retiré. Réessayez.",
+            "aal2_requis": "Reconnectez-vous avec votre code de double authentification, puis réessayez.",
+            "sessions": "L’appareil a été retiré, mais vos autres sessions n’ont pas pu être fermées. Changez votre mot de passe pour les fermer."
+        }
     }
 }

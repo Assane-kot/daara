@@ -10,8 +10,8 @@
   vérification en 375 px et les configurations Auth / Turnstile du développeur. Sprint suivant : 2 — Membres et
   navigation (planification à faire).
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
-  de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits) et S2.6 (réinitialisation assistée) faits. Suivante :
-  S2.7 Mon compte et sécurité.
+  de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
+  terminé**. Suivant : bilan du sprint 2, puis planification du sprint 3.
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -40,8 +40,7 @@
     (`docs/deploiement.md` §1.2, §2.2, §2.4 étape 6, §2.6).
   - Navigateurs : Angular 22 n'assure plus iOS 16 (iPhone 8, iPhone X) ; à vérifier avec les daaras pilotes (ADR-007).
   - Audit de l'authentification (2026-10-03), points reportés :
-    - AVANT le sprint 2 (invitations, changement d'e-mail) : modèles `magic_link`, `email_change`, `invite`,
-      `reauthentication` encore ceux de Supabase (avec lien) → modèles code seul fr / en ;
+    - ~~modèles `magic_link`, `email_change`, `invite`, `reauthentication` avec lien~~ → code seul fr / en (S2.7) ;
     - AVANT le sprint 3 (décision) : `is_member` n'exige pas `aal2` ; un admin avec TOTP dont seul le mot de passe
       est compromis reste « membre » en `aal1` (lecture de sa daara). Toute politique future fondée sur `is_member`
       s'ouvrirait sans second facteur → par ex. `aal2` exigé si l'utilisateur a un facteur vérifié ou est admin ;
@@ -63,12 +62,19 @@
     vérifier sur `daara-dev` que `verify_jwt` accepte les JWT (nouvelles clés de signature) et que le CORS ne répond
     qu'aux origines de l'application (en local, Kong ajoute un CORS ouvert).
   - CI : job `edge` jamais exécuté sur GitHub → vérifier le premier run (image Docker Deno épinglée par empreinte).
+  - Audits S2.7 (2026-10-09), points ouverts :
+    - Mon compte n'est accessible que depuis une daara active (`/d/:slug/compte`) : un utilisateur sans daara active ne
+      peut ni changer son mot de passe ni retirer un appareil perdu → route `/compte` hors daara (`authGuard` + `mfaGuard`)
+      à prévoir (sprint 3 ou 12) ;
+    - un jeton d'accès déjà émis reste valable 1 h au plus après un retrait de facteurs ou de sessions (`session_suffisante`
+      ne vérifie pas `auth.sessions`) → à décider au sprint 12 (coût par requête) ;
+    - « un admin garde un appareil » : contrôle d'interface seulement (l'API Auth ne permet pas de l'imposer) ;
+    - `retirer_facteurs` à essayer sur `daara-dev` avant tout usage réel (droits du rôle `postgres` sur le schéma `auth`).
   - Audits S2.4 (2026-10-05), points reportés :
     - S2.5 : `accepter_invitation` doit effacer `nom_affiche` en réactivant une ligne (la contrainte l'impose) et passer
       par les garde-fous ; promotion en admin d'un compte sans facteur = même risque que l'invitation admin (qui
       détient le mot de passe enrôle le TOTP en premier) → même correction ;
-    - S2.7 : un membre désactivé de sa seule daara arrive sur l'onboarding (« Créer ma daara ») → message « accès
-      désactivé » (ses memberships inactifs lui restent lisibles) ;
+    - ~~S2.7 : membre désactivé de sa seule daara sur l'onboarding~~ → message « accès désactivé » (S2.7) ;
     - sprint 3 : liste des membres sans pagination (limite de 1 000 lignes de PostgREST) → `data-table` ;
     - sprint 12 (CDP) : supprimer le compte du dernier admin d'une daara est refusé par le garde-fou → procédure.
   - Audit S2.3 (2026-10-05), points pour information :
@@ -135,6 +141,31 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-09 — S2.7 Mon compte et sécurité
+- Décisions (validées) : D1 fonction SQL `retirer_facteurs` pour la procédure super-admin (`docs/exploitation.md`) ; D2
+  changement de mot de passe : code de réauthentification par e-mail, reconnexion pour un compte téléphone.
+- Migration `retrait_facteurs` : `profiles_update_soi` exige `session_suffisante()` (audit RLS : en aal1 avec facteur, le
+  seul mot de passe permettait de changer le nom affiché) ; `session_suffisante` exécutable par `authenticated` (test du
+  sprint 2 adapté) ; `retirer_facteurs(p_user, p_motif)` (aucun rôle de l'API ; facteurs, sessions, jetons supprimés ;
+  journal : motif sur une ligne plateforme seulement). 17 tests pgTAP (446 au total).
+- Modèles `magic_link`, `email_change` (texte neutre : envoyé aux deux adresses), `reauthentication`, `invite` : code
+  seul fr / en, déclarés dans `config.toml` et `docs/deploiement.md` ; vérifiés dans Mailpit (aucun lien).
+- Front : `/d/:slug/compte` (menu du compte) : Profil (langue appliquée et copiée dans les métadonnées Auth), Mot de
+  passe (code de réauthentification si demandé), Sécurité (appareils, ajout nommé avec le panneau d'enrôlement, retrait
+  confirmé qui ferme les autres sessions, dernier appareil d'un admin protégé) ; onboarding : message « accès désactivé ».
+- Bug trouvé dans le navigateur et corrigé : avec deux appareils, seul le premier était accepté à la connexion →
+  `verifierTotp` essaie chaque facteur vérifié (seulement si le code est refusé). Premier appareil affiché « Premier
+  appareil » (nom technique masqué).
+- Vérifié dans le navigateur : admin → enrôlement → second appareil « Tablette » → déconnexion → connexion avec le code
+  de la tablette → OK ; profil enregistré ; Sécurité en sombre et 375 px sans débordement. Non vérifié dans le navigateur
+  : le code de réauthentification (session toujours récente en local ; tests unitaires) et le message « accès désactivé ».
+- Audits : sécurité (0 critique, **1 important** : retirer un appareil laissait la session du téléphone perdu ouverte →
+  `signOut({ scope: 'others' })`, 7 mineurs) et RLS (0 critique, **1 important** : profil modifiable en aal1, corrigé,
+  4 mineurs) ; mineurs corrigés (journal limité aux daaras actives et sans motif, doc : jeton valable 1 h, changement
+  de mot de passe obligatoire après retrait, motif sans donnée personnelle, essai sur `daara-dev`, modèle `email_change`
+  neutre, tests de profil) ; ouverts : voir « Problèmes ouverts ».
+- 222 tests unitaires ; chargement initial 150,5 kB transférés.
+
 ### 2026-10-09 — S2.6 Réinitialisation assistée (ADR-006 niveau 2)
 - Décisions (validées) : D1 la personne visée n'est admin dans aucune daara (ni super-admin) ; D2 risque résiduel
   accepté (l'admin peut utiliser lui-même le code : sessions révoquées, journal, e-mail, TOTP jamais contourné), ADR-006.

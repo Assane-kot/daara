@@ -62,7 +62,17 @@
         </button>
         <ng-template #menuCompte>
             <div cdkMenu class="mt-2 min-w-[220px] rounded-lg border border-white-light bg-white p-1.5 shadow-lg dark:border-night-border dark:bg-night-raised">
-                <p class="truncate px-3 py-2 text-xs text-muted dark:text-night-muted">{{ auth.email() }}</p>
+                <p class="truncate px-3 py-2 text-xs text-muted dark:text-night-muted">{{ identifiant() }}</p>
+                @if (courante.slug(); as slug) {
+                    <a
+                        cdkMenuItem
+                        class="flex min-h-11 w-full items-center gap-2 rounded-md px-3 text-left font-semibold hover:bg-primary/10 hover:text-primary focus:bg-primary/10"
+                        [routerLink]="['/d', slug, 'compte']"
+                    >
+                        <icon-user class="h-[18px] w-[18px]" />
+                        {{ 'layout.compte.mon_compte' | translate }}
+                    </a>
+                }
                 <button
                     cdkMenuItem
                     type="button"

@@ -10,6 +10,14 @@
         </li>
     </ol>
 
+    @if (accesDesactive()) {
+        <div
+            class="mb-5 rounded-md border border-warning/40 bg-warning-light p-3.5 text-warning-strong dark:bg-warning-dark-light dark:text-warning"
+            role="status"
+        >
+            {{ 'onboarding.acces_desactive' | translate }}
+        </div>
+    }
     @switch (etape()) {
         @case ('chargement') {
             @if (erreurChargement(); as erreurChargement) {

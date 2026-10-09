@@ -33,5 +33,14 @@ pgTAP : un utilisateur ne modifie que son profil (sprint 1, déjà couvert).
 Unitaires : service du compte, ajout / retrait d'appareil (dernier appareil d'un admin protégé), formulaire du profil.
 Manuel : second appareil, connexion avec l'un puis l'autre ; e-mails des nouveaux modèles dans Mailpit.
 
+## Réalisation (S2.7, 2026-10-09)
+- Décisions (validées) : D1 fonction SQL `retirer_facteurs` pour la procédure super-admin ; D2 mot de passe : code de
+  réauthentification par e-mail (`secure_password_change`), reconnexion pour un compte téléphone.
+- Profil modifiable seulement avec une session suffisante (aal2 si facteur vérifié) ; la langue est aussi copiée dans les
+  métadonnées Auth (langue des e-mails). Retirer un appareil ferme les autres sessions (`signOut({ scope: 'others' })`).
+- Connexion : le code TOTP est essayé sur chaque appareil vérifié (sinon seul le premier était accepté).
+- Membre désactivé de toutes ses daaras : message « accès désactivé » sur l'onboarding.
+- Écart : Mon compte n'est accessible que depuis une daara active (`/d/:slug/compte`) → « Problèmes ouverts ».
+
 ## Hors périmètre
 Suppression du compte par l'utilisateur (sprint 12, CDP) ; codes de secours.

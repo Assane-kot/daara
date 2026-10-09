@@ -33,6 +33,8 @@ export class OnboardingPage implements OnInit {
     private readonly router = inject(Router);
 
     protected readonly etape = signal<Etape>('chargement');
+    /** Membre désactivé de sa (ou ses) daara(s) : il arrive ici faute de daara active (S2.7). */
+    protected readonly accesDesactive = signal(false);
     protected readonly erreurChargement = signal<string | null>(null);
     protected readonly envoi = signal(false);
     protected readonly erreur = signal<string | null>(null);
@@ -63,6 +65,7 @@ export class OnboardingPage implements OnInit {
     }
 
     ngOnInit(): void {
+        void this.auth.aUnAccesDesactive().then((desactive) => this.accesDesactive.set(desactive));
         void this.demarrer();
     }
 
