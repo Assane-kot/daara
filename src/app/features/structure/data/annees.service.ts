@@ -42,7 +42,15 @@ export class ErreurStructure extends Error {
     }
 }
 
-const MESSAGES_METIER = new Set(['periode_hors_annee', 'periodes_chevauchement', 'periode_cloturee', 'annee_active', 'autre_daara']);
+const MESSAGES_METIER = new Set([
+    'periode_hors_annee',
+    'periodes_chevauchement',
+    'periode_cloturee',
+    'annee_active',
+    'autre_daara',
+    'enseignant_invalide',
+    'matiere_archivee',
+]);
 
 export function erreurStructure(erreur: { code?: string; message?: string } | null): ErreurStructure {
     const message = erreur?.message ?? '';
@@ -56,6 +64,9 @@ export function erreurStructure(erreur: { code?: string; message?: string } | nu
         case '23514':
             if (MESSAGES_METIER.has(message)) {
                 return new ErreurStructure(`structure.erreurs.${message}`);
+            }
+            if (message.includes('_coefficient_check')) {
+                return new ErreurStructure('structure.erreurs.coefficient');
             }
             return new ErreurStructure(message.includes('_dates_check') ? 'structure.erreurs.dates' : 'structure.erreurs.donnee_invalide');
         default:

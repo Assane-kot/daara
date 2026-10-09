@@ -189,7 +189,10 @@ ce contrôle, il renseigne un étranger sur les données d'une autre daara : aud
 ligne référencée (`23514 autre_daara`), `daara_id` et clés parentes immuables (droits par colonne + trigger).
 S3.1 : `periodes_coherentes` (dates dans l'année, sans chevauchement, période clôturée : seule la réouverture, ni
 modification ni suppression hors cascade), `annees_coherentes` (périodes gardées dans l'année, année active non
-supprimable hors cascade). S3.3 : `membre_enseignant` (titulaire, enseignant). Libellés : `libelle = btrim(libelle)` et
+supprimable hors cascade). S3.3 : `classes_coherentes` / `classe_matieres_coherentes` (droits via `ecrivain_structure`, année / classe / matière de la
+même daara, matière non archivée à l'ajout, titulaire et enseignant = membre actif `enseignant` ou `admin` : `est_enseignant_de`) ;
+libellés courts : `libelle_valide(texte, max)` (NFC, sans blanc autour, `texte_sur`). Pas d'agrégat `count(*)` côté
+client sur une table à droits par colonne (refusé par Postgres) : compter les lignes renvoyées. Libellés : `libelle = btrim(libelle)` et
 `texte_sur(libelle)` (caractères interdits du socle + U+061C, U+034F, U+180E, U+2028, U+2029). `created_by` illisible
 par le client. Les tables des sprints suivants (inscriptions,
 évaluations, absences) référenceront ces tables en `restrict`.

@@ -12,8 +12,8 @@
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
-- Sprint 3 — Structure scolaire : S3.0 (conception), S3.1 (années, périodes) et S3.2 (matières) faits. Suivante :
-  S3.3 classes et affectations. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 3 — Structure scolaire : S3.0 (conception), S3.1 (années, périodes), S3.2 (matières) et S3.3 (classes, affectations)
+  faits. Suivante : S3.4 `data-table`. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -66,10 +66,10 @@
     qu'aux origines de l'application (en local, Kong ajoute un CORS ouvert).
   - CI : job `edge` jamais exécuté sur GitHub → vérifier le premier run (image Docker Deno épinglée par empreinte).
   - À l'audit de fin de sprint 3 (audits par story arrêtés à partir de S3.2, décision du développeur du 2026-10-09) :
-    - audit RLS de S3.2 non fait (interrompu) ; audits complets de S3.3 et S3.4 ;
+    - audit RLS de S3.2 non fait (interrompu) ; audits complets de S3.3 et S3.4 (S3.3 : `teaches_class`,
+      `enseignants_daara` exposée aux enseignants, triggers `classes_coherentes` / `classe_matieres_coherentes`) ;
     - libellés des années et périodes (S3.1) : forme NFC et espace insécable en tête / fin acceptés, comme corrigé pour
       `matieres` (S3.2) ; `id` choisi par le client à l'insertion (`annees_scolaires`, `periodes`) ;
-    - S3.3 : refuser en base l'affectation d'une matière archivée (trigger de `classe_matieres`, droits en tête) ;
     - tests pgTAP de `matieres` à compléter : suppression par l'enseignant, admin aal1 en update / delete, parent,
       module désactivé en update / delete.
   - Audit RLS S3.1 (2026-10-09) : la contrainte « caractères interdits » du socle (`daaras`, `profiles`, `invitations`)
@@ -170,6 +170,20 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-09 — S3.3 Classes et affectations
+- Migration `classes` (module `structure`) : `libelle_valide` (texte court NFC sans blanc autour), `est_enseignant_de`,
+  `ecrivain_structure` (droits en tête des triggers), `classes` (nom unique dans l'année sans casse, niveau libre,
+  titulaire), `classe_matieres` (coefficient 0,5-20, enseignant, matière `restrict`), triggers de cohérence (même daara,
+  matière non archivée, titulaire / enseignant = enseignant ou admin actif), journal, droits par colonne, lecture admin et
+  enseignant ; `teaches_class(classe)` et RPC `enseignants_daara(daara)` (noms figés des désactivés). 34 tests pgTAP (553).
+- Front : onglet Classes (par défaut ; sélecteur d'année, active d'abord ; titulaire et nombre de matières ; création,
+  modification, suppression), détail `classes/:classeId` (matières enseignées : ajout parmi les non archivées absentes,
+  coefficient, enseignant ; modification, retrait), modales `ClasseDialog` / `AffectationDialog`, niveaux suggérés.
+- Vérifié dans le navigateur (admin) : classe CE1 A avec titulaire, matière Coran coefficient 3 avec enseignant,
+  375 px sans débordement. Piège trouvé : `classe_matieres(count)` refusé par Postgres (agrégat `count(*)` sur une table à
+  droits par colonne) → lignes comptées côté client.
+- Pas d'audit (fin de sprint). 237 tests unitaires ; chargement initial 150,7 kB transférés.
+
 ### 2026-10-09 — S3.2 Matières
 - Migration `matieres` (module `structure`) : enum `type_matiere`, table `matieres` (nom NFC sans blanc autour, unique
   sans casse ni formes compatibles ; code `^[A-Z0-9_-]{1,10}$` unique ; archivage), `daara_id_immuable` (trigger

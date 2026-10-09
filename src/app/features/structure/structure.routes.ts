@@ -13,12 +13,22 @@ export const STRUCTURE_ROUTES: Routes = [
         canActivate: [moduleGuard('structure'), roleGuard(['admin', 'enseignant'])],
         children: [
             // Onglet ouvert aux deux rôles (une redirection s'évalue avant les guards : rôles pas encore chargés).
-            { path: '', pathMatch: 'full', redirectTo: 'matieres' },
+            { path: '', pathMatch: 'full', redirectTo: 'classes' },
             {
                 path: 'annees',
                 title: 'titres.structure_annees',
                 canActivate: [roleGuard(['admin'])],
                 loadComponent: () => import('./pages/annees-page').then((m) => m.AnneesPage),
+            },
+            {
+                path: 'classes',
+                title: 'titres.structure_classes',
+                loadComponent: () => import('./pages/classes-page').then((m) => m.ClassesPage),
+            },
+            {
+                path: 'classes/:classeId',
+                title: 'titres.structure_classe',
+                loadComponent: () => import('./pages/classe-detail-page').then((m) => m.ClasseDetailPage),
             },
             {
                 path: 'matieres',

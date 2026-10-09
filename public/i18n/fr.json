@@ -48,7 +48,9 @@
         "compte_mot_de_passe": "Mot de passe",
         "compte_securite": "Sécurité du compte",
         "structure_annees": "Années scolaires",
-        "structure_matieres": "Matières"
+        "structure_matieres": "Matières",
+        "structure_classes": "Classes",
+        "structure_classe": "Classe"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -608,7 +610,8 @@
         "titre": "Structure scolaire",
         "onglets": {
             "annees": "Années",
-            "matieres": "Matières"
+            "matieres": "Matières",
+            "classes": "Classes"
         },
         "enregistrer": "Enregistrer",
         "modifier": "Modifier",
@@ -671,7 +674,11 @@
             "autre_daara": "Élément d’une autre daara.",
             "inattendue": "L’action a échoué. Réessayez.",
             "periode_cloturee": "Période clôturée : rouvrez-la avant de la modifier ou de la supprimer.",
-            "utilisee": "Élément utilisé ailleurs (par exemple une matière enseignée dans une classe) : archivez-le plutôt."
+            "utilisee": "Élément utilisé ailleurs (par exemple une matière enseignée dans une classe) : archivez-le plutôt.",
+            "enseignant_invalide": "Choisissez un enseignant ou un admin actif de la daara.",
+            "matiere_archivee": "Cette matière est archivée : désarchivez-la d’abord.",
+            "coefficient": "Le coefficient doit être compris entre 0,5 et 20.",
+            "classe_introuvable": "Cette classe est introuvable."
         },
         "matieres": {
             "nouvelle": "Nouvelle matière",
@@ -696,6 +703,44 @@
             "confirmer_suppression_message": "Elle sera supprimée du catalogue. Une matière utilisée dans une classe ne peut pas être supprimée : archivez-la.",
             "vide_titre": "Aucune matière",
             "vide_message": "Créez les matières enseignées dans votre daara (scolaires, Coran, religieuses)."
+        },
+        "classes": {
+            "annee": "Année scolaire",
+            "nouvelle": "Nouvelle classe",
+            "modifier": "Modifier la classe",
+            "nom": "Nom",
+            "niveau": "Niveau",
+            "aide_niveau": "Facultatif : CI, CP, CE1… ou un niveau coranique.",
+            "titulaire": "Titulaire",
+            "aucun": "Aucun",
+            "titulaire_x": "Titulaire : {{nom}}",
+            "sans_niveau": "Niveau non précisé",
+            "nb_matieres": "{{n}} matière(s)",
+            "retour": "Retour aux classes",
+            "supprimee": "Classe supprimée.",
+            "confirmer_suppression": "Supprimer la classe {{nom}} ?",
+            "confirmer_suppression_message": "Ses matières (coefficients, enseignants) seront supprimées aussi.",
+            "vide_titre": "Aucune classe",
+            "vide_message": "Créez les classes de cette année.",
+            "sans_annee_titre": "Aucune année scolaire",
+            "sans_annee_message": "Créez d’abord une année scolaire (onglet Années)."
+        },
+        "affectations": {
+            "titre": "Matières enseignées",
+            "ajouter": "Ajouter une matière",
+            "modifier": "Modifier la matière de la classe",
+            "matiere": "Matière",
+            "choisir": "Choisissez une matière",
+            "coefficient": "Coefficient",
+            "enseignant": "Enseignant",
+            "coef_x": "Coefficient {{coef}}",
+            "sans_enseignant": "Sans enseignant",
+            "retirer": "Retirer",
+            "retiree": "Matière retirée de la classe.",
+            "confirmer_retrait": "Retirer {{nom}} de la classe ?",
+            "confirmer_retrait_message": "La matière ne sera plus enseignée dans cette classe.",
+            "vide_titre": "Aucune matière",
+            "vide_message": "Ajoutez les matières enseignées dans cette classe."
         }
     }
 }

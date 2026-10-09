@@ -97,6 +97,109 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            classe_matieres: {
+                Row: {
+                    classe_id: string;
+                    coefficient: number;
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    enseignant_id: string | null;
+                    id: string;
+                    matiere_id: string;
+                };
+                Insert: {
+                    classe_id: string;
+                    coefficient?: number;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id: string;
+                    enseignant_id?: string | null;
+                    id?: string;
+                    matiere_id: string;
+                };
+                Update: {
+                    classe_id?: string;
+                    coefficient?: number;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id?: string;
+                    enseignant_id?: string | null;
+                    id?: string;
+                    matiere_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'classe_matieres_classe_id_fkey';
+                        columns: ['classe_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'classes';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'classe_matieres_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'classe_matieres_matiere_id_fkey';
+                        columns: ['matiere_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'matieres';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
+            classes: {
+                Row: {
+                    annee_id: string;
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    id: string;
+                    niveau: string | null;
+                    nom: string;
+                    titulaire_id: string | null;
+                };
+                Insert: {
+                    annee_id: string;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id: string;
+                    id?: string;
+                    niveau?: string | null;
+                    nom: string;
+                    titulaire_id?: string | null;
+                };
+                Update: {
+                    annee_id?: string;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id?: string;
+                    id?: string;
+                    niveau?: string | null;
+                    nom?: string;
+                    titulaire_id?: string | null;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'classes_annee_id_fkey';
+                        columns: ['annee_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'annees_scolaires';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'classes_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             codes_acces: {
                 Row: {
                     code_hash: string;
@@ -536,8 +639,19 @@ export type Database = {
                 Returns: Database['public']['Enums']['module_daara'][];
             };
             ecrire_modules: { Args: { p_actifs: Database['public']['Enums']['module_daara'][]; p_daara: string }; Returns: undefined };
+            ecrivain_structure: { Args: { p_daara: string }; Returns: undefined };
+            enseignants_daara: {
+                Args: { p_daara: string };
+                Returns: {
+                    actif: boolean;
+                    nom: string;
+                    prenom: string;
+                    user_id: string;
+                }[];
+            };
             envoi_sms_factice: { Args: { event: Json }; Returns: Json };
             est_admin_quelque_part: { Args: { p_user: string }; Returns: boolean };
+            est_enseignant_de: { Args: { p_daara: string; p_user: string }; Returns: boolean };
             etat_invitation: { Args: { p_invitation: Database['public']['Tables']['invitations']['Row'] }; Returns: string };
             hacher_code_acces: { Args: { p_code: string; p_user: string }; Returns: string };
             hacher_jeton: { Args: { p_token: string }; Returns: string };
@@ -557,6 +671,7 @@ export type Database = {
             };
             is_member: { Args: { p_daara: string }; Returns: boolean };
             is_platform_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+            libelle_valide: { Args: { p_max: number; p_texte: string }; Returns: boolean };
             membership_administre: {
                 Args: { p_membership: string };
                 Returns: {
@@ -585,6 +700,7 @@ export type Database = {
             retirer_facteurs: { Args: { p_motif: string; p_user: string }; Returns: number };
             revoquer_invitation: { Args: { p_invitation: string }; Returns: undefined };
             session_suffisante: { Args: Record<PropertyKey, never>; Returns: boolean };
+            teaches_class: { Args: { p_classe: string }; Returns: boolean };
             texte_sur: { Args: { p_texte: string }; Returns: boolean };
         };
         Enums: {

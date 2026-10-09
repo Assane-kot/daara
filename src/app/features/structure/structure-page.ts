@@ -8,9 +8,10 @@ import { PageHeader } from '../../shared/ui/page-header/page-header';
 const ONGLETS: readonly { route: string; cle: string; roles: readonly RoleMembre[] }[] = [
     { route: 'annees', cle: 'structure.onglets.annees', roles: ['admin'] },
     { route: 'matieres', cle: 'structure.onglets.matieres', roles: ['admin', 'enseignant'] },
+    { route: 'classes', cle: 'structure.onglets.classes', roles: ['admin', 'enseignant'] },
 ];
 
-/** Onglets de la structure scolaire (sprint 3) filtrés par rôle : Années (S3.1, admin), Matières (S3.2) ; Classes (S3.3). */
+/** Onglets de la structure scolaire (sprint 3) filtrés par rôle : Années (S3.1, admin), Matières (S3.2), Classes (S3.3). */
 @Component({
     selector: 'app-structure-page',
     imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, PageHeader],

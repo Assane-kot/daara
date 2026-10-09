@@ -48,7 +48,9 @@
         "compte_mot_de_passe": "Password",
         "compte_securite": "Account security",
         "structure_annees": "School years",
-        "structure_matieres": "Subjects"
+        "structure_matieres": "Subjects",
+        "structure_classes": "Classes",
+        "structure_classe": "Class"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -608,7 +610,8 @@
         "titre": "School structure",
         "onglets": {
             "annees": "Years",
-            "matieres": "Subjects"
+            "matieres": "Subjects",
+            "classes": "Classes"
         },
         "enregistrer": "Save",
         "modifier": "Edit",
@@ -671,7 +674,11 @@
             "autre_daara": "Item from another daara.",
             "inattendue": "The action failed. Try again.",
             "periode_cloturee": "Closed term: reopen it before editing or deleting it.",
-            "utilisee": "Item used elsewhere (for example a subject taught in a class): archive it instead."
+            "utilisee": "Item used elsewhere (for example a subject taught in a class): archive it instead.",
+            "enseignant_invalide": "Choose an active teacher or admin of the daara.",
+            "matiere_archivee": "This subject is archived: unarchive it first.",
+            "coefficient": "The coefficient must be between 0.5 and 20.",
+            "classe_introuvable": "This class cannot be found."
         },
         "matieres": {
             "nouvelle": "New subject",
@@ -696,6 +703,44 @@
             "confirmer_suppression_message": "It will be removed from the catalogue. A subject used in a class cannot be deleted: archive it.",
             "vide_titre": "No subject",
             "vide_message": "Create the subjects taught in your daara (school, Quran, religious)."
+        },
+        "classes": {
+            "annee": "School year",
+            "nouvelle": "New class",
+            "modifier": "Edit the class",
+            "nom": "Name",
+            "niveau": "Level",
+            "aide_niveau": "Optional: CI, CP, CE1… or a Quran level.",
+            "titulaire": "Homeroom teacher",
+            "aucun": "None",
+            "titulaire_x": "Homeroom teacher: {{nom}}",
+            "sans_niveau": "Level not set",
+            "nb_matieres": "{{n}} subject(s)",
+            "retour": "Back to classes",
+            "supprimee": "Class deleted.",
+            "confirmer_suppression": "Delete the class {{nom}}?",
+            "confirmer_suppression_message": "Its subjects (coefficients, teachers) will be deleted too.",
+            "vide_titre": "No class",
+            "vide_message": "Create the classes of this year.",
+            "sans_annee_titre": "No school year",
+            "sans_annee_message": "First create a school year (Years tab)."
+        },
+        "affectations": {
+            "titre": "Subjects taught",
+            "ajouter": "Add a subject",
+            "modifier": "Edit the class subject",
+            "matiere": "Subject",
+            "choisir": "Choose a subject",
+            "coefficient": "Coefficient",
+            "enseignant": "Teacher",
+            "coef_x": "Coefficient {{coef}}",
+            "sans_enseignant": "No teacher",
+            "retirer": "Remove",
+            "retiree": "Subject removed from the class.",
+            "confirmer_retrait": "Remove {{nom}} from the class?",
+            "confirmer_retrait_message": "The subject will no longer be taught in this class.",
+            "vide_titre": "No subject",
+            "vide_message": "Add the subjects taught in this class."
         }
     }
 }
