@@ -6,13 +6,14 @@ import { CurrentDaaraService } from '../../core/daara/current-daara.service';
 import { IconCaretsDown } from '../../shared/icon/icon-carets-down';
 import { IconMenuDashboard } from '../../shared/icon/icon-menu-dashboard';
 import { IconSettings } from '../../shared/icon/icon-settings';
+import { IconBook } from '../../shared/icon/icon-book';
 import { IconUsers } from '../../shared/icon/icon-users';
 import { LayoutService } from '../layout.service';
 import { MENU, menuVisible } from './menu';
 
 @Component({
     selector: 'app-sidebar',
-    imports: [RouterLink, RouterLinkActive, TranslatePipe, IconCaretsDown, IconMenuDashboard, IconSettings, IconUsers],
+    imports: [RouterLink, RouterLinkActive, TranslatePipe, IconCaretsDown, IconMenuDashboard, IconSettings, IconUsers, IconBook],
     templateUrl: './sidebar.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

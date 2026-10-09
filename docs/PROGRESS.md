@@ -12,7 +12,7 @@
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
-- Sprint 3 — Structure scolaire : planifié (S3.0, 2026-10-09). Suivante : S3.1 années scolaires et périodes.
+- Sprint 3 — Structure scolaire : S3.0 (conception) et S3.1 (années, périodes) faits. Suivante : S3.2 matières.
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -63,6 +63,9 @@
     vérifier sur `daara-dev` que `verify_jwt` accepte les JWT (nouvelles clés de signature) et que le CORS ne répond
     qu'aux origines de l'application (en local, Kong ajoute un CORS ouvert).
   - CI : job `edge` jamais exécuté sur GitHub → vérifier le premier run (image Docker Deno épinglée par empreinte).
+  - Audit RLS S3.1 (2026-10-09) : la contrainte « caractères interdits » du socle (`daaras`, `profiles`, `invitations`)
+    laisse passer U+061C (marque de lettre arabe), U+034F, U+180E, U+2028, U+2029 ; `texte_sur` (S3.1) les refuse →
+    aligner les contraintes du socle sur `texte_sur` dans une migration (avant les libellés en arabe).
   - Audits S2.7 (2026-10-09), points ouverts :
     - Mon compte n'est accessible que depuis une daara active (`/d/:slug/compte`) : un utilisateur sans daara active ne
       peut ni changer son mot de passe ni retirer un appareil perdu → route `/compte` hors daara (`authGuard` + `mfaGuard`)
@@ -154,6 +157,29 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-09 — S3.1 Années scolaires et périodes
+- Migration `annees_periodes` (module `structure`) : `texte_sur` (texte affichable, réutilisé par la suite),
+  `annees_scolaires` (libellé unique, 18 mois au plus, une seule active, `active` hors des droits), `periodes` (ordre
+  unique, dans l'année, sans chevauchement, clôture), triggers `periodes_coherentes` / `annees_coherentes`, journal,
+  droits par colonne (`daara_id`, `annee_id`, `active`, `created_by` non modifiables ; `created_by` illisible), politiques
+  admin aal2 + module, RPC `activer_annee` (verrous et revérification). 48 tests pgTAP (494 au total).
+- Front : menu « Structure » (admin, module `structure`), `/d/:slug/structure/annees` : années (création avec valeurs
+  proposées, modification, « Rendre active », suppression d'une année inactive), périodes (modèles « 3 trimestres » /
+  « 2 semestres », ajout, modification, clôture / réouverture confirmées ; période clôturée : seule la réouverture),
+  modale de saisie commune (`DatesDialog`), icône Vristo `book`.
+- Vérifié dans le navigateur : année créée, 3 trimestres, rendue active, trimestre clôturé, chevauchement refusé dans la
+  modale (message de la base), 375 px en sombre (texte des périodes écrasé par les boutons → corrigé).
+- Audits : sécurité (0 critique, **1 important**, 4 mineurs) et RLS (0 critique, **1 important**, 6 mineurs), corrigés :
+  - important (relevé par les deux) : le trigger `periodes_coherentes` (security definer, avant la RLS) renseignait un
+    étranger sur les dates d'une autre daara et y posait un verrou → droits contrôlés en tête du trigger (règle ajoutée
+    au LLD pour toutes les tables suivantes) ;
+  - libellé avec espaces autour (longueur et unicité contournées), `activer_annee` sans revérification après verrou,
+    période clôturée modifiable, test dépendant des données locales, `created_by` lisible, `daara_id` / `annee_id`
+    immuables aussi par trigger, caractères bidirectionnels arabes ; 11 cas pgTAP ajoutés ;
+  - ouvert : contraintes du socle à aligner sur `texte_sur` (« Problèmes ouverts »).
+- Piège : un contrôle de droits dans un trigger bloque les suppressions en cascade → le limiter à insert / update (un
+  delete direct est déjà filtré par la RLS).
+
 ### 2026-10-09 — Bilan du sprint 2 (Membres et navigation)
 **Objectif** : chaque profil accède à son espace et ne voit que ses modules ; l'admin invite, gère ses membres et
 paramètre sa daara ; un parent sans e-mail se connecte et récupère son accès. **Atteint en local** (navigateur, pgTAP,

@@ -1,0 +1,149 @@
+@if (chargement()) {
+    <div class="panel"><app-skeleton [lignes]="4" /></div>
+} @else if (erreurChargement()) {
+    <div class="panel grid gap-4">
+        <div class="rounded-md border border-danger/30 bg-danger-light p-3.5 text-danger-strong dark:bg-danger-dark-light dark:text-danger-soft" role="alert">
+            {{ 'structure.erreurs.chargement' | translate }}
+        </div>
+        <div>
+            <button type="button" class="btn btn-outline-primary" (click)="charger()">{{ 'membres.reessayer' | translate }}</button>
+        </div>
+    </div>
+} @else {
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p class="m-0 text-muted dark:text-night-muted">{{ 'structure.annees.intro' | translate }}</p>
+        <button type="button" class="btn btn-primary" [disabled]="enCours()" (click)="nouvelleAnnee()">{{ 'structure.annees.nouvelle' | translate }}</button>
+    </div>
+
+    @if (erreur(); as erreur) {
+        <div
+            class="mb-4 rounded-md border border-danger/30 bg-danger-light p-3.5 text-danger-strong dark:bg-danger-dark-light dark:text-danger-soft"
+            role="alert"
+        >
+            {{ erreur | translate }}
+        </div>
+    }
+    @if (succes(); as succes) {
+        <div class="mb-4 rounded-md border border-primary/30 bg-primary/10 p-3.5 text-black dark:text-white-light" role="status">{{ succes | translate }}</div>
+    }
+
+    @if (annees().length === 0) {
+        <div class="panel">
+            <app-empty-state [titre]="'structure.annees.vide_titre' | translate" [message]="'structure.annees.vide_message' | translate" />
+        </div>
+    }
+
+    <div class="grid gap-5">
+        @for (annee of annees(); track annee.id) {
+            <section class="panel" [attr.aria-labelledby]="'annee-' + annee.id">
+                <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <h2 [id]="'annee-' + annee.id" class="m-0 flex flex-wrap items-center gap-2 text-lg font-bold dark:text-white-light">
+                            {{ annee.libelle }}
+                            @if (annee.active) {
+                                <app-badge variante="success">{{ 'structure.annees.active' | translate }}</app-badge>
+                            }
+                        </h2>
+                        <p class="m-0 mt-1 text-sm text-muted dark:text-night-muted">
+                            {{ 'structure.du_au' | translate: { debut: date(annee.dateDebut), fin: date(annee.dateFin) } }}
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        @if (!annee.active) {
+                            <button type="button" class="btn btn-sm btn-primary min-h-11" [disabled]="enCours()" (click)="activer(annee)">
+                                {{ 'structure.annees.rendre_active' | translate }}
+                            </button>
+                        }
+                        <button type="button" class="btn btn-sm btn-outline-primary min-h-11" [disabled]="enCours()" (click)="modifierAnnee(annee)">
+                            {{ 'structure.modifier' | translate }}
+                        </button>
+                        @if (!annee.active) {
+                            <button type="button" class="btn btn-sm btn-outline-danger min-h-11" [disabled]="enCours()" (click)="supprimerAnnee(annee)">
+                                {{ 'structure.supprimer' | translate }}
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <h3 class="mt-0 mb-2 text-base font-bold dark:text-white-light">{{ 'structure.periodes.titre' | translate }}</h3>
+                @if (annee.periodes.length === 0) {
+                    <p class="mt-0 mb-3 text-muted dark:text-night-muted">{{ 'structure.periodes.aucune' | translate }}</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-primary min-h-11"
+                            [disabled]="enCours()"
+                            (click)="appliquerModele(annee, 'trimestres')"
+                        >
+                            {{ 'structure.periodes.modele_trimestres' | translate }}
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-primary min-h-11"
+                            [disabled]="enCours()"
+                            (click)="appliquerModele(annee, 'semestres')"
+                        >
+                            {{ 'structure.periodes.modele_semestres' | translate }}
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary min-h-11" [disabled]="enCours()" (click)="nouvellePeriode(annee)">
+                            {{ 'structure.periodes.ajouter' | translate }}
+                        </button>
+                    </div>
+                } @else {
+                    <ul class="m-0 grid list-none gap-2 p-0">
+                        @for (periode of annee.periodes; track periode.id) {
+                            <li class="flex flex-wrap items-center gap-3 rounded-md border border-white-light p-3 dark:border-night-border">
+                                <div class="min-w-0 flex-1 basis-56">
+                                    <p class="m-0 flex flex-wrap items-center gap-2 font-semibold text-black dark:text-white-light">
+                                        {{ periode.libelle }}
+                                        <app-badge [variante]="periode.cloturee ? 'warning' : 'info'">{{
+                                            (periode.cloturee ? 'structure.periodes.etat_cloturee' : 'structure.periodes.etat_ouverte') | translate
+                                        }}</app-badge>
+                                    </p>
+                                    <p class="m-0 text-sm text-muted dark:text-night-muted">
+                                        {{ 'structure.du_au' | translate: { debut: date(periode.dateDebut), fin: date(periode.dateFin) } }}
+                                    </p>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    @if (!periode.cloturee) {
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-primary min-h-11"
+                                            [disabled]="enCours()"
+                                            (click)="modifierPeriode(periode)"
+                                        >
+                                            {{ 'structure.modifier' | translate }}
+                                        </button>
+                                    }
+                                    <button
+                                        type="button"
+                                        class="btn btn-sm btn-outline-primary min-h-11"
+                                        [disabled]="enCours()"
+                                        (click)="basculerCloture(periode)"
+                                    >
+                                        {{ (periode.cloturee ? 'structure.periodes.reouvrir' : 'structure.periodes.cloturer') | translate }}
+                                    </button>
+                                    @if (!periode.cloturee) {
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-danger min-h-11"
+                                            [disabled]="enCours()"
+                                            (click)="supprimerPeriode(periode)"
+                                        >
+                                            {{ 'structure.supprimer' | translate }}
+                                        </button>
+                                    }
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-sm btn-outline-primary min-h-11" [disabled]="enCours()" (click)="nouvellePeriode(annee)">
+                            {{ 'structure.periodes.ajouter' | translate }}
+                        </button>
+                    </div>
+                }
+            </section>
+        }
+    </div>
+}

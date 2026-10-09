@@ -25,7 +25,8 @@
         "tableau_de_bord": "Tableau de bord",
         "changer_daara": "Changer de daara",
         "membres": "Membres",
-        "parametres": "Paramètres"
+        "parametres": "Paramètres",
+        "structure": "Structure"
     },
     "titres": {
         "tableau_de_bord": "Tableau de bord",
@@ -45,7 +46,8 @@
         "code_acces": "Code de votre daara",
         "compte_profil": "Mon profil",
         "compte_mot_de_passe": "Mot de passe",
-        "compte_securite": "Sécurité du compte"
+        "compte_securite": "Sécurité du compte",
+        "structure_annees": "Années scolaires"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -599,6 +601,74 @@
             "retrait": "L’appareil n’a pas pu être retiré. Réessayez.",
             "aal2_requis": "Reconnectez-vous avec votre code de double authentification, puis réessayez.",
             "sessions": "L’appareil a été retiré, mais vos autres sessions n’ont pas pu être fermées. Changez votre mot de passe pour les fermer."
+        }
+    },
+    "structure": {
+        "titre": "Structure scolaire",
+        "onglets": {
+            "annees": "Années"
+        },
+        "enregistrer": "Enregistrer",
+        "modifier": "Modifier",
+        "supprimer": "Supprimer",
+        "enregistre": "Modifications enregistrées.",
+        "du_au": "Du {{debut}} au {{fin}}",
+        "champs": {
+            "libelle": "Libellé",
+            "ordre": "Ordre",
+            "date_debut": "Début",
+            "date_fin": "Fin"
+        },
+        "annees": {
+            "intro": "L’année active sert de référence pour les classes, les absences et les notes.",
+            "nouvelle": "Nouvelle année",
+            "modifier": "Modifier l’année",
+            "active": "Active",
+            "rendre_active": "Rendre active",
+            "activee": "Année rendue active.",
+            "vide_titre": "Aucune année scolaire",
+            "vide_message": "Créez votre première année scolaire, puis ses périodes.",
+            "confirmer_suppression": "Supprimer l’année {{libelle}} ?",
+            "confirmer_suppression_message": "Ses périodes et ses classes seront supprimées aussi.",
+            "supprimee": "Année supprimée."
+        },
+        "periodes": {
+            "titre": "Périodes",
+            "aucune": "Aucune période : choisissez un modèle ou ajoutez-les une par une.",
+            "modele_trimestres": "3 trimestres",
+            "modele_semestres": "2 semestres",
+            "ajouter": "Ajouter une période",
+            "trimestre_n": "Trimestre {{n}}",
+            "semestre_n": "Semestre {{n}}",
+            "nouvelle": "Nouvelle période",
+            "modifier": "Modifier la période",
+            "creees": "Périodes créées.",
+            "etat_ouverte": "Ouverte",
+            "etat_cloturee": "Clôturée",
+            "cloturer": "Clôturer",
+            "reouvrir": "Rouvrir",
+            "cloturee": "Période clôturée.",
+            "rouverte": "Période rouverte.",
+            "confirmer_cloturer": "Clôturer {{libelle}} ?",
+            "confirmer_cloturer_message": "Les notes de cette période ne pourront plus être modifiées, ni ses dates. Vous pourrez la rouvrir si besoin.",
+            "confirmer_reouvrir": "Rouvrir {{libelle}} ?",
+            "confirmer_reouvrir_message": "Les notes de cette période redeviendront modifiables.",
+            "confirmer_suppression": "Supprimer {{libelle}} ?",
+            "confirmer_suppression_message": "Cette période sera supprimée.",
+            "supprimee": "Période supprimée."
+        },
+        "erreurs": {
+            "chargement": "La structure scolaire n’a pas pu être chargée.",
+            "droits": "Seul un administrateur ayant confirmé son identité peut modifier la structure.",
+            "doublon": "Ce libellé ou cet ordre est déjà utilisé.",
+            "dates": "La date de fin doit suivre la date de début (une année dure 18 mois au plus).",
+            "donnee_invalide": "Une valeur saisie est invalide.",
+            "periode_hors_annee": "Les périodes doivent rester dans les dates de l’année.",
+            "periodes_chevauchement": "Cette période chevauche une autre période de l’année.",
+            "annee_active": "L’année active ne peut pas être supprimée : rendez d’abord une autre année active.",
+            "autre_daara": "Élément d’une autre daara.",
+            "inattendue": "L’action a échoué. Réessayez.",
+            "periode_cloturee": "Période clôturée : rouvrez-la avant de la modifier ou de la supprimer."
         }
     }
 }

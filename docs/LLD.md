@@ -184,9 +184,14 @@ Toutes : `id uuid`, `daara_id` (fk `daaras` cascade, index), `created_at`, `crea
 | `classes` | annee_id (fk cascade), nom text (1-50), niveau text null (≤ 50), titulaire_id uuid null (fk `auth.users` set null) | unique (annee_id, nom) ; index (daara_id), (annee_id) ; titulaire = membre actif `enseignant` ou `admin` de la daara (trigger, à l'écriture) |
 | `classe_matieres` | classe_id (fk cascade), matiere_id (fk `restrict`), coefficient numeric(4,2) (défaut 1, 0,5-20), enseignant_id uuid null (fk `auth.users` set null) | unique (classe_id, matiere_id) ; index (daara_id), (matiere_id), (enseignant_id) ; enseignant = membre actif `enseignant` ou `admin` de la daara (trigger) |
 
-Triggers : `meme_daara` (année d'une période ou d'une classe, classe et matière d'une affectation : même `daara_id`,
-sinon `23514 autre_daara`) ; `daara_id` immuable sur les 5 tables ; `periodes_coherentes` ; `membre_enseignant`
-(titulaire, enseignant) ; `annee_active_protegee` (suppression). Les tables des sprints suivants (inscriptions,
+Triggers (security definer) : **droits de l'écrivain contrôlés en tête** (un trigger BEFORE passe avant la RLS ; sans
+ce contrôle, il renseigne un étranger sur les données d'une autre daara : audits S3.1), puis même `daara_id` que la
+ligne référencée (`23514 autre_daara`), `daara_id` et clés parentes immuables (droits par colonne + trigger).
+S3.1 : `periodes_coherentes` (dates dans l'année, sans chevauchement, période clôturée : seule la réouverture, ni
+modification ni suppression hors cascade), `annees_coherentes` (périodes gardées dans l'année, année active non
+supprimable hors cascade). S3.3 : `membre_enseignant` (titulaire, enseignant). Libellés : `libelle = btrim(libelle)` et
+`texte_sur(libelle)` (caractères interdits du socle + U+061C, U+034F, U+180E, U+2028, U+2029). `created_by` illisible
+par le client. Les tables des sprints suivants (inscriptions,
 évaluations, absences) référenceront ces tables en `restrict`.
 
 ### 3.4 Apprenants (sprint 4)

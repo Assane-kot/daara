@@ -27,7 +27,8 @@ Cohérence : toute référence (année, classe, matière) appartient à la même
 - Une seule année active par daara : `activer_annee` bascule atomiquement (l'ancienne devient inactive).
 - Modèles de périodes en un clic : « 3 trimestres » ou « 2 semestres » (dates proposées à partir des dates de l'année,
   modifiables) ; saisie libre aussi.
-- Période clôturée : notes verrouillées (sprint 6) ; l'admin peut la rouvrir (journalisé).
+- Période clôturée : notes verrouillées (sprint 6), dates, ordre et libellé figés, suppression refusée ; l'admin peut
+  la rouvrir (journalisé).
 - Matière utilisée dans une classe : suppression refusée, archivage proposé (masquée des nouveaux choix).
 - Suppression d'une année : refusée si elle est active ; supprime ses périodes, classes et affectations (tant qu'aucune
   donnée des sprints suivants n'y est rattachée : clés étrangères `restrict` à partir du sprint 4).

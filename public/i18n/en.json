@@ -25,7 +25,8 @@
         "tableau_de_bord": "Dashboard",
         "changer_daara": "Switch daara",
         "membres": "Members",
-        "parametres": "Settings"
+        "parametres": "Settings",
+        "structure": "Structure"
     },
     "titres": {
         "tableau_de_bord": "Dashboard",
@@ -45,7 +46,8 @@
         "code_acces": "Code from your daara",
         "compte_profil": "My profile",
         "compte_mot_de_passe": "Password",
-        "compte_securite": "Account security"
+        "compte_securite": "Account security",
+        "structure_annees": "School years"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -599,6 +601,74 @@
             "retrait": "The device could not be removed. Try again.",
             "aal2_requis": "Sign in again with your two-factor code, then try again.",
             "sessions": "The device was removed, but your other sessions could not be signed out. Change your password to sign them out."
+        }
+    },
+    "structure": {
+        "titre": "School structure",
+        "onglets": {
+            "annees": "Years"
+        },
+        "enregistrer": "Save",
+        "modifier": "Edit",
+        "supprimer": "Delete",
+        "enregistre": "Changes saved.",
+        "du_au": "From {{debut}} to {{fin}}",
+        "champs": {
+            "libelle": "Label",
+            "ordre": "Order",
+            "date_debut": "Start",
+            "date_fin": "End"
+        },
+        "annees": {
+            "intro": "The active year is the reference for classes, absences and grades.",
+            "nouvelle": "New year",
+            "modifier": "Edit the year",
+            "active": "Active",
+            "rendre_active": "Make active",
+            "activee": "Year made active.",
+            "vide_titre": "No school year",
+            "vide_message": "Create your first school year, then its terms.",
+            "confirmer_suppression": "Delete the year {{libelle}}?",
+            "confirmer_suppression_message": "Its terms and classes will be deleted too.",
+            "supprimee": "Year deleted."
+        },
+        "periodes": {
+            "titre": "Terms",
+            "aucune": "No term: choose a template or add them one by one.",
+            "modele_trimestres": "3 terms",
+            "modele_semestres": "2 semesters",
+            "ajouter": "Add a term",
+            "trimestre_n": "Term {{n}}",
+            "semestre_n": "Semester {{n}}",
+            "nouvelle": "New term",
+            "modifier": "Edit the term",
+            "creees": "Terms created.",
+            "etat_ouverte": "Open",
+            "etat_cloturee": "Closed",
+            "cloturer": "Close",
+            "reouvrir": "Reopen",
+            "cloturee": "Term closed.",
+            "rouverte": "Term reopened.",
+            "confirmer_cloturer": "Close {{libelle}}?",
+            "confirmer_cloturer_message": "Grades and dates of this term will no longer be editable. You can reopen it if needed.",
+            "confirmer_reouvrir": "Reopen {{libelle}}?",
+            "confirmer_reouvrir_message": "Grades of this term will be editable again.",
+            "confirmer_suppression": "Delete {{libelle}}?",
+            "confirmer_suppression_message": "This term will be deleted.",
+            "supprimee": "Term deleted."
+        },
+        "erreurs": {
+            "chargement": "The school structure could not be loaded.",
+            "droits": "Only an administrator who confirmed their identity can change the structure.",
+            "doublon": "This label or order is already used.",
+            "dates": "The end date must follow the start date (a year lasts 18 months at most).",
+            "donnee_invalide": "A value is invalid.",
+            "periode_hors_annee": "Terms must stay within the dates of the year.",
+            "periodes_chevauchement": "This term overlaps another term of the year.",
+            "annee_active": "The active year cannot be deleted: make another year active first.",
+            "autre_daara": "Item from another daara.",
+            "inattendue": "The action failed. Try again.",
+            "periode_cloturee": "Closed term: reopen it before editing or deleting it."
         }
     }
 }

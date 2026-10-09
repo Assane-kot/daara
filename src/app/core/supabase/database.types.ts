@@ -20,6 +20,47 @@ export type Database = {
     };
     public: {
         Tables: {
+            annees_scolaires: {
+                Row: {
+                    active: boolean;
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    date_debut: string;
+                    date_fin: string;
+                    id: string;
+                    libelle: string;
+                };
+                Insert: {
+                    active?: boolean;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id: string;
+                    date_debut: string;
+                    date_fin: string;
+                    id?: string;
+                    libelle: string;
+                };
+                Update: {
+                    active?: boolean;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id?: string;
+                    date_debut?: string;
+                    date_fin?: string;
+                    id?: string;
+                    libelle?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'annees_scolaires_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             audit_log: {
                 Row: {
                     action: string;
@@ -291,6 +332,60 @@ export type Database = {
                     },
                 ];
             };
+            periodes: {
+                Row: {
+                    annee_id: string;
+                    cloturee: boolean;
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    date_debut: string;
+                    date_fin: string;
+                    id: string;
+                    libelle: string;
+                    ordre: number;
+                };
+                Insert: {
+                    annee_id: string;
+                    cloturee?: boolean;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id: string;
+                    date_debut: string;
+                    date_fin: string;
+                    id?: string;
+                    libelle: string;
+                    ordre: number;
+                };
+                Update: {
+                    annee_id?: string;
+                    cloturee?: boolean;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id?: string;
+                    date_debut?: string;
+                    date_fin?: string;
+                    id?: string;
+                    libelle?: string;
+                    ordre?: number;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'periodes_annee_id_fkey';
+                        columns: ['annee_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'annees_scolaires';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'periodes_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             platform_admins: {
                 Row: {
                     created_at: string;
@@ -347,6 +442,7 @@ export type Database = {
             accepter_invitation: { Args: { p_token: string }; Returns: string };
             accepter_invitation_nouveau_compte: { Args: { p_token: string; p_user: string }; Returns: string };
             accepter_invitation_pour: { Args: { p_nouveau_compte: boolean; p_token: string; p_uid: string }; Returns: string };
+            activer_annee: { Args: { p_annee: string }; Returns: undefined };
             avant_creation_utilisateur: { Args: { event: Json }; Returns: Json };
             avec_prerequis: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: Database['public']['Enums']['module_daara'][] };
             basculer_module: {
@@ -445,8 +541,10 @@ export type Database = {
             modules_valides: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: boolean };
             normaliser_code_acces: { Args: { p_code: string }; Returns: string };
             prerequis_module: { Args: { p_module: Database['public']['Enums']['module_daara'] }; Returns: Database['public']['Enums']['module_daara'][] };
+            retirer_facteurs: { Args: { p_motif: string; p_user: string }; Returns: number };
             revoquer_invitation: { Args: { p_invitation: string }; Returns: undefined };
             session_suffisante: { Args: Record<PropertyKey, never>; Returns: boolean };
+            texte_sur: { Args: { p_texte: string }; Returns: boolean };
         };
         Enums: {
             module_daara: 'structure' | 'absences' | 'notes' | 'bulletins' | 'coran_cahier' | 'coran_recitations' | 'coran_nafar' | 'notifications';
