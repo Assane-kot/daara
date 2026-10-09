@@ -4,10 +4,18 @@
     <p class="auth-intro">{{ 'auth.connexion.intro' | translate }}</p>
 
     <form class="auth-form" [formGroup]="form" (ngSubmit)="connecter()" novalidate>
-        <app-form-field [label]="'auth.champs.email' | translate">
+        <app-form-field [label]="'auth.champs.identifiant' | translate" [aide]="'auth.champs.aide_identifiant' | translate">
             <div class="auth-champ-icone">
                 <icon-mail />
-                <input appFormControl class="form-input" type="email" formControlName="email" autocomplete="email" inputmode="email" />
+                <input
+                    appFormControl
+                    class="form-input"
+                    type="text"
+                    formControlName="identifiant"
+                    autocomplete="username"
+                    autocapitalize="none"
+                    spellcheck="false"
+                />
             </div>
         </app-form-field>
 

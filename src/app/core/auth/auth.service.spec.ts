@@ -84,12 +84,30 @@ describe('AuthService', () => {
         const erreur = new AuthError('Invalid login credentials', 400, 'invalid_credentials');
         client.auth.signInWithPassword.mockResolvedValue({ error: erreur });
 
-        await expect(auth.connecter('awa@test.local', 'faux', 'jeton')).rejects.toBe(erreur);
+        await expect(auth.connecter({ email: 'awa@test.local' }, 'faux', 'jeton')).rejects.toBe(erreur);
         expect(client.auth.signInWithPassword).toHaveBeenCalledWith({
             email: 'awa@test.local',
             password: 'faux',
             options: { captchaToken: 'jeton' },
         });
+    });
+
+    it('se connecte par téléphone (ADR-009)', async () => {
+        const auth = creer(null);
+        client.auth.signInWithPassword.mockResolvedValue({ error: null });
+        await auth.connecter({ telephone: '+221771234567' }, 'daara2026', 'jeton');
+        expect(client.auth.signInWithPassword).toHaveBeenCalledWith({ phone: '+221771234567', password: 'daara2026', options: { captchaToken: 'jeton' } });
+    });
+
+    it('une invitation en attente passe avant la daara (retour après inscription)', async () => {
+        const auth = creer(sessionFactice());
+        client.roles = ['parent'];
+        sessionStorage.setItem('daara.invitation', 'J'.repeat(43));
+        try {
+            expect(await auth.destination()).toBe('/invitation');
+        } finally {
+            sessionStorage.removeItem('daara.invitation');
+        }
     });
 
     it('confirme et réinitialise par code à 6 chiffres', async () => {

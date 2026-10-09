@@ -301,6 +301,8 @@ export type Database = {
         };
         Functions: {
             accepter_invitation: { Args: { p_token: string }; Returns: string };
+            accepter_invitation_nouveau_compte: { Args: { p_token: string; p_user: string }; Returns: string };
+            accepter_invitation_pour: { Args: { p_nouveau_compte: boolean; p_token: string; p_uid: string }; Returns: string };
             avant_creation_utilisateur: { Args: { event: Json }; Returns: Json };
             avec_prerequis: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: Database['public']['Enums']['module_daara'][] };
             basculer_module: {

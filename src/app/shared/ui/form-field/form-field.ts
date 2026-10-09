@@ -46,6 +46,9 @@ export function messageValidation(erreurs: ValidationErrors): MessageChamp {
     if (erreurs['slug']) {
         return { cle: 'formulaire.erreurs.slug' };
     }
+    if (erreurs['identifiant']) {
+        return { cle: 'formulaire.erreurs.identifiant' };
+    }
     return { cle: 'formulaire.erreurs.invalide' };
 }
 

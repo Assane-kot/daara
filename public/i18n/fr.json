@@ -38,7 +38,9 @@
         "select_daara": "Choisir une daara",
         "parametres_modules": "Modules",
         "parametres_general": "Paramètres généraux",
-        "membres": "Membres"
+        "membres": "Membres",
+        "invitation": "Invitation",
+        "invitations": "Invitations"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -64,7 +66,8 @@
             "mot_de_passe": "8 caractères minimum, avec au moins une lettre et un chiffre.",
             "code": "Saisissez les 6 chiffres du code.",
             "different": "Les deux mots de passe ne sont pas identiques.",
-            "slug": "Lettres minuscules, chiffres et tirets uniquement (3 à 50 caractères)."
+            "slug": "Lettres minuscules, chiffres et tirets uniquement (3 à 50 caractères).",
+            "identifiant": "Saisissez une adresse e-mail ou un numéro de téléphone valide."
         },
         "code": {
             "chiffre": "Chiffre {{n}} sur 6"
@@ -99,7 +102,9 @@
             "code_application": "Code de l’application",
             "afficher_mot_de_passe": "Afficher le mot de passe",
             "masquer_mot_de_passe": "Masquer le mot de passe",
-            "aide_mot_de_passe": "8 caractères minimum, avec au moins une lettre et un chiffre."
+            "aide_mot_de_passe": "8 caractères minimum, avec au moins une lettre et un chiffre.",
+            "identifiant": "E-mail ou téléphone",
+            "aide_identifiant": "Numéro sénégalais : 9 chiffres suffisent (ex. 77 123 45 67)."
         },
         "connexion": {
             "surtitre": "Espace daara",
@@ -164,7 +169,7 @@
             "autre_compte": "Se connecter avec un autre compte"
         },
         "erreurs": {
-            "identifiants": "Adresse e-mail ou mot de passe incorrect.",
+            "identifiants": "Identifiant ou mot de passe incorrect.",
             "email_non_confirme": "Votre adresse e-mail n’est pas encore confirmée.",
             "code_invalide": "Code incorrect ou expiré.",
             "mot_de_passe_faible": "Mot de passe trop faible : 8 caractères minimum, avec au moins une lettre et un chiffre.",
@@ -387,6 +392,118 @@
             "role_deja_attribue": "Cette personne a déjà ce rôle dans la daara.",
             "role_invalide": "Ce rôle ne peut pas être attribué ici.",
             "inattendue": "L’action a échoué. Réessayez."
+        },
+        "onglets": {
+            "membres": "Membres",
+            "invitations": "Invitations"
         }
+    },
+    "invitations": {
+        "sans_nom": "Invité sans nom",
+        "inviter": {
+            "ouvrir": "Inviter",
+            "titre": "Inviter un membre",
+            "role": "Rôle",
+            "par": "Inviter par",
+            "mode_telephone": "Téléphone",
+            "mode_email": "E-mail",
+            "email": "Adresse e-mail",
+            "telephone": "Numéro de téléphone",
+            "aide_telephone": "Le lien sera envoyé sur WhatsApp depuis votre téléphone. Vérifiez bien le numéro : il servira d’identifiant.",
+            "aide_nom": "Facultatif : pour reconnaître l’invitation dans la liste.",
+            "langue": "Langue de l’invité",
+            "aide_admin": "Un administrateur devra activer la double authentification avant d’accéder à la daara.",
+            "bouton": "Créer l’invitation"
+        },
+        "resultat": {
+            "titre": "Invitation prête",
+            "email_envoye": "Un e-mail a été envoyé à {{contact}}. Vous pouvez aussi partager le lien.",
+            "email_non_envoye": "L’e-mail n’a pas pu être envoyé : partagez le lien ci-dessous.",
+            "telephone": "Envoyez le lien à {{contact}} par WhatsApp.",
+            "lien": "Lien d’invitation",
+            "aide_lien": "Lien personnel, valable 7 jours, utilisable une seule fois. Ne le publiez pas dans un groupe.",
+            "copier": "Copier le lien",
+            "copie": "Lien copié",
+            "whatsapp": "Envoyer sur WhatsApp"
+        },
+        "etat": {
+            "en_attente": "En attente jusqu’au {{date}}",
+            "expiree": "Expirée le {{date}}"
+        },
+        "actions": {
+            "renvoyer": "Renvoyer",
+            "revoquer": "Révoquer"
+        },
+        "confirmer": {
+            "titre": "Révoquer l’invitation de {{nom}} ?",
+            "message": "Le lien ne fonctionnera plus. Vous pourrez inviter à nouveau cette personne."
+        },
+        "vide": {
+            "titre": "Aucune invitation en attente",
+            "message": "Cliquez sur « Inviter » pour ajouter un enseignant, un parent ou un administrateur."
+        },
+        "erreurs": {
+            "chargement": "Les invitations n’ont pas pu être chargées.",
+            "admin_aal2_requis": "Seul un administrateur ayant confirmé son identité peut inviter.",
+            "daara_suspendue": "Cette daara est suspendue : les invitations sont bloquées.",
+            "deja_membre": "Cette personne est déjà membre de la daara avec ce rôle.",
+            "quota_invitations": "Limite de 50 invitations par jour atteinte. Réessayez demain.",
+            "quota_global_email": "Trop d’e-mails envoyés aujourd’hui sur DAARA : invitez par téléphone ou réessayez demain.",
+            "donnee_invalide": "Une information est invalide : vérifiez le contact et le nom.",
+            "contact_invalide": "Indiquez un e-mail ou un téléphone.",
+            "reseau": "Connexion impossible au serveur. Vérifiez votre connexion Internet.",
+            "inattendue": "L’invitation n’a pas pu être créée. Réessayez."
+        }
+    },
+    "invitation": {
+        "surtitre": "Invitation",
+        "titre": "« {{daara}} » vous invite",
+        "role": "Vous êtes invité comme {{role}}.",
+        "contact_email": "Invitation adressée à {{contact}}.",
+        "contact_telephone": "Invitation adressée au {{contact}}.",
+        "rejoindre": "Rejoindre {{daara}}",
+        "autre_compte": "Ce n’est pas mon compte",
+        "activer_mfa": "Activer la double authentification",
+        "creer_compte": "Créer mon compte",
+        "deja_compte": "J’ai déjà un compte",
+        "deja_compte_question": "Vous avez déjà un compte ?",
+        "me_connecter": "Me connecter",
+        "mot_de_passe": "Choisissez votre mot de passe",
+        "creer_compte_telephone": "Créer mon compte et rejoindre",
+        "accueil": "Retour à l’accueil",
+        "reessayer": "Réessayer",
+        "absente": {
+            "titre": "Lien d’invitation incomplet",
+            "message": "Ouvrez le lien complet reçu par e-mail ou par WhatsApp."
+        },
+        "invalide": {
+            "titre": "Invitation indisponible",
+            "conseil": "Demandez un nouveau lien à l’administrateur de la daara."
+        },
+        "connexion": {
+            "titre": "Compte créé",
+            "message": "Vous rejoignez la daara…",
+            "en_cours": "Connexion en cours…"
+        },
+        "erreurs": {
+            "jeton_invalide": "Ce lien d’invitation n’est pas valide.",
+            "invitation_expiree": "Cette invitation a expiré.",
+            "invitation_utilisee": "Cette invitation a déjà été utilisée.",
+            "invitation_revoquee": "Cette invitation a été annulée.",
+            "invitation_suspendue": "Cette daara est momentanément suspendue.",
+            "daara_suspendue": "Cette daara est momentanément suspendue.",
+            "invitation_email": "Cette invitation se fait par e-mail : créez votre compte avec l’adresse invitée.",
+            "compte_existant": "Ce numéro a déjà un compte : connectez-vous pour rejoindre la daara.",
+            "mot_de_passe_faible": "8 caractères minimum, avec au moins une lettre et un chiffre.",
+            "captcha": "La vérification anti-robot a échoué. Réessayez.",
+            "captcha_requis": "Patientez pendant la vérification anti-robot.",
+            "contact_different": "Ce lien est destiné à {{contact}} : connectez-vous avec ce compte.",
+            "aal2_requis": "Activez d’abord la double authentification de votre compte.",
+            "donnee_invalide": "Une information est invalide : vérifiez votre nom.",
+            "connexion_apres_creation": "Votre compte est créé, mais la connexion a échoué.",
+            "reseau": "Connexion impossible au serveur. Vérifiez votre connexion Internet.",
+            "inattendue": "Une erreur inattendue est survenue. Réessayez."
+        },
+        "ignorer": "Ignorer cette invitation"
     }
 }

@@ -11,7 +11,6 @@ import { IconSearch } from '../../../../shared/icon/icon-search';
 import { Badge, BadgeVariante } from '../../../../shared/ui/badge/badge';
 import { ConfirmDialogService } from '../../../../shared/ui/confirm-dialog/confirm-dialog.service';
 import { EmptyState } from '../../../../shared/ui/empty-state/empty-state';
-import { PageHeader } from '../../../../shared/ui/page-header/page-header';
 import { Skeleton } from '../../../../shared/ui/skeleton/skeleton';
 import { ErreurMembres, Membre, MembresService, ROLES_ATTRIBUABLES } from '../../data/membres.service';
 
@@ -26,7 +25,7 @@ export const VARIANTE_ROLE: Record<RoleMembre, BadgeVariante> = { admin: 'second
  */
 @Component({
     selector: 'app-membres-page',
-    imports: [NgTemplateOutlet, TranslatePipe, PageHeader, Skeleton, EmptyState, Badge, CdkMenuTrigger, CdkMenu, CdkMenuItem, IconHorizontalDots, IconSearch],
+    imports: [NgTemplateOutlet, TranslatePipe, Skeleton, EmptyState, Badge, CdkMenuTrigger, CdkMenu, CdkMenuItem, IconHorizontalDots, IconSearch],
     templateUrl: './membres-page.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

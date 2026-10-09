@@ -78,7 +78,7 @@ describe('ConnexionPage', () => {
 
         await envoyer();
 
-        expect(auth.connecter).toHaveBeenCalledWith('awa@test.local', 'daara2026', 'jeton');
+        expect(auth.connecter).toHaveBeenCalledWith({ email: 'awa@test.local' }, 'daara2026', 'jeton');
         expect(navigation).toHaveBeenCalledWith('/onboarding');
     });
 
@@ -89,7 +89,7 @@ describe('ConnexionPage', () => {
 
         await envoyer();
 
-        expect(element.querySelector('[role=alert]')?.textContent).toContain('Adresse e-mail ou mot de passe incorrect.');
+        expect(element.querySelector('[role=alert]')?.textContent).toContain('Identifiant ou mot de passe incorrect.');
         expect(turnstile.reinitialiser).toHaveBeenCalled();
     });
 
@@ -102,5 +102,24 @@ describe('ConnexionPage', () => {
 
         expect(auth.emailEnAttente.set).toHaveBeenCalledWith('awa@test.local');
         expect(element.querySelector('a[href="/auth/confirmation"]')).not.toBeNull();
+    });
+
+    it('se connecte par téléphone : numéro sénégalais à 9 chiffres normalisé', async () => {
+        vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+        auth.connecter.mockResolvedValue(undefined);
+        auth.destination.mockResolvedValue('/');
+        remplir('77 123 45 67', 'daara2026');
+        donnerCaptcha();
+
+        await envoyer();
+
+        expect(auth.connecter).toHaveBeenCalledWith({ telephone: '+221771234567' }, 'daara2026', 'jeton');
+    });
+
+    it('refuse un identifiant qui n’est ni un e-mail ni un téléphone', async () => {
+        remplir('abc', 'daara2026');
+        await envoyer();
+        expect(element.textContent).toContain('Saisissez une adresse e-mail ou un numéro de téléphone valide.');
+        expect(auth.connecter).not.toHaveBeenCalled();
     });
 });

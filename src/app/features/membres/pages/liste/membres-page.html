@@ -1,5 +1,3 @@
-<app-page-header [titre]="'membres.titre' | translate" />
-
 @if (chargement()) {
     <div class="panel"><app-skeleton [lignes]="6" [avecTitre]="true" /></div>
 } @else if (erreurChargement()) {

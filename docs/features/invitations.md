@@ -58,7 +58,10 @@ Manuel : parcours e-mail (Mailpit) et téléphone de bout en bout.
   `invitation_expiree|utilisee|revoquee|suspendue`, `invitation_email`, `compte_existant`, `mot_de_passe_faible`,
   `donnee_invalide`, `contact_invalide`, `admin_aal2_requis`, `deja_membre`, `quota_invitations`, `quota_global_email`,
   `daara_suspendue`, `inattendue`.
-- S2.5c (front) : à faire.
+- S2.5c (front) : modale « Inviter » (lien, Copier, WhatsApp `wa.me`), onglet Invitations (renvoyer, révoquer), page
+  publique `/invitation` (jeton lu dans le fragment puis effacé de l'adresse, gardé en `sessionStorage` pendant
+  l'inscription, oublié à l'acceptation et à la déconnexion), connexion « E-mail ou téléphone ». Écart à la spec :
+  l'e-mail n'est pas prérempli à l'inscription (l'aperçu ne donne que le contact masqué, affiché comme indice).
 
 ## Hors périmètre
 Invitations d'apprenants et rattachement aux enfants (sprint 4) ; import CSV (sprint 4).

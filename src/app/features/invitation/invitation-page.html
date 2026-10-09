@@ -1,0 +1,143 @@
+<div class="auth-carte">
+    <p class="auth-surtitre">{{ 'invitation.surtitre' | translate }}</p>
+
+    @switch (etape()) {
+        @case ('chargement') {
+            <app-skeleton [lignes]="5" [avecTitre]="true" />
+        }
+
+        @case ('absente') {
+            <h1 class="auth-titre">{{ 'invitation.absente.titre' | translate }}</h1>
+            <p class="auth-intro">{{ 'invitation.absente.message' | translate }}</p>
+            <a class="btn-auth-secondaire" [routerLink]="routes.racine">{{ 'invitation.accueil' | translate }}</a>
+        }
+
+        @case ('invalide') {
+            <h1 class="auth-titre">{{ 'invitation.invalide.titre' | translate }}</h1>
+            <div class="auth-erreur mb-4" role="alert">{{ 'invitation.erreurs.' + erreur() | translate }}</div>
+            @if (erreur() === 'reseau' || erreur() === 'inattendue') {
+                <button type="button" class="btn-auth-secondaire" (click)="charger()">{{ 'invitation.reessayer' | translate }}</button>
+            } @else {
+                <p class="auth-intro">{{ 'invitation.invalide.conseil' | translate }}</p>
+                <a class="btn-auth-secondaire" [routerLink]="routes.racine">{{ 'invitation.accueil' | translate }}</a>
+            }
+        }
+
+        @case ('connexion') {
+            <h1 class="auth-titre">{{ 'invitation.connexion.titre' | translate }}</h1>
+            <p class="auth-intro">{{ 'invitation.connexion.message' | translate }}</p>
+            <app-turnstile (jeton)="jetonTurnstile($event)" />
+            @if (erreur(); as erreur) {
+                <div class="auth-erreur" role="alert">
+                    {{ 'invitation.erreurs.' + erreur | translate }}
+                    <a class="auth-lien ml-1" [routerLink]="routes.connexion">{{ 'invitation.me_connecter' | translate }}</a>
+                </div>
+            } @else {
+                <p class="auth-info" role="status">
+                    <span class="auth-spinner mr-2" aria-hidden="true"></span>{{ 'invitation.connexion.en_cours' | translate }}
+                </p>
+            }
+        }
+
+        @case ('apercu') {
+            @if (apercu(); as apercu) {
+                <h1 class="auth-titre">{{ 'invitation.titre' | translate: { daara: apercu.daara } }}</h1>
+                <p class="auth-intro">
+                    {{ 'invitation.role' | translate: { role: ('roles.' + apercu.role | translate) } }}
+                    {{ (apercu.type === 'email' ? 'invitation.contact_email' : 'invitation.contact_telephone') | translate: { contact: apercu.contact } }}
+                </p>
+
+                @if (auth.session()) {
+                    <!-- Connecté : rejoindre avec ce compte. -->
+                    @if (erreur(); as erreur) {
+                        <div class="auth-erreur mb-4" role="alert">{{ 'invitation.erreurs.' + erreur | translate: { contact: apercu.contact } }}</div>
+                    }
+                    @if (erreur() === 'aal2_requis') {
+                        <a class="btn-auth" [routerLink]="routes.mfa">{{ 'invitation.activer_mfa' | translate }}</a>
+                    } @else {
+                        <button type="button" class="btn-auth" [disabled]="envoi()" (click)="rejoindre()">
+                            @if (envoi()) {
+                                <span class="auth-spinner" aria-hidden="true"></span>
+                            }
+                            {{ 'invitation.rejoindre' | translate: { daara: apercu.daara } }}
+                        </button>
+                    }
+                    <p class="auth-bas">
+                        <button type="button" class="auth-lien min-h-11" (click)="changerDeCompte()">{{ 'invitation.autre_compte' | translate }}</button>
+                        @if (erreur() === 'contact_different' || erreur() === 'aal2_requis') {
+                            ·
+                            <button type="button" class="auth-lien min-h-11" (click)="ignorer()">{{ 'invitation.ignorer' | translate }}</button>
+                        }
+                    </p>
+                } @else if (apercu.type === 'email') {
+                    <!-- Invité par e-mail : inscription habituelle (code e-mail) ou connexion, puis retour ici. -->
+                    <div class="grid gap-3">
+                        <a class="btn-auth" routerLink="/auth/inscription">{{ 'invitation.creer_compte' | translate }}</a>
+                        <a class="btn-auth-secondaire" [routerLink]="routes.connexion">{{ 'invitation.deja_compte' | translate }}</a>
+                    </div>
+                } @else {
+                    <!-- Invité par téléphone : choix du mot de passe, le compte est créé par l'invitation (ADR-009). -->
+                    <form class="auth-form" [formGroup]="form" (ngSubmit)="creerCompte()" novalidate>
+                        <div class="grid gap-3 min-[421px]:grid-cols-2">
+                            <app-form-field [label]="'auth.champs.prenom' | translate">
+                                <input appFormControl class="form-input" type="text" formControlName="prenom" autocomplete="given-name" maxlength="100" />
+                            </app-form-field>
+                            <app-form-field [label]="'auth.champs.nom' | translate">
+                                <input appFormControl class="form-input" type="text" formControlName="nom" autocomplete="family-name" maxlength="100" />
+                            </app-form-field>
+                        </div>
+                        <app-form-field [label]="'invitation.mot_de_passe' | translate" [aide]="'auth.champs.aide_mot_de_passe' | translate">
+                            <div class="auth-champ-icone">
+                                <icon-lock-dots />
+                                <input
+                                    appFormControl
+                                    class="form-input pr-12"
+                                    [type]="voirMotDePasse() ? 'text' : 'password'"
+                                    formControlName="motDePasse"
+                                    autocomplete="new-password"
+                                />
+                                <button
+                                    type="button"
+                                    class="auth-voir"
+                                    [attr.aria-label]="
+                                        (voirMotDePasse() ? 'auth.champs.masquer_mot_de_passe' : 'auth.champs.afficher_mot_de_passe') | translate
+                                    "
+                                    [attr.aria-pressed]="voirMotDePasse()"
+                                    (click)="voirMotDePasse.set(!voirMotDePasse())"
+                                >
+                                    @if (voirMotDePasse()) {
+                                        <icon-eye-off class="h-[18px] w-[18px]" />
+                                    } @else {
+                                        <icon-eye class="h-[18px] w-[18px]" />
+                                    }
+                                </button>
+                            </div>
+                        </app-form-field>
+
+                        <app-turnstile (jeton)="jetonTurnstile($event)" />
+
+                        @if (erreur(); as erreur) {
+                            <div class="auth-erreur" role="alert">
+                                {{ 'invitation.erreurs.' + erreur | translate }}
+                                @if (erreur === 'compte_existant') {
+                                    <a class="auth-lien ml-1" [routerLink]="routes.connexion">{{ 'invitation.me_connecter' | translate }}</a>
+                                }
+                            </div>
+                        }
+
+                        <button class="btn-auth" type="submit" [disabled]="envoi()">
+                            @if (envoi()) {
+                                <span class="auth-spinner" aria-hidden="true"></span>
+                            }
+                            {{ 'invitation.creer_compte_telephone' | translate }}
+                        </button>
+                    </form>
+                    <p class="auth-bas">
+                        {{ 'invitation.deja_compte_question' | translate }}
+                        <a class="auth-lien" [routerLink]="routes.connexion">{{ 'invitation.me_connecter' | translate }}</a>
+                    </p>
+                }
+            }
+        }
+    }
+</div>

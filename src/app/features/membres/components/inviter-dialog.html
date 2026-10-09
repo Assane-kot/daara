@@ -1,0 +1,134 @@
+<div
+    class="relative flex max-h-[calc(100dvh-2rem)] flex-col overflow-hidden rounded-lg bg-white text-base text-black shadow-sm dark:bg-night dark:text-white-dark"
+>
+    <div class="flex items-center justify-between gap-4 bg-gray-50 px-5 py-3 dark:bg-night-hover">
+        <h2 id="inviter-titre" class="text-lg font-bold dark:text-white-light">
+            {{ (resultat() ? 'invitations.resultat.titre' : 'invitations.inviter.titre') | translate }}
+        </h2>
+        <button
+            type="button"
+            class="shrink-0 text-3xl leading-7 font-normal text-muted hover:text-black dark:text-night-muted dark:hover:text-white-light"
+            [attr.aria-label]="'commun.fermer' | translate"
+            (click)="fermer()"
+        >
+            ×
+        </button>
+    </div>
+
+    <div class="overflow-y-auto px-5 py-5">
+        @if (resultat(); as r) {
+            <!-- Résultat : le lien est toujours rendu à l'admin. -->
+            <div class="grid gap-4">
+                <p class="m-0" role="status">
+                    @if (r.emailEnvoye) {
+                        {{ 'invitations.resultat.email_envoye' | translate: { contact: destinataire() } }}
+                    } @else if (r.telephone) {
+                        {{ 'invitations.resultat.telephone' | translate: { contact: destinataire() || r.telephone } }}
+                    } @else {
+                        {{ 'invitations.resultat.email_non_envoye' | translate }}
+                    }
+                </p>
+                <label class="mb-0!" for="lien-invitation">
+                    <span class="mb-1.5 block font-semibold">{{ 'invitations.resultat.lien' | translate }}</span>
+                    <input
+                        id="lien-invitation"
+                        class="form-input font-mono text-sm"
+                        type="text"
+                        readonly
+                        [value]="r.lien"
+                        (focus)="$any($event.target).select()"
+                    />
+                </label>
+                <p class="m-0 text-sm text-muted dark:text-night-muted">{{ 'invitations.resultat.aide_lien' | translate }}</p>
+                <div class="flex flex-col gap-3 sm:flex-row">
+                    <button type="button" class="btn btn-outline-primary gap-2" (click)="copier(r.lien)">
+                        <icon-copy class="h-4 w-4" />
+                        {{ (copie() ? 'invitations.resultat.copie' : 'invitations.resultat.copier') | translate }}
+                    </button>
+                    <a class="btn btn-primary" [href]="whatsapp(r)" target="_blank" rel="noopener noreferrer">{{
+                        'invitations.resultat.whatsapp' | translate
+                    }}</a>
+                </div>
+            </div>
+        } @else {
+            <form class="grid gap-4" [formGroup]="form" (ngSubmit)="inviter()" novalidate>
+                <fieldset class="m-0 border-0 p-0">
+                    <legend class="mb-1.5 font-semibold">{{ 'invitations.inviter.role' | translate }}</legend>
+                    <div class="grid grid-cols-3 gap-2">
+                        @for (role of roles; track role) {
+                            <label
+                                class="mb-0! flex min-h-11 cursor-pointer items-center justify-center rounded-md border border-white-light px-2 text-center text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:text-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary dark:border-night-border"
+                            >
+                                <input class="sr-only" type="radio" formControlName="role" [value]="role" />
+                                {{ 'roles.' + role | translate }}
+                            </label>
+                        }
+                    </div>
+                    @if (form.controls.role.value === 'admin') {
+                        <p class="mt-2 mb-0 text-xs text-muted dark:text-night-muted">{{ 'invitations.inviter.aide_admin' | translate }}</p>
+                    }
+                </fieldset>
+
+                <fieldset class="m-0 border-0 p-0">
+                    <legend class="mb-1.5 font-semibold">{{ 'invitations.inviter.par' | translate }}</legend>
+                    <div class="grid grid-cols-2 gap-2">
+                        @for (m of ['telephone', 'email']; track m) {
+                            <label
+                                class="mb-0! flex min-h-11 cursor-pointer items-center justify-center rounded-md border border-white-light text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:text-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary dark:border-night-border"
+                            >
+                                <input class="sr-only" type="radio" formControlName="mode" [value]="m" />
+                                {{ 'invitations.inviter.mode_' + m | translate }}
+                            </label>
+                        }
+                    </div>
+                </fieldset>
+
+                @if (mode() === 'email') {
+                    <app-form-field [label]="'invitations.inviter.email' | translate">
+                        <input appFormControl class="form-input" type="email" formControlName="email" autocomplete="off" inputmode="email" maxlength="254" />
+                    </app-form-field>
+                } @else {
+                    <app-form-field [label]="'invitations.inviter.telephone' | translate" [aide]="'invitations.inviter.aide_telephone' | translate">
+                        <input appFormControl class="form-input" type="tel" formControlName="telephone" autocomplete="off" inputmode="tel" maxlength="20" />
+                    </app-form-field>
+                }
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <app-form-field [label]="'auth.champs.prenom' | translate">
+                        <input appFormControl class="form-input" type="text" formControlName="prenom" autocomplete="off" maxlength="100" />
+                    </app-form-field>
+                    <app-form-field [label]="'auth.champs.nom' | translate">
+                        <input appFormControl class="form-input" type="text" formControlName="nom" autocomplete="off" maxlength="100" />
+                    </app-form-field>
+                </div>
+                <p class="-mt-2 mb-0 text-xs text-muted dark:text-night-muted">{{ 'invitations.inviter.aide_nom' | translate }}</p>
+
+                <app-form-field [label]="'invitations.inviter.langue' | translate">
+                    <select appFormControl class="form-select" formControlName="langue">
+                        <option value="fr" lang="fr">{{ 'onboarding.langues.fr' | translate }}</option>
+                        <option value="en" lang="en">{{ 'onboarding.langues.en' | translate }}</option>
+                    </select>
+                </app-form-field>
+
+                @if (erreur(); as erreur) {
+                    <div
+                        class="rounded-md border border-danger/30 bg-danger-light p-3.5 text-danger-strong dark:bg-danger-dark-light dark:text-danger-soft"
+                        role="alert"
+                    >
+                        {{ erreur | translate }}
+                    </div>
+                }
+
+                <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                    <button type="button" class="btn btn-outline-primary" (click)="fermer()">{{ 'commun.annuler' | translate }}</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="envoi()">
+                        @if (envoi()) {
+                            <span class="auth-spinner ltr:mr-2 rtl:ml-2" aria-hidden="true"></span>
+                        }
+                        {{ 'invitations.inviter.bouton' | translate }}
+                    </button>
+                </div>
+            </form>
+        }
+    </div>
+</div>

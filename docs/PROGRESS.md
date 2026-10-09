@@ -10,8 +10,8 @@
   vérification en 375 px et les configurations Auth / Turnstile du développeur. Sprint suivant : 2 — Membres et
   navigation (planification à faire).
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
-  de la daara) et S2.4 (gestion des membres) faits (2026-10-05). S2.5 invitations découpée en 3 commits : S2.5a (base)
-  et S2.5b (Edge Functions) faites ; suivante : S2.5c (front).
+  de la daara), S2.4 (gestion des membres) et S2.5 (invitations, en 3 commits) faits. Suivante : S2.6 réinitialisation
+  assistée.
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -134,6 +134,23 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-09 — S2.5c Invitations : front
+- Connexion « E-mail ou téléphone » (`core/auth/identifiant.ts` : +221 par défaut pour 9 chiffres, même règle que les
+  Edge Functions) ; `AuthService.connecter(identifiant)`, `accepterInvitation`, retour vers `/invitation` après
+  inscription, connexion ou TOTP si une invitation attend.
+- Membres : en-tête avec « Inviter » (modale CDK : rôle, téléphone ou e-mail, nom, langue de l'invité → lien, Copier,
+  WhatsApp), onglets Membres / Invitations (en attente, expirées ; renvoyer = nouveau lien ; révoquer avec confirmation).
+- Page publique `/invitation` : aperçu (contact masqué), invité connecté → « Rejoindre » (messages contact différent,
+  double authentification à activer) ; invité par e-mail → créer un compte ou se connecter ; invité par téléphone →
+  mot de passe choisi, compte créé par `accept-invitation`, connexion automatique avec un nouveau jeton Turnstile.
+- Vérifié dans le navigateur : admin invite un parent par téléphone (modale, lien WhatsApp, onglet), déconnexion,
+  ouverture du lien (jeton effacé de l'adresse), création du compte → arrivée dans la daara. Piège : première réponse
+  d'une Edge Function lente (démarrage à froid) ; `app-page-header` ne projette que les éléments `[actions]`.
+- Audit sécurité : 0 critique, 1 important corrigé (reconnexion automatique qui pouvait boucler en gardant le mot de
+  passe en mémoire → une seule tentative, mot de passe effacé), 7 mineurs corrigés (format du jeton contrôlé, « Ignorer
+  cette invitation », retour sur l'invitation après « Ce n'est pas mon compte », pas de numéro dans l'URL…).
+- 204 tests unitaires ; chargement initial 148,5 kB transférés.
+
 ### 2026-10-05 — S2.5b Invitations : Edge Functions
 - Décision I3 (validée) : risque résiduel accepté qu'un admin crée le compte du numéro qu'il invite, limité par la
   création et le rattachement dans la même opération, le marqueur `app_metadata.invitation`, le journal et les quotas

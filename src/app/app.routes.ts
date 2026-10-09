@@ -62,6 +62,18 @@ export const routes: Routes = [
             },
         ],
     },
+    // Lien d'invitation (S2.5c) : public, connecté ou non ; le jeton est dans le fragment (LLD §7.1).
+    {
+        path: 'invitation',
+        loadComponent: () => import('./layouts/auth-layout/auth-layout').then((m) => m.AuthLayout),
+        children: [
+            {
+                path: '',
+                title: 'titres.invitation',
+                loadComponent: () => import('./features/invitation/invitation-page').then((m) => m.InvitationPage),
+            },
+        ],
+    },
     {
         path: 'auth',
         loadComponent: () => import('./layouts/auth-layout/auth-layout').then((m) => m.AuthLayout),

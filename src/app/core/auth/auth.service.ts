@@ -1,3 +1,5 @@
+import { Identifiant } from './identifiant';
+import { lireInvitation, oublierInvitation } from './invitation-en-attente';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Session, isAuthError } from '@supabase/supabase-js';
 import { CurrentDaaraService } from '../daara/current-daara.service';
@@ -28,6 +30,7 @@ export const ROUTES_AUTH = {
     mfa: '/auth/mfa',
     onboarding: '/onboarding',
     selectionDaara: '/select-daara',
+    invitation: '/invitation',
     racine: '/',
 } as const;
 
@@ -71,6 +74,7 @@ export class AuthService {
             }
             if (evenement === 'SIGNED_OUT') {
                 oublierDerniereDaara();
+                oublierInvitation();
             }
             this.sessionCouranteSig.set(session);
         });
@@ -116,11 +120,30 @@ export class AuthService {
         }
     }
 
-    async connecter(email: string, motDePasse: string, captcha: string): Promise<void> {
-        const { error } = await this.sb.auth.signInWithPassword({ email, password: motDePasse, options: { captchaToken: captcha } });
+    /** Connexion par e-mail ou par téléphone (ADR-009), identifiant déjà lu par `lireIdentifiant`. */
+    async connecter(identifiant: Identifiant, motDePasse: string, captcha: string): Promise<void> {
+        const options = { captchaToken: captcha };
+        const { error } =
+            'email' in identifiant
+                ? await this.sb.auth.signInWithPassword({ email: identifiant.email, password: motDePasse, options })
+                : await this.sb.auth.signInWithPassword({ phone: identifiant.telephone, password: motDePasse, options });
         if (error) {
             throw error;
         }
+    }
+
+    /**
+     * Accepte l'invitation en attente pour l'utilisateur connecté (`accepter_invitation`, LLD §4) et renvoie le slug de
+     * la daara rejointe. Erreur : `{ code, message }` de la RPC (contact_different, aal2_requis…).
+     */
+    async accepterInvitation(jeton: string): Promise<string> {
+        const { data, error } = await this.sb.rpc('accepter_invitation', { p_token: jeton });
+        if (error) {
+            throw error;
+        }
+        oublierInvitation();
+        this.invaliderDaaras();
+        return data;
     }
 
     /** Envoie un code de réinitialisation. Réponse identique que le compte existe ou non (message neutre). */
@@ -278,6 +301,10 @@ export class AuthService {
         }
         if (await this.mfaRequise()) {
             return ROUTES_AUTH.mfa;
+        }
+        // Invitation ouverte avant l'inscription ou la connexion : on y revient pour l'accepter.
+        if (lireInvitation()) {
+            return ROUTES_AUTH.invitation;
         }
         const daaras = await this.mesDaaras();
         if (daaras.length === 0) {
