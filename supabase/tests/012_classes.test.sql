@@ -131,8 +131,8 @@ select ok(not (select public.teaches_class(id) from classe_ce1), 'teaches_class 
 select tests.connecter('00000000-0000-0000-0000-00000000c0e1');
 select results_eq(
     $$ select nom, actif from public.enseignants_daara('00000000-0000-0000-0000-0000000c000a') order by nom $$,
-    $$ values ('Ancien Maître'::text, false), ('Diop'::text, true), ('Fall'::text, true) $$,
-    'enseignants_daara : enseignants et admins, nom figé pour un désactivé');
+    $$ values ('Diop'::text, true), ('Fall'::text, true) $$,
+    'enseignants_daara (enseignant) : collègue désactivé non référencé absent');
 select tests.connecter('00000000-0000-0000-0000-00000000c0c1', 'aal1');
 select throws_ok($$ select * from public.enseignants_daara('00000000-0000-0000-0000-0000000c000a') $$, '42501', null,
     'enseignants_daara : parent refusé');

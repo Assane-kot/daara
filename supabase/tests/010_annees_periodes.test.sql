@@ -41,9 +41,12 @@ set local role authenticated;
 -- Années : écriture
 -- ---------------------------------------------------------------------------------------------------
 select tests.connecter('00000000-0000-0000-0000-00000000a0a1');
-select lives_ok($$ insert into public.annees_scolaires (id, daara_id, libelle, date_debut, date_fin) values
-    ('00000000-0000-0000-0000-00000000a100', '00000000-0000-0000-0000-0000000a000a', '2026-2027', '2026-10-01', '2027-07-31') $$,
+select lives_ok($$ insert into public.annees_scolaires (daara_id, libelle, date_debut, date_fin) values
+    ('00000000-0000-0000-0000-0000000a000a', '2026-2027', '2026-10-01', '2027-07-31') $$,
     'admin aal2 : crée une année');
+reset role;
+update public.annees_scolaires set id = '00000000-0000-0000-0000-00000000a100' where libelle = '2026-2027' and daara_id = '00000000-0000-0000-0000-0000000a000a';
+set local role authenticated;
 select throws_ok($$ insert into public.annees_scolaires (daara_id, libelle, date_debut, date_fin) values
     ('00000000-0000-0000-0000-0000000a000a', '2025-2026', '2027-07-31', '2026-10-01') $$, '23514', null, 'fin avant début : refusé');
 select throws_ok($$ insert into public.annees_scolaires (daara_id, libelle, date_debut, date_fin) values
@@ -85,8 +88,10 @@ set local role authenticated;
 -- ---------------------------------------------------------------------------------------------------
 select tests.connecter('00000000-0000-0000-0000-00000000a0a1');
 select lives_ok($$ select public.activer_annee('00000000-0000-0000-0000-00000000a100') $$, 'admin : active une année');
+reset role;
 insert into public.annees_scolaires (id, daara_id, libelle, date_debut, date_fin) values
     ('00000000-0000-0000-0000-00000000a200', '00000000-0000-0000-0000-0000000a000a', '2027-2028', '2027-10-01', '2028-07-31');
+set local role authenticated;
 select public.activer_annee('00000000-0000-0000-0000-00000000a200');
 select results_eq($$ select libelle from public.annees_scolaires where active $$, $$ values ('2027-2028'::text) $$,
     'une seule année active : la précédente ne l''est plus');
@@ -104,9 +109,15 @@ select throws_ok($$ select public.activer_annee('00000000-0000-0000-0000-0000000
 -- Périodes
 -- ---------------------------------------------------------------------------------------------------
 select tests.connecter('00000000-0000-0000-0000-00000000a0a1');
-select lives_ok($$ insert into public.periodes (id, daara_id, annee_id, libelle, ordre, date_debut, date_fin) values
-    ('00000000-0000-0000-0000-00000000a110', '00000000-0000-0000-0000-0000000a000a', '00000000-0000-0000-0000-00000000a100',
+select lives_ok($$ insert into public.periodes (daara_id, annee_id, libelle, ordre, date_debut, date_fin) values
+    ('00000000-0000-0000-0000-0000000a000a', '00000000-0000-0000-0000-00000000a100',
      'Trimestre 1', 1, '2026-10-01', '2026-12-20') $$, 'admin : crée une période dans l''année');
+reset role;
+-- Mise en place (id fixe) sans les triggers : changer l'id ferait chevaucher la période avec elle-même.
+set local session_replication_role = replica;
+update public.periodes set id = '00000000-0000-0000-0000-00000000a110' where libelle = 'Trimestre 1' and daara_id = '00000000-0000-0000-0000-0000000a000a';
+set local session_replication_role = origin;
+set local role authenticated;
 select throws_ok($$ insert into public.periodes (daara_id, annee_id, libelle, ordre, date_debut, date_fin) values
     ('00000000-0000-0000-0000-0000000a000a', '00000000-0000-0000-0000-00000000a100', 'Hors', 2, '2026-09-01', '2026-12-31') $$,
     '23514', 'periode_hors_annee', 'période hors de l''année : refusée');

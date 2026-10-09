@@ -12,8 +12,8 @@
 - Sprint 2 en cours : S2.0 (spike, ADR-009), S2.1 (navigation par daara), S2.2 (modules activables) et S2.3 (paramètres
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
-- Sprint 3 — Structure scolaire : S3.0 à S3.4 faits : **code du sprint 3 terminé**. Suivant : audit de fin de sprint
-  (sécurité + RLS sur S3.1 à S3.4), corrections, puis bilan du sprint 3. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous). Suivant :
+  planification du sprint 4 (apprenants et parents). **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -65,15 +65,9 @@
     vérifier sur `daara-dev` que `verify_jwt` accepte les JWT (nouvelles clés de signature) et que le CORS ne répond
     qu'aux origines de l'application (en local, Kong ajoute un CORS ouvert).
   - CI : job `edge` jamais exécuté sur GitHub → vérifier le premier run (image Docker Deno épinglée par empreinte).
-  - À l'audit de fin de sprint 3 (audits par story arrêtés à partir de S3.2, décision du développeur du 2026-10-09) :
-    - S3.4 : `rechercher_membres` (security definer, recherche et tri), `sans_accents` et colonnes générées exposées,
-      motifs `ilike` construits côté client (`motifIlike`) ;
-    - audit RLS de S3.2 non fait (interrompu) ; audits complets de S3.3 et S3.4 (S3.3 : `teaches_class`,
-      `enseignants_daara` exposée aux enseignants, triggers `classes_coherentes` / `classe_matieres_coherentes`) ;
-    - libellés des années et périodes (S3.1) : forme NFC et espace insécable en tête / fin acceptés, comme corrigé pour
-      `matieres` (S3.2) ; `id` choisi par le client à l'insertion (`annees_scolaires`, `periodes`) ;
-    - tests pgTAP de `matieres` à compléter : suppression par l'enseignant, admin aal1 en update / delete, parent,
-      module désactivé en update / delete.
+  - Audit de fin de sprint 3 (2026-10-09), point reporté : les triggers de `classes` / `classe_matieres` contrôlent les
+    droits aussi lors du `on delete set null` (suppression d'un compte) : une suppression de compte faite en session
+    utilisateur non admin serait refusée (sans effet en service_role) → à prendre en compte dans la purge CDP (sprint 12).
   - Audit RLS S3.1 (2026-10-09) : la contrainte « caractères interdits » du socle (`daaras`, `profiles`, `invitations`)
     laisse passer U+061C (marque de lettre arabe), U+034F, U+180E, U+2028, U+2029 ; `texte_sur` (S3.1) les refuse →
     aligner les contraintes du socle sur `texte_sur` dans une migration (avant les libellés en arabe).
@@ -172,6 +166,34 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-09 — Audit de fin de sprint 3 et bilan du sprint 3 (Structure scolaire)
+**Audit** (un seul agent `auditeur-securite`, mode économe, à la demande du développeur) : 0 critique, **1 important**
+corrigé — `enseignants_daara` rendait à un enseignant le nom figé de tous ses collègues désactivés (lecture retirée en
+S2.4) → pour un non-admin, seuls les désactivés encore titulaires ou enseignants d'une classe. Mineurs corrigés dans la
+migration `corrections_sprint3` : libellés d'années / périodes par `libelle_valide` (NFC, espace insécable), `id` plus
+choisi par le client, motif de `rechercher_membres` calculé après validation ; tests pgTAP ajoutés (refus d'écriture sur
+`matieres`, désactivés, libellés) : 11 (577 au total). Reporté : voir « Problèmes ouverts » (cascade et purge CDP).
+
+**Objectif** : l'admin configure son année complète. **Atteint en local** (navigateur + pgTAP).
+
+| Story | État |
+|---|---|
+| S3.0 Conception (LLD §3.3, §4, spec) | Fait |
+| S3.1 Années scolaires et périodes | Fait |
+| S3.2 Matières | Fait |
+| S3.3 Classes et affectations, `teaches_class` | Fait |
+| S3.4 `data-table` (matières, classes, membres) | Fait |
+
+**Chiffres** : 577 tests pgTAP (446 au sprint 2) ; 242 tests unitaires (222) ; chargement initial 150,7 kB (150,5) ;
+1 extension ajoutée (`unaccent`, gratuite) ; aucun paquet npm ajouté.
+
+**Ce qui a bien marché** : la conception d'abord (S3.0) ; la règle « droits contrôlés en tête des triggers security
+definer », trouvée en S3.1 et appliquée ensuite partout ; le navigateur trouve toujours ce que les tests ne voient pas
+(`count(*)` embarqué refusé, recherche sensible aux accents, redirection évaluée avant les guards).
+
+**À améliorer** : un seul audit en fin de sprint coûte moins cher, mais les corrections arrivent dans une migration à
+part ; garder les migrations de story petites pour que ce soit simple.
+
 ### 2026-10-09 — S3.4 Composant `data-table`
 - `shared/ui/data-table` : chargeur serveur (page, taille, tri, recherche), cellules projetées (`appCellule`), cartes
   sous 640 px (`appCarte`), filtres de l'écran projetés (`[filtres]`), recherche différée (300 ms) et réponses périmées

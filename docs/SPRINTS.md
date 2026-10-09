@@ -74,6 +74,7 @@ commit par story.
 - [x] S3.3 Classes et affectations : `classes`, `classe_matieres` (coefficient, enseignant), `teaches_class`, `enseignants_daara`
 - [x] S3.4 Composant `data-table` (pagination, tri, recherche serveur) appliqué aux matières, classes et membres (`rechercher_membres`)
 Reporté : « Préparer la rentrée » (copie de l'année précédente), avant la deuxième année des pilotes.
+Audit de fin de sprint fait et corrigé (2026-10-09).
 Livrable : l'admin configure son année complète.
 
 ## Sprint 4 — Apprenants et parents
