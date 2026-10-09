@@ -82,7 +82,7 @@ Planification validée le 2026-10-09 (LLD §3.4, §4, §5 ; spec `apprenants.md`
 Un commit par story ; audit unique en fin de sprint.
 - [x] S4.0 Conception : LLD §3.4, ADR-010 (données des apprenants), spec, règle d'ergonomie
 - [x] S4.1 Fiches apprenants : matricule généré, statut, photo privée, liste (`data-table`), saisie en série
-- [ ] S4.2 Inscriptions dans les classes, élèves d'une classe, `enseigne_apprenant`
+- [x] S4.2 Inscriptions dans les classes, élèves d'une classe, `enseigne_apprenant`
 - [ ] S4.3 Liens parents (`is_parent_of`), invitation d'un parent depuis la fiche, « Mes enfants »
 - [ ] S4.4 Import CSV des apprenants (modèle, rapport d'erreurs, tout ou rien)
 - [ ] S4.5 Démarrage guidé de l'admin (tableau de bord : étapes et avancement)

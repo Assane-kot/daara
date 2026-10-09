@@ -811,6 +811,37 @@
             "photo_illisible": "This image cannot be read: choose a JPEG, PNG or WebP photo.",
             "photo": "The photo could not be saved. Try again.",
             "inattendue": "The action failed. Try again."
+        },
+        "classe": "Class",
+        "toutes_classes": "All classes",
+        "vide_enseignant": "The students of your classes will appear here.",
+        "classe_annee": "Class ({{annee}})",
+        "sans_classe": "No class yet",
+        "choisir_classe": "Choose a class",
+        "pas_annee_active": "No active year: make a year active in Structure."
+    },
+    "inscriptions": {
+        "inscrire": "Enrol students",
+        "inscrire_dans": "Enrol students in {{classe}}",
+        "inscrire_n": "Enrol ({{n}})",
+        "tout_selectionner": "Select all ({{n}})",
+        "aucun_candidat": "All students of the daara already have a class this year. Add new students in “Students”.",
+        "eleves_n": "Students ({{n}})",
+        "retirer": "Remove from class",
+        "inscrits_ok": "Students enrolled.",
+        "retire_ok": "Student removed from the class.",
+        "classe_ok": "Class saved.",
+        "confirmer_retrait": "Remove {{nom}} from {{classe}}?",
+        "confirmer_retrait_message": "The student stays in the daara, without a class for this year.",
+        "vide_titre": "No student in this class",
+        "vide_message": "Enrol the students of the class with the “Enrol students” button.",
+        "vide_lecture": "No student is enrolled in this class yet.",
+        "erreurs": {
+            "droits": "Only an administrator who confirmed their identity can enrol students.",
+            "deja_inscrit": "One of these students already has a class this year.",
+            "eleve_parti": "This student left the daara: re-enrol them first.",
+            "autre_annee": "Choose a class of the same year.",
+            "inattendue": "The action failed. Try again."
         }
     }
 }

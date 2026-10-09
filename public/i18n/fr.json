@@ -811,6 +811,37 @@
             "photo_illisible": "Cette image ne peut pas être lue : choisissez une photo JPEG, PNG ou WebP.",
             "photo": "La photo n’a pas pu être enregistrée. Réessayez.",
             "inattendue": "L’action a échoué. Réessayez."
+        },
+        "classe": "Classe",
+        "toutes_classes": "Toutes les classes",
+        "vide_enseignant": "Les élèves de vos classes apparaîtront ici.",
+        "classe_annee": "Classe ({{annee}})",
+        "sans_classe": "Pas encore de classe",
+        "choisir_classe": "Choisir une classe",
+        "pas_annee_active": "Aucune année active : rendez une année active dans Structure."
+    },
+    "inscriptions": {
+        "inscrire": "Inscrire des élèves",
+        "inscrire_dans": "Inscrire des élèves en {{classe}}",
+        "inscrire_n": "Inscrire ({{n}})",
+        "tout_selectionner": "Tout sélectionner ({{n}})",
+        "aucun_candidat": "Tous les élèves inscrits à la daara ont déjà une classe cette année. Ajoutez de nouveaux élèves dans « Élèves ».",
+        "eleves_n": "Élèves ({{n}})",
+        "retirer": "Retirer de la classe",
+        "inscrits_ok": "Élèves inscrits.",
+        "retire_ok": "Élève retiré de la classe.",
+        "classe_ok": "Classe enregistrée.",
+        "confirmer_retrait": "Retirer {{nom}} de {{classe}} ?",
+        "confirmer_retrait_message": "L’élève reste dans la daara, sans classe pour cette année.",
+        "vide_titre": "Aucun élève dans cette classe",
+        "vide_message": "Inscrivez les élèves de la classe avec le bouton « Inscrire des élèves ».",
+        "vide_lecture": "Aucun élève n’est encore inscrit dans cette classe.",
+        "erreurs": {
+            "droits": "Seul un administrateur ayant confirmé son identité peut inscrire des élèves.",
+            "deja_inscrit": "Un de ces élèves a déjà une classe cette année.",
+            "eleve_parti": "Cet élève a quitté la daara : réinscrivez-le d’abord.",
+            "autre_annee": "Choisissez une classe de la même année.",
+            "inattendue": "L’action a échoué. Réessayez."
         }
     }
 }

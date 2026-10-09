@@ -409,6 +409,68 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            inscriptions: {
+                Row: {
+                    annee_id: string;
+                    apprenant_id: string;
+                    classe_id: string;
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    date_inscription: string;
+                    id: string;
+                };
+                Insert: {
+                    annee_id: string;
+                    apprenant_id: string;
+                    classe_id: string;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id: string;
+                    date_inscription?: string;
+                    id?: string;
+                };
+                Update: {
+                    annee_id?: string;
+                    apprenant_id?: string;
+                    classe_id?: string;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id?: string;
+                    date_inscription?: string;
+                    id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'inscriptions_annee_id_fkey';
+                        columns: ['annee_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'annees_scolaires';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'inscriptions_apprenant_id_fkey';
+                        columns: ['apprenant_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'apprenants';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'inscriptions_classe_id_fkey';
+                        columns: ['classe_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'classes';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'inscriptions_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             invitations: {
                 Row: {
                     accepted_at: string | null;
@@ -741,6 +803,7 @@ export type Database = {
                     user_id: string;
                 }[];
             };
+            enseigne_apprenant: { Args: { p_apprenant: string }; Returns: boolean };
             envoi_sms_factice: { Args: { event: Json }; Returns: Json };
             est_admin_quelque_part: { Args: { p_user: string }; Returns: boolean };
             est_enseignant_de: { Args: { p_daara: string; p_user: string }; Returns: boolean };
@@ -789,6 +852,7 @@ export type Database = {
             modules_valides: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: boolean };
             normaliser_code_acces: { Args: { p_code: string }; Returns: string };
             photo_apprenant_administree: { Args: { p_nom: string }; Returns: boolean };
+            photo_apprenant_lisible: { Args: { p_nom: string }; Returns: boolean };
             prerequis_module: { Args: { p_module: Database['public']['Enums']['module_daara'] }; Returns: Database['public']['Enums']['module_daara'][] };
             rechercher_membres: {
                 Args: {

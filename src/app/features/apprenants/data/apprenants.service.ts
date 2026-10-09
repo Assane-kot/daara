@@ -17,6 +17,8 @@ export interface Apprenant {
     readonly sexe: Sexe | null;
     readonly statut: StatutApprenant;
     readonly photoPath: string | null;
+    /** Classe de l'année active (liste seulement). */
+    readonly classe?: string | null;
 }
 
 export interface SaisieApprenant {
@@ -82,8 +84,13 @@ export class ApprenantsService {
     private readonly images = inject(ImageLogoService);
 
     /** Page pour `data-table` : recherche sans accents (prénom, nom, matricule), filtre statut, tri nom / matricule. */
-    async page(r: RequeteTable, statut: StatutApprenant | ''): Promise<PageTable<Apprenant>> {
-        let q = this.sb.from('apprenants').select(COLONNES, { count: 'exact' }).eq('daara_id', this.daaraId());
+    async page(r: RequeteTable, statut: StatutApprenant | '', classeId = ''): Promise<PageTable<Apprenant>> {
+        // Inscriptions embarquées (classe affichée) ; jointure interne quand on filtre par classe.
+        const inscriptions = classeId ? 'inscriptions!inner(classe_id, annee_id, classes(nom))' : 'inscriptions(classe_id, annee_id, classes(nom))';
+        let q = this.sb.from('apprenants').select(`${COLONNES}, ${inscriptions}`, { count: 'exact' }).eq('daara_id', this.daaraId());
+        if (classeId) {
+            q = q.eq('inscriptions.classe_id', classeId);
+        }
         if (statut) {
             q = q.eq('statut', statut);
         }
@@ -100,7 +107,33 @@ export class ApprenantsService {
         if (error) {
             throw erreurApprenants(error);
         }
-        return { lignes: data.map(versApprenant), total: count ?? 0 };
+        const anneeActive = await this.anneeActive();
+        return {
+            lignes: data.map((a) => ({
+                ...versApprenant(a),
+                classe: a.inscriptions.find((i) => i.annee_id === anneeActive)?.classes?.nom ?? null,
+            })),
+            total: count ?? 0,
+        };
+    }
+
+    /** Classes de l'année active (filtre de la liste, choix de la classe sur la fiche). */
+    async classesAnneeActive(): Promise<{ id: string; nom: string; anneeId: string }[]> {
+        const anneeId = await this.anneeActive();
+        if (!anneeId) {
+            return [];
+        }
+        const { data, error } = await this.sb.from('classes').select('id, nom, annee_id').eq('annee_id', anneeId).order('nom');
+        if (error) {
+            throw erreurApprenants(error);
+        }
+        return data.map((c) => ({ id: c.id, nom: c.nom, anneeId: c.annee_id }));
+    }
+
+    /** Identifiant de l'année active (null si aucune ou module structure inactif). */
+    async anneeActive(): Promise<string | null> {
+        const { data } = await this.sb.from('annees_scolaires').select('id').eq('daara_id', this.daaraId()).eq('active', true).maybeSingle();
+        return data?.id ?? null;
     }
 
     async detail(id: string): Promise<Apprenant> {

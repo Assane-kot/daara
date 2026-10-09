@@ -94,7 +94,7 @@ select is((select count(*)::int from public.classes), 0, 'admin d''une autre daa
 -- ---------------------------------------------------------------------------------------------------
 select tests.connecter('00000000-0000-0000-0000-00000000c0a1');
 reset role;
-create temporary table classe_ce1 as select id from public.classes where nom = 'CE1 A';
+create temporary table classe_ce1 as select id from public.classes where nom = 'CE1 A' and daara_id = '00000000-0000-0000-0000-0000000c000a';
 grant select on classe_ce1 to authenticated;
 set local role authenticated;
 select lives_ok($$ insert into public.classe_matieres (daara_id, classe_id, matiere_id, coefficient, enseignant_id)
@@ -159,7 +159,7 @@ set local role authenticated;
 
 -- Suppression d'une classe : ses affectations suivent ; journal avec auteur.
 select tests.connecter('00000000-0000-0000-0000-00000000c0a1');
-select lives_ok($$ delete from public.classes where nom = 'CE1 A' $$, 'admin : supprime la classe');
+select lives_ok($$ delete from public.classes where nom = 'CE1 A' and daara_id = '00000000-0000-0000-0000-0000000c000a' $$, 'admin : supprime la classe');
 reset role;
 select is((select count(*)::int from public.classe_matieres where daara_id = '00000000-0000-0000-0000-0000000c000a'), 0,
     'classe supprimée : ses affectations aussi');

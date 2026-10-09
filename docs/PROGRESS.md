@@ -13,7 +13,8 @@
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
 - Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
-- Sprint 4 — Apprenants et parents : S4.0 (conception) et S4.1 (fiches) faits. Suivante : S4.2 inscriptions. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 4 — Apprenants et parents : S4.0 (conception), S4.1 (fiches) et S4.2 (inscriptions) faits. Suivante : S4.3 liens
+  parents. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -173,6 +174,21 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-09 — S4.2 Inscriptions dans les classes
+- Migration `inscriptions` (module `structure`) : une classe par élève et par année (année copiée de la classe par le
+  trigger, droits en tête), élève parti non inscriptible, changement de classe seulement dans l'année, classe avec
+  inscrits non supprimable (`restrict`), journal sans valeurs ; `enseigne_apprenant`, politique de lecture des élèves
+  par l'enseignant, `photo_apprenant_lisible` (photos lisibles par les enseignants de l'élève). 20 tests pgTAP (619).
+- Front : détail d'une classe → « Élèves (n) », « Inscrire des élèves » (recherche sans accents, cases, « Tout
+  sélectionner », un clic), « Retirer de la classe » ; fiche élève → classe de l'année active choisie dans une liste
+  (inscrire / changer / retirer en un choix) ; liste des élèves → colonne et filtre « Classe » ; enseignant : menu
+  Élèves en lecture seule (élèves de ses classes, aucune action).
+- Vérifié dans le navigateur : 2 élèves inscrits en CE1 A en un clic, Modou placé en CP B depuis sa fiche, filtre
+  CE1 A ; enseignant (titulaire de CE1 A) : ses 2 élèves seulement, fiche sans bouton.
+- Piège (3e fois) : un test pgTAP qui cherche une ligne par son seul libellé casse dès que la base locale contient des
+  données de démonstration → toujours filtrer sur la daara du test (012 corrigé).
+- 245 tests unitaires ; chargement initial ~150,8 kB transférés. Pas d'audit (fin de sprint).
+
 ### 2026-10-09 — S4.1 Fiches apprenants
 - Migration `apprenants` (socle, ADR-010) : enums `sexe_apprenant` / `statut_apprenant`, `apprenants` (matricule
   `AAAA-NNNN` attribué par trigger via `compteurs_matricule`, non fourni ni modifiable par le client ; recherche sans

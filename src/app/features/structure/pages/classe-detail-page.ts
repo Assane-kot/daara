@@ -6,6 +6,7 @@ import { Badge } from '../../../shared/ui/badge/badge';
 import { ConfirmDialogService } from '../../../shared/ui/confirm-dialog/confirm-dialog.service';
 import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
+import { ElevesClasse } from '../../apprenants/components/eleves-classe';
 import { ClasseDialogsService } from '../components/classe-dialogs';
 import { ErreurStructure } from '../data/annees.service';
 import { Affectation, ClasseDetail, ClassesService, Enseignant } from '../data/classes.service';
@@ -18,7 +19,7 @@ import { Matiere, MatieresService } from '../data/matieres.service';
  */
 @Component({
     selector: 'app-classe-detail-page',
-    imports: [RouterLink, TranslatePipe, Badge, EmptyState, Skeleton],
+    imports: [RouterLink, TranslatePipe, Badge, EmptyState, Skeleton, ElevesClasse],
     template: `
         <p class="mt-0 mb-3">
             <a class="font-semibold text-primary hover:underline" routerLink="..">← {{ 'structure.classes.retour' | translate }}</a>
@@ -93,6 +94,7 @@ import { Matiere, MatieresService } from '../data/matieres.service';
                         }
                     </ul>
                 }
+                <app-eleves-classe [classeId]="c.id" [anneeId]="c.anneeId" [classeNom]="c.nom" [slug]="slug()" [admin]="admin()" />
             }
         </div>
     `,
@@ -109,6 +111,7 @@ export class ClasseDetailPage implements OnInit {
     private readonly courante = inject(CurrentDaaraService);
 
     protected readonly admin = computed(() => this.courante.roles().includes('admin'));
+    protected readonly slug = computed(() => this.courante.slug() ?? '');
     protected readonly classe = signal<ClasseDetail | null>(null);
     private readonly enseignants = signal<Enseignant[]>([]);
     private readonly matieres = signal<Matiere[]>([]);

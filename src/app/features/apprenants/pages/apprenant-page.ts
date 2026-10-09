@@ -1,11 +1,13 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { CurrentDaaraService } from '../../../core/daara/current-daara.service';
 import { Badge } from '../../../shared/ui/badge/badge';
 import { ConfirmDialogService } from '../../../shared/ui/confirm-dialog/confirm-dialog.service';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { ApprenantDialogService } from '../components/apprenant-dialog';
 import { Apprenant, ApprenantsService, ErreurApprenants } from '../data/apprenants.service';
+import { InscriptionEleve, InscriptionsService } from '../data/inscriptions.service';
 
 /**
  * Fiche d'un élève (S4.1, admin) : identité, matricule, photo (bucket privé, URL signée), statut (« A quitté la daara »
@@ -53,25 +55,27 @@ import { Apprenant, ApprenantsService, ErreurApprenants } from '../data/apprenan
                                 {{ a.prenom[0] }}{{ a.nom[0] }}
                             }
                         </div>
-                        <label class="btn btn-sm btn-outline-primary mb-0! min-h-11 cursor-pointer" [class.opacity-60]="enCours()">
-                            {{ (a.photoPath ? 'apprenants.changer_photo' : 'apprenants.ajouter_photo') | translate }}
-                            <input
-                                type="file"
-                                class="sr-only"
-                                accept="image/png,image/jpeg,image/webp"
-                                [disabled]="enCours()"
-                                (change)="choisirPhoto(a, $event)"
-                            />
-                        </label>
-                        @if (a.photoPath) {
-                            <button
-                                type="button"
-                                class="text-sm text-danger-strong hover:underline dark:text-danger-soft"
-                                [disabled]="enCours()"
-                                (click)="retirerPhoto(a)"
-                            >
-                                {{ 'apprenants.retirer_photo' | translate }}
-                            </button>
+                        @if (admin()) {
+                            <label class="btn btn-sm btn-outline-primary mb-0! min-h-11 cursor-pointer" [class.opacity-60]="enCours()">
+                                {{ (a.photoPath ? 'apprenants.changer_photo' : 'apprenants.ajouter_photo') | translate }}
+                                <input
+                                    type="file"
+                                    class="sr-only"
+                                    accept="image/png,image/jpeg,image/webp"
+                                    [disabled]="enCours()"
+                                    (change)="choisirPhoto(a, $event)"
+                                />
+                            </label>
+                            @if (a.photoPath) {
+                                <button
+                                    type="button"
+                                    class="text-sm text-danger-strong hover:underline dark:text-danger-soft"
+                                    [disabled]="enCours()"
+                                    (click)="retirerPhoto(a)"
+                                >
+                                    {{ 'apprenants.retirer_photo' | translate }}
+                                </button>
+                            }
                         }
                     </div>
                     <div class="min-w-0 flex-1 basis-56">
@@ -86,18 +90,41 @@ import { Apprenant, ApprenantsService, ErreurApprenants } from '../data/apprenan
                             <dd class="m-0">{{ a.dateNaissance ? date(a.dateNaissance) : ('apprenants.non_renseignee' | translate) }}</dd>
                             <dt class="text-muted dark:text-night-muted">{{ 'apprenants.sexe' | translate }}</dt>
                             <dd class="m-0">{{ 'apprenants.sexes.' + (a.sexe ?? 'non_precise') | translate }}</dd>
+                            <dt class="self-center text-muted dark:text-night-muted">{{ 'apprenants.classe' | translate }}</dt>
+                            <dd class="m-0">
+                                @if (!anneeActiveId()) {
+                                    <span class="text-muted dark:text-night-muted">{{ 'apprenants.pas_annee_active' | translate }}</span>
+                                } @else if (admin() && a.statut === 'inscrit') {
+                                    <select
+                                        class="form-select max-w-64"
+                                        [attr.aria-label]="'apprenants.choisir_classe' | translate"
+                                        [value]="inscription()?.classeId ?? ''"
+                                        [disabled]="enCours()"
+                                        (change)="choisirClasse(a, $event)"
+                                    >
+                                        <option value="">{{ 'apprenants.sans_classe' | translate }}</option>
+                                        @for (c of classes(); track c.id) {
+                                            <option [value]="c.id">{{ c.nom }}</option>
+                                        }
+                                    </select>
+                                } @else {
+                                    {{ inscription()?.classeNom ?? ('apprenants.sans_classe' | translate) }}
+                                }
+                            </dd>
                         </dl>
-                        <div class="mt-5 flex flex-wrap gap-2">
-                            <button type="button" class="btn btn-primary min-h-11" [disabled]="enCours()" (click)="modifier(a)">
-                                {{ 'apprenants.modifier' | translate }}
-                            </button>
-                            <button type="button" class="btn btn-outline-primary min-h-11" [disabled]="enCours()" (click)="basculerStatut(a)">
-                                {{ (a.statut === 'inscrit' ? 'apprenants.marquer_parti' : 'apprenants.reinscrire') | translate }}
-                            </button>
-                            <button type="button" class="btn btn-outline-danger min-h-11" [disabled]="enCours()" (click)="supprimer(a)">
-                                {{ 'apprenants.supprimer' | translate }}
-                            </button>
-                        </div>
+                        @if (admin()) {
+                            <div class="mt-5 flex flex-wrap gap-2">
+                                <button type="button" class="btn btn-primary min-h-11" [disabled]="enCours()" (click)="modifier(a)">
+                                    {{ 'apprenants.modifier' | translate }}
+                                </button>
+                                <button type="button" class="btn btn-outline-primary min-h-11" [disabled]="enCours()" (click)="basculerStatut(a)">
+                                    {{ (a.statut === 'inscrit' ? 'apprenants.marquer_parti' : 'apprenants.reinscrire') | translate }}
+                                </button>
+                                <button type="button" class="btn btn-outline-danger min-h-11" [disabled]="enCours()" (click)="supprimer(a)">
+                                    {{ 'apprenants.supprimer' | translate }}
+                                </button>
+                            </div>
+                        }
                     </div>
                 </div>
             }
@@ -113,6 +140,14 @@ export class ApprenantPage implements OnInit {
     private readonly router = inject(Router);
     private readonly route = inject(ActivatedRoute);
     private readonly id = this.route.snapshot.paramMap.get('apprenantId') ?? '';
+    private readonly inscriptions = inject(InscriptionsService);
+    private readonly courante = inject(CurrentDaaraService);
+
+    protected readonly admin = computed(() => this.courante.roles().includes('admin'));
+    protected readonly anneeActiveId = signal<string | null>(null);
+    protected readonly classes = signal<readonly { id: string; nom: string }[]>([]);
+    /** Inscription de l'année active. */
+    protected readonly inscription = signal<InscriptionEleve | null>(null);
 
     protected readonly apprenant = signal<Apprenant | null>(null);
     protected readonly photoUrl = signal<string | null>(null);
@@ -138,6 +173,25 @@ export class ApprenantPage implements OnInit {
             this.succes.set('apprenants.enregistre');
             await this.charger();
         }
+    }
+
+    /** Classe de l'année active : inscrire, changer ou retirer, en un seul choix. */
+    protected async choisirClasse(a: Apprenant, evenement: Event): Promise<void> {
+        const classeId = (evenement.target as HTMLSelectElement).value;
+        const actuelle = this.inscription();
+        const anneeId = this.anneeActiveId();
+        if (!anneeId || classeId === (actuelle?.classeId ?? '')) {
+            return;
+        }
+        await this.agir(async () => {
+            if (!classeId && actuelle) {
+                await this.inscriptions.desinscrire(actuelle.id);
+            } else if (actuelle) {
+                await this.inscriptions.changerClasse(actuelle.id, classeId);
+            } else {
+                await this.inscriptions.inscrire(classeId, anneeId, [a.id]);
+            }
+        }, 'inscriptions.classe_ok');
     }
 
     protected async basculerStatut(a: Apprenant): Promise<void> {
@@ -185,7 +239,17 @@ export class ApprenantPage implements OnInit {
         try {
             const a = await this.service.detail(this.id);
             this.apprenant.set(a);
-            this.photoUrl.set(await this.service.urlPhoto(a.photoPath));
+            // Classe de l'année active (module structure inactif ou sans année : rien d'affiché).
+            const [photo, anneeId, classes, inscriptions] = await Promise.all([
+                this.service.urlPhoto(a.photoPath),
+                this.service.anneeActive(),
+                this.admin() ? this.service.classesAnneeActive().catch(() => []) : Promise.resolve([]),
+                this.inscriptions.deLEleve(a.id).catch(() => []),
+            ]);
+            this.photoUrl.set(photo);
+            this.anneeActiveId.set(anneeId);
+            this.classes.set(classes);
+            this.inscription.set(inscriptions.find((i) => i.anneeId === anneeId) ?? null);
         } catch (e) {
             this.erreurChargement.set(e instanceof ErreurApprenants ? e.cle : 'apprenants.erreurs.chargement');
         } finally {

@@ -4,6 +4,7 @@ import { ActivatedRoute, provideRouter } from '@angular/router';
 import { provideTranslateTesting } from '../../../../testing/translate-testing';
 import { CurrentDaaraService } from '../../../core/daara/current-daara.service';
 import { RoleMembre } from '../../../core/daara/daara.model';
+import { InscriptionsService } from '../../apprenants/data/inscriptions.service';
 import { ConfirmDialogService } from '../../../shared/ui/confirm-dialog/confirm-dialog.service';
 import { ClasseDialogsService } from '../components/classe-dialogs';
 import { ClasseDetail, ClassesService } from '../data/classes.service';
@@ -40,7 +41,8 @@ function configurer(): void {
             { provide: MatieresService, useValue: matieresService },
             { provide: ClasseDialogsService, useValue: dialogues },
             { provide: ConfirmDialogService, useValue: { confirmer: vi.fn() } },
-            { provide: CurrentDaaraService, useValue: { roles } },
+            { provide: CurrentDaaraService, useValue: { roles, slug: () => 'd' } },
+            { provide: InscriptionsService, useValue: { eleves: () => Promise.resolve([]) } },
         ],
     });
 }
