@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(22);
+select plan(23);
 
 create schema tests;
 grant usage on schema tests to authenticated;
@@ -34,20 +34,22 @@ select tests.connecter('00000000-0000-0000-0000-00000000f0a1');
 -- Création et matricule.
 insert into public.apprenants (daara_id, nom, prenom, date_naissance, sexe)
 values ('00000000-0000-0000-0000-0000000f000a', 'Ndiaye', 'Awa', '2016-03-12', 'F');
-insert into public.apprenants (daara_id, nom, prenom) values ('00000000-0000-0000-0000-0000000f000a', 'Fall', 'Modou');
+insert into public.apprenants (daara_id, nom, prenom, sexe) values ('00000000-0000-0000-0000-0000000f000a', 'Fall', 'Modou', 'M');
 select results_eq(
     $$ select matricule from public.apprenants order by matricule $$,
     $$ values (extract(year from current_date)::text || '-0001'), (extract(year from current_date)::text || '-0002') $$,
     'matricule généré : année + compteur de la daara');
 select is((select statut::text from public.apprenants where prenom = 'Modou'), 'inscrit', 'statut par défaut : inscrit');
+select throws_ok($$ insert into public.apprenants (daara_id, nom, prenom) values ('00000000-0000-0000-0000-0000000f000a', 'Sow', 'Ali') $$,
+    '23502', null, 'sexe obligatoire (Garçon ou Fille)');
 select throws_ok($$ insert into public.apprenants (daara_id, matricule, nom, prenom) values
     ('00000000-0000-0000-0000-0000000f000a', '1999-0001', 'X', 'Y') $$, '42501', null, 'matricule fourni par le client : refusé');
 select throws_ok($$ update public.apprenants set matricule = '1999-0001' $$, '42501', null, 'matricule non modifiable');
 select throws_ok($$ update public.apprenants set daara_id = '00000000-0000-0000-0000-0000000f000b' $$, '42501', null, 'daara_id non modifiable');
-select throws_ok($$ insert into public.apprenants (daara_id, nom, prenom) values
-    ('00000000-0000-0000-0000-0000000f000a', 'Sow' || chr(160), 'Ali') $$, '23514', null, 'nom avec espace insécable : refusé');
-select throws_ok($$ insert into public.apprenants (daara_id, nom, prenom, date_naissance) values
-    ('00000000-0000-0000-0000-0000000f000a', 'Sow', 'Ali', current_date + 1) $$, '23514', null, 'date de naissance future : refusée');
+select throws_ok($$ insert into public.apprenants (daara_id, nom, prenom, sexe) values
+    ('00000000-0000-0000-0000-0000000f000a', 'Sow' || chr(160), 'Ali', 'M') $$, '23514', null, 'nom avec espace insécable : refusé');
+select throws_ok($$ insert into public.apprenants (daara_id, nom, prenom, date_naissance, sexe) values
+    ('00000000-0000-0000-0000-0000000f000a', 'Sow', 'Ali', current_date + 1, 'M') $$, '23514', null, 'date de naissance future : refusée');
 select throws_ok($$ select created_by from public.apprenants $$, '42501', null, 'created_by illisible');
 select throws_ok($$ select * from public.compteurs_matricule $$, '42501', null, 'compteurs : aucun accès client');
 
@@ -62,17 +64,17 @@ set local role authenticated;
 
 -- Droits refusés.
 select tests.connecter('00000000-0000-0000-0000-00000000f0a1', 'aal1');
-select throws_ok($$ insert into public.apprenants (daara_id, nom, prenom) values ('00000000-0000-0000-0000-0000000f000a', 'X', 'Y') $$,
+select throws_ok($$ insert into public.apprenants (daara_id, nom, prenom, sexe) values ('00000000-0000-0000-0000-0000000f000a', 'X', 'Y', 'M') $$,
     '42501', null, 'admin aal1 : refusé');
 select tests.connecter('00000000-0000-0000-0000-00000000f0e1');
-select throws_ok($$ insert into public.apprenants (daara_id, nom, prenom) values ('00000000-0000-0000-0000-0000000f000a', 'X', 'Y') $$,
+select throws_ok($$ insert into public.apprenants (daara_id, nom, prenom, sexe) values ('00000000-0000-0000-0000-0000000f000a', 'X', 'Y', 'M') $$,
     '42501', null, 'enseignant : création refusée');
 select is((select count(*)::int from public.apprenants), 0, 'enseignant : aucun élève lisible en S4.1 (ses classes en S4.2)');
 select tests.connecter('00000000-0000-0000-0000-00000000f0c1', 'aal1');
 select is((select count(*)::int from public.apprenants), 0, 'parent : aucun élève lisible en S4.1 (ses enfants en S4.3)');
 select tests.connecter('00000000-0000-0000-0000-00000000f0b1');
 select is((select count(*)::int from public.apprenants), 0, 'admin d''une autre daara : rien de lisible');
-select throws_ok($$ insert into public.apprenants (daara_id, nom, prenom) values ('00000000-0000-0000-0000-0000000f000a', 'X', 'Y') $$,
+select throws_ok($$ insert into public.apprenants (daara_id, nom, prenom, sexe) values ('00000000-0000-0000-0000-0000000f000a', 'X', 'Y', 'M') $$,
     '42501', 'admin_aal2_requis', 'admin d''une autre daara : création refusée avant tout calcul du matricule');
 
 -- Photo : chemin contraint, bucket privé.

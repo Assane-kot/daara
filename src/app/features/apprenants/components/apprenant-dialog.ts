@@ -55,7 +55,7 @@ interface DonneesApprenant {
                     </app-form-field>
                     <fieldset class="m-0 border-0 p-0">
                         <legend class="mb-1.5 font-semibold">{{ 'apprenants.sexe' | translate }}</legend>
-                        <div class="grid grid-cols-3 gap-2">
+                        <div class="grid grid-cols-2 gap-2">
                             @for (s of sexes; track s.valeur) {
                                 <label
                                     class="mb-0! flex min-h-11 cursor-pointer items-center justify-center rounded-md border border-white-light px-2 text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:text-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary dark:border-night-border"
@@ -65,6 +65,9 @@ interface DonneesApprenant {
                                 </label>
                             }
                         </div>
+                        @if (form.controls.sexe.touched && form.controls.sexe.invalid) {
+                            <p class="mt-1 mb-0 text-danger-strong dark:text-danger-soft" role="alert">{{ 'apprenants.sexe_requis' | translate }}</p>
+                        }
                     </fieldset>
                 </div>
                 @if (erreur(); as erreur) {
@@ -101,10 +104,9 @@ export class ApprenantDialog {
     protected readonly d = inject<DonneesApprenant>(DIALOG_DATA);
     private readonly premierChamp = viewChild<ElementRef<HTMLInputElement>>('premierChamp');
     protected readonly aujourdhui = new Date().toISOString().slice(0, 10);
-    protected readonly sexes: readonly { valeur: Sexe | ''; cle: string }[] = [
-        { valeur: 'F', cle: 'apprenants.sexes.F' },
+    protected readonly sexes: readonly { valeur: Sexe; cle: string }[] = [
         { valeur: 'M', cle: 'apprenants.sexes.M' },
-        { valeur: '', cle: 'apprenants.sexes.non_precise' },
+        { valeur: 'F', cle: 'apprenants.sexes.F' },
     ];
     protected readonly envoi = signal(false);
     protected readonly erreur = signal<string | null>(null);
@@ -113,7 +115,7 @@ export class ApprenantDialog {
         prenom: [this.d.apprenant?.prenom ?? '', [Validators.required, Validators.maxLength(100)]],
         nom: [this.d.apprenant?.nom ?? '', [Validators.required, Validators.maxLength(100)]],
         dateNaissance: [this.d.apprenant?.dateNaissance ?? ''],
-        sexe: [(this.d.apprenant?.sexe ?? '') as Sexe | ''],
+        sexe: [(this.d.apprenant?.sexe ?? '') as Sexe | '', Validators.required],
     });
 
     protected async valider(continuer: boolean): Promise<void> {
@@ -125,7 +127,7 @@ export class ApprenantDialog {
         this.envoi.set(true);
         this.erreur.set(null);
         try {
-            await this.d.enregistrer({ prenom: v.prenom.trim(), nom: v.nom.trim(), dateNaissance: v.dateNaissance || null, sexe: v.sexe || null });
+            await this.d.enregistrer({ prenom: v.prenom.trim(), nom: v.nom.trim(), dateNaissance: v.dateNaissance || null, sexe: v.sexe as Sexe });
             if (continuer) {
                 this.ajoutes.update((n) => n + 1);
                 this.form.reset({ prenom: '', nom: v.nom.trim(), dateNaissance: '', sexe: '' });

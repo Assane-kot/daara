@@ -34,10 +34,11 @@ describe('ApprenantDialog', () => {
     it('« Enregistrer et ajouter un autre » : modale ouverte, prénom vidé, nom gardé (fratrie), compteur', async () => {
         saisir(0, ' Awa ');
         saisir(1, 'Ndiaye');
+        (element.querySelectorAll('input[type=radio]')[1] as HTMLInputElement).click();
         bouton('Enregistrer et ajouter un autre').click();
         await stable();
 
-        expect(enregistrer).toHaveBeenCalledWith({ prenom: 'Awa', nom: 'Ndiaye', dateNaissance: null, sexe: null });
+        expect(enregistrer).toHaveBeenCalledWith({ prenom: 'Awa', nom: 'Ndiaye', dateNaissance: null, sexe: 'F' });
         expect(ref.close).not.toHaveBeenCalled();
         expect((element.querySelectorAll('input')[0] as HTMLInputElement).value).toBe('');
         expect((element.querySelectorAll('input')[1] as HTMLInputElement).value).toBe('Ndiaye');
@@ -56,6 +57,14 @@ describe('ApprenantDialog', () => {
         saisir(1, 'Fall');
         element.querySelector('form')?.dispatchEvent(new Event('submit'));
         await stable();
+        // Sexe obligatoire : Garçon ou Fille seulement.
+        expect(element.textContent).toContain('Choisissez Garçon ou Fille');
+        expect(enregistrer).not.toHaveBeenCalled();
+        (element.querySelectorAll('input[type=radio]')[0] as HTMLInputElement).click();
+        element.querySelector('form')?.dispatchEvent(new Event('submit'));
+        await stable();
+        expect(enregistrer).toHaveBeenCalledWith(expect.objectContaining({ sexe: 'M' }));
+        expect(element.querySelectorAll('input[type=radio]').length).toBe(2);
         expect(ref.close).toHaveBeenCalledWith(true);
     });
 });

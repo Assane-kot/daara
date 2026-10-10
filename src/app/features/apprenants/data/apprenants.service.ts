@@ -14,7 +14,7 @@ export interface Apprenant {
     readonly nom: string;
     readonly prenom: string;
     readonly dateNaissance: string | null;
-    readonly sexe: Sexe | null;
+    readonly sexe: Sexe;
     readonly statut: StatutApprenant;
     readonly photoPath: string | null;
     /** Classe de l'année active (liste seulement). */
@@ -25,7 +25,7 @@ export interface SaisieApprenant {
     readonly nom: string;
     readonly prenom: string;
     readonly dateNaissance: string | null;
-    readonly sexe: Sexe | null;
+    readonly sexe: Sexe;
 }
 
 /** Erreur traduite des apprenants (clé `apprenants.erreurs.*`). */
@@ -55,7 +55,7 @@ interface Ligne {
     nom: string;
     prenom: string;
     date_naissance: string | null;
-    sexe: Sexe | null;
+    sexe: Sexe;
     statut: StatutApprenant;
     photo_path: string | null;
 }

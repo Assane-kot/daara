@@ -9,7 +9,8 @@ Statut : acceptée (2026-10-09) · Mise en œuvre : sprint 4 (fiches, journal), 
   trancher « avant le sprint 5 »).
 
 ## Décision
-1. **Minimisation** : la fiche ne contient que nom, prénom, date de naissance (facultative), sexe (facultatif), statut
+1. **Minimisation** : la fiche ne contient que nom, prénom, date de naissance (facultative), sexe (**obligatoire :
+   Garçon ou Fille seulement**, jamais « non précisé », décision du développeur du 2026-10-10), statut
    (`inscrit` / `parti`), matricule et photo (facultative). Pas d'adresse, de lieu de naissance, de données médicales,
    de religion ni de numéro d'identité. Toute nouvelle donnée d'enfant passe par une mise à jour de cet ADR.
 2. **Matricule** généré par la base (`AAAA-NNNN`, année d'inscription + compteur de la daara), unique par daara, non

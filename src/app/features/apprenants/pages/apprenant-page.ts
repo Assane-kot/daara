@@ -89,7 +89,7 @@ import { InscriptionEleve, InscriptionsService } from '../data/inscriptions.serv
                             <dt class="text-muted dark:text-night-muted">{{ 'apprenants.date_naissance' | translate }}</dt>
                             <dd class="m-0">{{ a.dateNaissance ? date(a.dateNaissance) : ('apprenants.non_renseignee' | translate) }}</dd>
                             <dt class="text-muted dark:text-night-muted">{{ 'apprenants.sexe' | translate }}</dt>
-                            <dd class="m-0">{{ 'apprenants.sexes.' + (a.sexe ?? 'non_precise') | translate }}</dd>
+                            <dd class="m-0">{{ 'apprenants.sexes.' + a.sexe | translate }}</dd>
                             <dt class="self-center text-muted dark:text-night-muted">{{ 'apprenants.classe' | translate }}</dt>
                             <dd class="m-0">
                                 @if (!anneeActiveId()) {

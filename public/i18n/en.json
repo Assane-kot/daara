@@ -776,8 +776,7 @@
         "non_renseignee": "Not provided",
         "sexes": {
             "F": "Girl",
-            "M": "Boy",
-            "non_precise": "Not specified"
+            "M": "Boy"
         },
         "statuts": {
             "inscrit": "Enrolled",
@@ -818,7 +817,8 @@
         "classe_annee": "Class ({{annee}})",
         "sans_classe": "No class yet",
         "choisir_classe": "Choose a class",
-        "pas_annee_active": "No active year: make a year active in Structure."
+        "pas_annee_active": "No active year: make a year active in Structure.",
+        "sexe_requis": "Choose Boy or Girl."
     },
     "inscriptions": {
         "inscrire": "Enrol students",

@@ -776,8 +776,7 @@
         "non_renseignee": "Non renseignée",
         "sexes": {
             "F": "Fille",
-            "M": "Garçon",
-            "non_precise": "Non précisé"
+            "M": "Garçon"
         },
         "statuts": {
             "inscrit": "Inscrit",
@@ -818,7 +817,8 @@
         "classe_annee": "Classe ({{annee}})",
         "sans_classe": "Pas encore de classe",
         "choisir_classe": "Choisir une classe",
-        "pas_annee_active": "Aucune année active : rendez une année active dans Structure."
+        "pas_annee_active": "Aucune année active : rendez une année active dans Structure.",
+        "sexe_requis": "Choisissez Garçon ou Fille."
     },
     "inscriptions": {
         "inscrire": "Inscrire des élèves",

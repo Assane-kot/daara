@@ -19,4 +19,7 @@ story, à annoncer dans son plan et à vérifier dans le navigateur.
   silence.
 - **Ne rien perdre** : ne pas effacer un formulaire en erreur ; prévenir avant de quitter une saisie non enregistrée
   quand elle est longue.
+- **Pas de choix inutile** : jamais d'option « Non précisé » / « Autre » quand la réponse est connue et attendue ;
+  proposer seulement les vraies réponses (ex. sexe : Garçon ou Fille) et rendre le champ obligatoire (décision du
+  développeur, 2026-10-10).
 - **Cohérence** : mêmes composants (`shared/ui`), mêmes places pour les mêmes actions, mêmes mots d'un écran à l'autre.

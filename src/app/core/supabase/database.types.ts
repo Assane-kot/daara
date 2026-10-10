@@ -73,7 +73,7 @@ export type Database = {
                     photo_path: string | null;
                     prenom: string;
                     recherche: string | null;
-                    sexe: Database['public']['Enums']['sexe_apprenant'] | null;
+                    sexe: Database['public']['Enums']['sexe_apprenant'];
                     statut: Database['public']['Enums']['statut_apprenant'];
                     updated_at: string;
                     user_id: string | null;
@@ -89,7 +89,7 @@ export type Database = {
                     photo_path?: string | null;
                     prenom: string;
                     recherche?: never;
-                    sexe?: Database['public']['Enums']['sexe_apprenant'] | null;
+                    sexe: Database['public']['Enums']['sexe_apprenant'];
                     statut?: Database['public']['Enums']['statut_apprenant'];
                     updated_at?: string;
                     user_id?: string | null;
@@ -105,7 +105,7 @@ export type Database = {
                     photo_path?: string | null;
                     prenom?: string;
                     recherche?: never;
-                    sexe?: Database['public']['Enums']['sexe_apprenant'] | null;
+                    sexe?: Database['public']['Enums']['sexe_apprenant'];
                     statut?: Database['public']['Enums']['statut_apprenant'];
                     updated_at?: string;
                     user_id?: string | null;

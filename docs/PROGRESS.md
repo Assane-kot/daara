@@ -185,6 +185,9 @@ mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (spri
   Élèves en lecture seule (élèves de ses classes, aucune action).
 - Vérifié dans le navigateur : 2 élèves inscrits en CE1 A en un clic, Modou placé en CP B depuis sa fiche, filtre
   CE1 A ; enseignant (titulaire de CE1 A) : ses 2 élèves seulement, fiche sans bouton.
+- Décision du développeur (2026-10-10) : sexe de l'élève **obligatoire, Garçon ou Fille seulement**, jamais « non
+  précisé » → migration `sexe_obligatoire` (not null), formulaire à 2 choix obligatoire, ADR-010, LLD et règle
+  d'ergonomie (« pas de choix inutile ») mis à jour.
 - Piège (3e fois) : un test pgTAP qui cherche une ligne par son seul libellé casse dès que la base locale contient des
   données de démonstration → toujours filtrer sur la daara du test (012 corrigé).
 - 245 tests unitaires ; chargement initial ~150,8 kB transférés. Pas d'audit (fin de sprint).
