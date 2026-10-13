@@ -91,12 +91,15 @@ Audit de fin de sprint fait et corrigé (2026-10-13).
 Livrable : une classe remplie avec ses parents invités.
 
 ## Sprint 5 — Absences et espace parent (fin R1 → pilote)
-- [ ] Saisie rapide des absences par classe (appel du jour)
-- [ ] Justification, historique, statistiques simples
-- [ ] Realtime (admin, parent) + table `notifications` + centre de notifications
-- [ ] Tableau de bord parent mobile (enfants, absences)
-- [ ] Tests e2e : enseignant saisit → parent voit en temps réel
-- [ ] Préparation pilote : données de démo, guide utilisateur court
+Planification validée le 2026-10-13 (LLD §3.5, §4, §7.2 ; specs `absences.md`, `notifications.md` ; ADR-011). Modules
+`absences` et `notifications` (ADR-008). Un commit par story ; audit unique en fin de sprint.
+- [x] S5.0 Conception : LLD, specs, ADR-011 (temps réel et notifications)
+- [ ] S5.1 Appel du jour : `appels`, `absences`, réglage demi-journée, écran d'appel mobile, « Terminer l'appel »
+- [ ] S5.2 Justification (parent) et décision (admin, titulaire), historique, écran Absences, statistiques simples
+- [ ] S5.3 Notifications dans l'application : `notifications`, cloche, centre, temps réel
+- [ ] S5.4 Accueil parent mobile : présent / absent aujourd'hui, absences récentes, « Justifier »
+- [ ] S5.5 Tests e2e Playwright (appel → parent en temps réel → justification → décision), job CI
+- [ ] S5.6 Préparation pilote : daara de démonstration (`daara-dev`), guide utilisateur par rôle, check-list pilote
 Livrable : déploiement chez les daaras pilotes.
 
 ## Sprint 6 — Évaluations et notes

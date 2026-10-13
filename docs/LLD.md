@@ -58,10 +58,13 @@ src/app/
   ├── structure/...                admin (écriture), enseignant (lecture) ; moduleGuard('structure') :
   │                                annees (admin), matieres, classes, classes/:id (sprint 3)
   ├── apprenants/...               admin, enseignant (lecture) : liste, :id (fiche), import (admin) (sprint 4)
-  ├── absences                     admin, enseignant
+  ├── appel, appel/:classeId       admin, enseignant ; moduleGuard('absences') : appel du jour (sprint 5)
+  ├── absences                     admin, enseignant titulaire ; moduleGuard('absences') : suivi, justifications, stats
+  ├── notifications                tous ; moduleGuard('notifications') (sprint 5 ; barre basse des parents)
   ├── evaluations/...              admin, enseignant
   ├── bulletins/...                admin (gestion), parent/apprenant (consultation)
-  ├── enfants                      parent : « Mes enfants » (sprint 4) ; :apprenantId/... (sprints 5+)
+  ├── enfants                      parent : « Mes enfants » (sprint 4) = accueil du parent (sprint 5 : présent / absent
+  │                                aujourd'hui, absences, « Justifier ») ; :apprenantId/... (sprints 5+)
   ├── coran/...                    admin, enseignant, apprenant
   └── parametres                   admin : onglets Général (nom, logo, langue, barème) et Modules (ADR-008)
 /plateforme/...                    super-admin
@@ -171,7 +174,7 @@ Colonnes ajoutées au sprint 2 :
   pas usurper l'auteur (`auth.uid()` prime, testé).
 - `memberships` : `daara_id` et `user_id` immuables (trigger) ; `nom_affiche` nul sur une ligne active (contrainte).
 
-Table `notifications` : reportée au sprint 5 (module Notifications, ADR-008).
+Table `notifications` : sprint 5 (module Notifications, ADR-008, ADR-011), détaillée au §3.5.
 
 ### 3.3 Structure scolaire (sprint 3, module `structure`, détaillé le 2026-10-09)
 Toutes : `id uuid`, `daara_id` (fk `daaras` cascade, index), `created_at`, `created_by` (défaut `auth.uid()`), RLS, journal
@@ -217,9 +220,27 @@ admin aal2) ; reportés sur la nouvelle invitation par `creer_invitation` (« Re
 crée les `parent_links` (indicateur de transaction `daara.acceptation_invitation` pour le trigger). Lecture admin.
 
 ### 3.5 Vie scolaire et évaluations (sprints 5-7)
+
+#### Absences et notifications (sprint 5, détaillé le 2026-10-13 ; spec `absences.md`, `notifications.md` ; ADR-011)
+Module `absences` (prérequis `structure`) ; `notifications` : module `notifications`. Tables d'enfants : journal sans
+valeurs (`audit_trigger_colonnes`, ADR-010). Droits contrôlés en tête des triggers `security definer` (insert / update).
+- `daaras.appel_demi_journee bool not null default false` : un appel par jour (`journee`) ou deux (`matin`, `apres_midi`) ;
+  modifiable par l'admin (droit par colonne, Paramètres → Général).
+- Enums : `creneau_appel` (`journee`, `matin`, `apres_midi`), `type_absence` (`absence`, `retard`), `etat_justification`
+  (`aucune`, `envoyee`, `justifiee`, `non_justifiee`), `type_notification` (`absence`, `retard`, `absence_annulee`,
+  `justification_envoyee`, `justification_decidee`).
+
 | Table | Colonnes principales | Contraintes |
 |---|---|---|
-| `absences` | daara_id, apprenant_id, classe_id, date_absence, creneau (matin/après-midi/journée), justifiee, motif | unique (apprenant_id, date_absence, creneau) |
+| `appels` | classe_id (fk cascade), annee_id (copiée de la classe), date_appel date, creneau `creneau_appel`, termine_at timestamptz null, termine_par uuid null, created_at, created_by | unique (classe_id, date_appel, creneau) ; trigger `appels_coherents` : droits (admin aal2, ou enseignant `teaches_class` de la classe) + module ; classe de l'**année active** ; date dans l'année, pas future ; enseignant : date ≥ aujourd'hui − 7 jours ; créneau cohérent avec `appel_demi_journee` ; `termine_at` / `termine_par` posés seulement par `terminer_appel` ; index (daara_id), (classe_id, date_appel) |
+| `absences` | appel_id (fk cascade), apprenant_id (fk cascade), classe_id, date_absence, creneau (copiés de l'appel), type `type_absence`, motif text null (≤ 300, `texte_sur`), motif_at, etat `etat_justification` (défaut `aucune`), decide_par uuid null, decide_at, created_at, created_by | unique (appel_id, apprenant_id) ; unique (apprenant_id, date_absence, creneau) ; trigger `absences_coherentes` : mêmes droits et fenêtre que l'appel, élève **inscrit** (statut `inscrit`) dans la classe pour l'année de l'appel, colonnes copiées de l'appel ; motif, état et décision seulement par RPC ; index (daara_id), (apprenant_id, date_absence), (classe_id, date_absence) |
+| `notifications` | user_id (destinataire, fk cascade), type `type_notification`, apprenant_id null (fk cascade), absence_id null (fk cascade), lien text, lu_at null, created_at | aucun texte ni nom d'enfant (message composé à l'écran) ; créées seulement par la base ; index (user_id, created_at desc), (daara_id) ; publication `supabase_realtime` ; purge : lues 90 j, non lues 1 an (sprint 12) |
+
+Realtime (ADR-011) : publication `supabase_realtime` = `notifications` et `absences` seulement.
+
+#### Évaluations et bulletins (sprints 6-7)
+| Table | Colonnes principales | Contraintes |
+|---|---|---|
 | `evaluations` | daara_id, classe_matiere_id, periode_id, libelle, type (devoir/composition), date_eval, bareme, coefficient | période non clôturée |
 | `notes` | daara_id, evaluation_id, apprenant_id, valeur, absent, appreciation | unique (evaluation_id, apprenant_id) ; 0 ≤ valeur ≤ barème |
 | `bulletins` | daara_id, apprenant_id, periode_id, moyenne, rang, effectif, appreciation, statut (brouillon/publie), pdf_path, publie_at | unique (apprenant_id, periode_id) |
@@ -256,7 +277,9 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 | apprenants (sprint 4) | L E S | L (élèves inscrits dans ses classes) | L (ses enfants) | — (sprint 9) |
 | inscriptions (sprint 4, module `structure`) | L E S | L (ses classes) | L (ses enfants) | — |
 | parent_links (sprint 4) | L E S | — | L (les siens) | — |
-| absences | L E S | L E (ses classes) | L (les siens) | L (soi) |
+| appels (sprint 5, module `absences`) | L E S | L E (ses classes, année active, 7 jours) | L (classes de ses enfants) | — |
+| absences (sprint 5, module `absences`) | L E S ; décide la justification | L E S (ses classes, année active, 7 jours) ; décide s'il est titulaire | L (les siens) ; motif (RPC) | — (sprint 9) |
+| notifications (sprint 5, module `notifications`) | L (les siennes) ; marquer lue | idem | idem | idem |
 | evaluations | L E S | L E (ses classe_matieres) | L publiées | L publiées |
 | notes | L E S | L E (ses évaluations, période ouverte) | L (les siens) | L (soi) |
 | bulletins | L E S | L (ses classes) | L publiés (les siens) | L publiés (soi) |
@@ -355,6 +378,14 @@ nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `au
 | `classes` (ajout S4.3) | parent : classes d'une inscription de ses enfants | — |
 | `storage.objects`, bucket `photos` | admin ; enseignant / parent de l'enfant du chemin (`enseigne_apprenant`, `is_parent_of` sur le 3e segment) | admin aal2 ; nom `<daara_id>/apprenants/<apprenant_id>.webp` |
 
+### Absences et notifications (sprint 5) : politiques
+| Table | Lecture | Écriture |
+|---|---|---|
+| `appels` | admin ; enseignant si `teaches_class(classe_id)` ; parent si `classe_d_un_enfant(classe_id)` ; module `absences` | admin aal2 ou enseignant `teaches_class` (insert, delete d'un appel non terminé) + module ; trigger : année active, fenêtre de 7 jours (enseignant), créneau ; `termine_*` hors droits (RPC) |
+| `absences` | admin ; enseignant si `teaches_class(classe_id)` ; parent si `is_parent_of(apprenant_id)` (sans limite de temps) ; module | admin aal2 ou enseignant `teaches_class` (insert, update de `type`, delete) + module ; `motif`, `etat`, `decide_*` hors droits (RPC) |
+| `notifications` | `user_id = auth.uid()` et `is_member(daara_id)` ; module `notifications` | update de `lu_at` seulement (ses lignes) ; aucune insertion / suppression client |
+| `daaras.appel_demi_journee` | membres | admin aal2 (droit par colonne) |
+
 ### Fonctions RPC
 | Fonction | Rôle | Sécurité |
 |---|---|---|
@@ -373,6 +404,10 @@ nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `au
 | `activer_annee(p_annee)` (S3.1) | rend l'année active et désactive l'autre, en une transaction (verrou de la daara) | admin `aal2` ; module `structure` actif |
 | `enseignants_daara(p_daara)` → (user_id, prenom, nom, actif) (S3.3) | noms des enseignants et admins de la daara (titulaire, enseignant d'une matière) : l'enseignant ne lit pas les profils de ses collègues | `has_role(p_daara, [admin, enseignant])` + module ; désactivés : nom figé (`nom_affiche`), tous pour l'admin, pour un enseignant seulement ceux encore titulaires ou enseignants d'une classe (audit de fin de sprint 3) |
 | `rechercher_membres(p_daara, p_texte, p_role, p_etat, p_tri, p_offset, p_limite)` → lignes (id, user_id, role, actif, nom, telephone, depuis, total) (S3.4) | liste paginée des membres pour `data-table` : recherche sans accents (`unaccent`) sur le nom et le téléphone (actifs seulement), filtres rôle / état, tri `role` / `nom` / `depuis` (± ), total par fenêtre ; nom figé et pas de téléphone pour un désactivé | admin `aal2` ; limite ≤ 100, texte ≤ 100, paramètres contrôlés (`22023 parametre_invalide`) |
+| `terminer_appel(p_appel)` (S5.1) | marque l'appel terminé (`termine_at`, `termine_par`) et crée les notifications `absence` / `retard` des parents actuels (module `notifications`) ; rappel sur un appel déjà terminé : sans effet | admin aal2 ou enseignant `teaches_class`, fenêtre de 7 jours ; verrou de l'appel |
+| `justifier_absence(p_absence, p_motif)` (S5.2) | le parent envoie ou modifie le motif (≤ 300, texte sûr) → `envoyee` ; notifie admins et titulaire | `is_parent_of` ; refus après décision (`deja_decidee`) |
+| `decider_justification(p_absence, p_justifiee bool)` (S5.2) | `justifiee` / `non_justifiee`, `decide_par`, `decide_at` ; notifie les parents actuels | admin aal2 ou **titulaire** de la classe (`classes.titulaire_id`) ; module |
+| `statistiques_absences(p_daara, p_debut, p_fin, p_classe null)` (S5.2) | par classe : élèves, appels terminés, absences, retards, non justifiées, taux ; 10 élèves les plus absents | security invoker (RLS) ; admin ou enseignant (ses classes) |
 | `sans_accents(texte)` (S3.4) | minuscules sans accents (`unaccent` à dictionnaire explicite, immuable) ; colonnes générées `matieres.recherche` (nom + code) et `classes.recherche` (nom + niveau), filtrées par `ilike` côté client | fonction pure, exécutable par `authenticated` (colonnes générées) |
 | `importer_apprenants(p_daara, p_lignes jsonb, p_classe uuid null, p_simuler bool false)` → jsonb `{ crees, lignes, erreurs[{ligne, champ, code}] }` (S4.4) | import CSV (analysé dans le navigateur : séparateur `;` `,` ou tabulation, UTF-8 ou Windows-1252, en-têtes fr / en, dates JJ/MM/AAAA) : revalide toutes les lignes (nom, prénom `libelle_valide`, date ISO 1950 → aujourd'hui, sexe F / M, classe de l'année active retrouvée par son nom sans accents ni casse, sinon `p_classe`), doublons (même nom, prénom et date, sans accents) dans le fichier ou la daara ; **tout ou rien**, 500 lignes au plus ; erreurs par ligne et par champ sans rien écrire ; `p_simuler` : vérification seule (aperçu) | security invoker (RLS, triggers et droits par colonne comme une saisie) ; admin aal2 (`42501`) ; journal sans valeurs |
 | `avant_creation_utilisateur(event)` (S2.5, ADR-009) | hook Auth `before_user_created` : refuse toute inscription publique par téléphone (les comptes téléphone naissent par `accept-invitation`, API d'administration, non soumise au hook) | exécutable par `supabase_auth_admin` uniquement |
@@ -388,7 +423,8 @@ nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `au
 | `audit_trigger` | daaras (sprint 1, `daara_id` = `id`), memberships ; puis absences, notes, bulletins, cahier_entrees | journal d'audit ; copie la ligne entière : exclusion des colonnes sensibles et durée de conservation à décider (ADR) avant de le brancher sur des données d'apprenants |
 | `check_same_daara` | tables avec FK métier | refuse une référence vers une autre daara |
 | `lock_closed_period` | notes, evaluations | refuse les modifications si période clôturée |
-| `notify_*` | absences, bulletins (publication), recitations | crée les lignes `notifications` |
+| `notifier_absences` (S5.3) | absences (insert / delete / update de `type` après la fin de l'appel) | notifications `absence`, `retard`, `absence_annulee` aux parents actuels (ADR-011) ; rien pendant l'appel |
+| `notify_*` | bulletins (publication), recitations | crée les lignes `notifications` (sprints 7, 9) |
 
 ## 5. Storage
 | Bucket | Chemin | Accès |
@@ -508,12 +544,16 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   Enseignant->>Angular: marque absent
-  Angular->>DB: insert absences (RLS : teaches_class)
-  DB->>DB: trigger audit + trigger notify (ligne notifications pour les parents)
-  DB-->>Realtime: changement absences / notifications
+  Angular->>DB: upsert appels + insert / delete absences à chaque appui (RLS : teaches_class, fenêtre 7 jours)
+  DB-->>Realtime: changement absences
   Realtime-->>Angular Admin: liste mise à jour
-  Realtime-->>Angular Parent: notification in-app
-  DB-->>EF dispatch-notifications: push / SMS si parent hors ligne
+  Enseignant->>Angular: « Terminer l'appel » (3 absents, 1 retard)
+  Angular->>DB: rpc terminer_appel
+  DB->>DB: notifications des parents actuels (module notifications)
+  DB-->>Realtime: insert notifications (filtre user_id)
+  Realtime-->>Angular Parent: cloche + message composé à l'écran
+  Parent->>DB: rpc justifier_absence → admins et titulaire notifiés
+  Note over DB: hors application (Web Push, WhatsApp) : sprint 8, sans nom d'enfant
 ```
 
 ### 7.3 Calcul des moyennes (sprint 6-7)

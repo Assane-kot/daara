@@ -13,7 +13,7 @@
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
 - Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
-- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint suivant : 5 — Absences et espace parent (planification à faire). **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 fait (conception). Suivante : S5.1 appel du jour. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -105,6 +105,17 @@
 3. Sprint 2 : planification faite (2026-10-04). Commencer par S2.0 (spike téléphone sans SMS → ADR-009 confirmé ou
    alternative présentée au développeur), puis S2.1 à S2.7 dans l'ordre, un commit par story.
 
+### Décisions de planification du sprint 5 (validées le 2026-10-13)
+- Découpage S5.0 à S5.6 (conception, appel, justification et suivi, notifications et temps réel, accueil parent, e2e
+  Playwright, préparation du pilote) ; audit unique en fin de sprint.
+- L'appel est enregistré (`appels`) en plus des absences : « Présent aujourd'hui » et appels non faits visibles ;
+  présent par défaut ; types absent / retard ; un appel par jour, ou matin et après-midi (réglage de la daara).
+- Parents prévenus à la fin de l'appel (pas à chaque appui) et à chaque correction ensuite ; parents actuels seulement ;
+  notifications sans texte ni nom d'enfant (ADR-011) ; hors application au sprint 8.
+- Enseignant : ses classes, année active, aujourd'hui et 7 jours en arrière ; admin : toute l'année active.
+- Justification : le parent envoie un motif ; **l'admin ou l'enseignant titulaire** décide (choix du développeur).
+- `@playwright/test` (devDependency, gratuit) pour les e2e, job CI ; daara de démonstration sur `daara-dev` seulement.
+
 ### Décisions de planification du sprint 4 (validées le 2026-10-09)
 - Découpage S4.0 à S4.6 (dont S4.5 démarrage guidé et S4.6 revue ergonomique) ; audit unique en fin de sprint.
 - Matricule généré par la base (`AAAA-NNNN`), non modifiable ; photo facultative, bucket privé, URL signées ; données
@@ -178,6 +189,14 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-13 — S5.0 Conception du sprint 5
+- Plan du sprint 5 validé (décisions ci-dessus). ADR-011 (temps réel et notifications : notifications en base sans texte
+  ni nom d'enfant, prévenir à la fin de l'appel, un canal Realtime par écran, seuils de passage à Pro, conservation).
+- Specs `absences.md` et `notifications.md` ; LLD : §2 routes (`appel`, `absences`, `notifications`), §3.5 détaillé
+  (`daaras.appel_demi_journee`, enums, `appels`, `absences`, `notifications`, publication Realtime), §4 matrice et
+  politiques, RPC `terminer_appel`, `justifier_absence`, `decider_justification`, `statistiques_absences`, trigger
+  `notifier_absences`, §7.2 flux de l'appel.
+
 ### 2026-10-13 — Audit de fin de sprint 4 et bilan du sprint 4 (Apprenants et parents)
 **Audit** (un seul agent `auditeur-securite`, mode économe) : 0 critique, 0 important, 5 mineurs. Vérifié sans problème : le
 marqueur `daara.acceptation_invitation` n'est pas positionnable par un client, report des enfants limité aux invitations
