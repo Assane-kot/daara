@@ -22,6 +22,7 @@ export interface EntreeMenu {
 
 export const MENU: readonly EntreeMenu[] = [
     { cle: 'menu.tableau_de_bord', icone: 'tableau', route: '', barreBasse: true },
+    { cle: 'menu.enfants', icone: 'eleves', route: 'enfants', roles: ['parent'], barreBasse: true },
     { cle: 'menu.eleves', icone: 'eleves', route: 'apprenants', roles: ['admin', 'enseignant'] },
     { cle: 'menu.membres', icone: 'membres', route: 'membres', roles: ['admin'] },
     { cle: 'menu.structure', icone: 'structure', route: 'structure', roles: ['admin', 'enseignant'], module: 'structure' },

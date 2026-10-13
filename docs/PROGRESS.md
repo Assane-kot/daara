@@ -13,8 +13,7 @@
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
 - Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
-- Sprint 4 — Apprenants et parents : S4.0 (conception), S4.1 (fiches) et S4.2 (inscriptions) faits. Suivante : S4.3 liens
-  parents. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 4 — Apprenants et parents : S4.0 à S4.5 faits (conception, fiches, inscriptions, liens parents, import CSV, démarrage guidé). Suivante : S4.6 revue ergonomique. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -174,6 +173,53 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-13 — S4.5 Démarrage guidé de l'admin
+- Front seul (aucune migration) : sur le tableau de bord de l'admin, « Bien démarrer avec DAARA » : étapes dans l'ordre
+  (année, matières si module notes, classes, élèves, élèves placés dans une classe, enseignants invités ou membres,
+  parents reliés ou invités ; daara sans module structure : élèves, enseignants, parents), faites d'après des comptages
+  (`count: 'exact', head: true`, en parallèle ; table illisible = 0) ; barre d'avancement accessible ; un seul bouton plein
+  vers la prochaine étape, « Y aller » pour les autres ; « Masquer ce guide » (localStorage par daara, protégé) et
+  « Afficher le guide de démarrage ». Spec complétée.
+- `btn-outline-dark` illisible en mode sombre (texte sombre sur fond sombre) → variante sombre dans `styles.css`
+  (concerne aussi « Annuler » de l'import S4.4).
+- Vérifié dans le navigateur : Serigne Touba (année, classes, élèves importés, enseignant du jeu de données) → 5 étapes
+  sur 7, prochaine « Ajouter les matières » ; sombre ; 375 px sans débordement.
+- 263 tests unitaires (+5). Pas d'audit (fin de sprint).
+
+### 2026-10-10 — S4.4 Import CSV des apprenants
+- Migration `import_apprenants` : RPC `importer_apprenants(p_daara, p_lignes, p_classe, p_simuler)` en security invoker
+  (RLS, matricule, journal sans valeurs comme une saisie) : admin aal2, 1 à 500 lignes, revalidation complète, classe
+  de l'année active retrouvée par son nom sans accents ni casse (ou classe par défaut), doublons (même nom, prénom, date)
+  dans le fichier ou la daara, erreurs `{ligne, champ, code}` sans rien écrire (tout ou rien), mode simulation. LLD
+  complété (signature : `p_simuler`). 18 tests pgTAP (661).
+- Front : « Importer une liste » sur la liste des élèves → `/d/:slug/apprenants/import` (admin) : 1. modèle CSV (fr / en,
+  BOM, `;`), 2. aide par colonne avec exemples, 3. classe par défaut facultative + choix du fichier ; analyse dans le
+  navigateur sans paquet (`import-csv.ts` : guillemets, séparateur `;` `,` tabulation, UTF-8 sinon Windows-1252, en-têtes
+  fr / en dans n'importe quel ordre, Garçon / Fille et équivalents, dates JJ/MM/AAAA ou AAAA-MM-JJ) ; la base vérifie
+  aussitôt les lignes saines (simulation) → **toutes les erreurs en une fois**, au numéro de ligne du fichier, avec la
+  valeur lue et la correction à faire ; sinon aperçu (classe affichée sous son vrai nom) → « Importer les n élèves ».
+- Vérifié dans le navigateur : fichier Windows-1252 avec date impossible, classe inconnue et doublon interne → 3 erreurs
+  d'un coup ; fichier corrigé → 4 élèves importés (matricules 2026-0001 à 0004, « ce1 a » → CE1 A, « etoile cp » →
+  Étoile CP) ; réimport → doublon signalé ; séparateur virgule ; 375 px sans débordement. Téléchargement du modèle non
+  cliqué (vérifié par test unitaire : modèle relu par l'analyse).
+- 258 tests unitaires (+11). Test `badge.spec` instable une fois sous charge (styles calculés), vert au second passage.
+  Pas d'audit (fin de sprint).
+
+### 2026-10-10 — S4.3 Liens parents ↔ enfants
+- Migration `liens_parents` : enum `lien_parent`, `parent_links` (parent = membre actif `parent`, droits en tête sauf
+  pendant l'acceptation d'invitation), `invitation_enfants` (enfants rattachés à une invitation en attente : fratries,
+  reportés au « Renvoyer »), `is_parent_of`, `classe_d_un_enfant`, lecture parent des enfants / inscriptions / classes /
+  photos, RPC `rattacher_enfant_invitation`, `creer_invitation` et `accepter_invitation_pour` repris (report des
+  enfants, liens créés à l'acceptation). Écart au LLD (corrigé) : table `invitation_enfants` plutôt que des colonnes sur
+  `invitations` (plusieurs enfants par invitation). 23 tests pgTAP (643).
+- Front : fiche élève → « Parents » (lien père / mère / tuteur, parent déjà inscrit relié en un clic, ou « Inviter un
+  nouveau parent » qui ouvre la modale d'invitation avec le rôle parent imposé et rattache l'enfant), « Retirer » ;
+  parent → « Mes enfants » (photo, classe ; barre basse mobile). `InvitationCreee` porte l'identifiant de l'invitation.
+- Vérifié dans le navigateur : Fatou Ndiaye reliée à Awa (mère), invitation d'un père par téléphone avec l'enfant
+  rattaché (ligne `invitation_enfants`), parent.dev → « Mes enfants » : Awa, CE1 A. L'acceptation de bout en bout est
+  couverte par pgTAP (invitation, 2 enfants, « Renvoyer », acceptation → 2 liens).
+- 247 tests unitaires. Pas d'audit (fin de sprint).
+
 ### 2026-10-09 — S4.2 Inscriptions dans les classes
 - Migration `inscriptions` (module `structure`) : une classe par élève et par année (année copiée de la classe par le
   trigger, droits en tête), élève parti non inscriptible, changement de classe seulement dans l'année, classe avec

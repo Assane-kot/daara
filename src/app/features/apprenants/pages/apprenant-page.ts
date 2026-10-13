@@ -6,6 +6,7 @@ import { Badge } from '../../../shared/ui/badge/badge';
 import { ConfirmDialogService } from '../../../shared/ui/confirm-dialog/confirm-dialog.service';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { ApprenantDialogService } from '../components/apprenant-dialog';
+import { ParentsEnfant } from '../components/parents-enfant';
 import { Apprenant, ApprenantsService, ErreurApprenants } from '../data/apprenants.service';
 import { InscriptionEleve, InscriptionsService } from '../data/inscriptions.service';
 
@@ -15,7 +16,7 @@ import { InscriptionEleve, InscriptionsService } from '../data/inscriptions.serv
  */
 @Component({
     selector: 'app-apprenant-page',
-    imports: [RouterLink, TranslatePipe, Badge, Skeleton],
+    imports: [RouterLink, TranslatePipe, Badge, Skeleton, ParentsEnfant],
     template: `
         <p class="mt-0 mb-3">
             <a class="font-semibold text-primary hover:underline" routerLink="..">← {{ 'apprenants.retour' | translate }}</a>
@@ -127,6 +128,9 @@ import { InscriptionEleve, InscriptionsService } from '../data/inscriptions.serv
                         }
                     </div>
                 </div>
+                @if (admin()) {
+                    <app-parents-enfant [apprenantId]="a.id" [nomEnfant]="a.prenom + ' ' + a.nom" />
+                }
             }
         </div>
     `,

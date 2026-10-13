@@ -27,7 +27,8 @@
         "membres": "Members",
         "parametres": "Settings",
         "structure": "Structure",
-        "eleves": "Students"
+        "eleves": "Students",
+        "enfants": "My children"
     },
     "titres": {
         "tableau_de_bord": "Dashboard",
@@ -53,7 +54,9 @@
         "structure_classes": "Classes",
         "structure_classe": "Class",
         "apprenants": "Students",
-        "apprenant": "Student record"
+        "apprenant": "Student record",
+        "enfants": "My children",
+        "import": "Import students"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -818,7 +821,8 @@
         "sans_classe": "No class yet",
         "choisir_classe": "Choose a class",
         "pas_annee_active": "No active year: make a year active in Structure.",
-        "sexe_requis": "Choose Boy or Girl."
+        "sexe_requis": "Choose Boy or Girl.",
+        "importer": "Import a list"
     },
     "inscriptions": {
         "inscrire": "Enrol students",
@@ -842,6 +846,156 @@
             "eleve_parti": "This student left the daara: re-enrol them first.",
             "autre_annee": "Choose a class of the same year.",
             "inattendue": "The action failed. Try again."
+        }
+    },
+    "parents": {
+        "titre": "Parents",
+        "ajouter": "Add a parent",
+        "ajouter_pour": "Add a parent for {{nom}}",
+        "lien": "Relationship to the child",
+        "liens": {
+            "pere": "Father",
+            "mere": "Mother",
+            "tuteur": "Guardian"
+        },
+        "parent_inscrit": "Parent already in the daara",
+        "choisir_parent": "Choose a parent",
+        "relier": "Link this parent",
+        "ou": "or",
+        "inviter_nouveau": "Invite a new parent (WhatsApp or email)",
+        "choisir_lien": "First choose the relationship (father, mother or guardian).",
+        "aucun": "No parent linked yet.",
+        "retirer": "Remove",
+        "relie_ok": "Parent linked to the child.",
+        "retire_ok": "Link removed.",
+        "invite_ok": "Invitation sent: the child will be linked to the parent as soon as they accept it.",
+        "invitation_enfant": "{{nom}} will be linked to this parent as soon as they accept the invitation.",
+        "confirmer_retrait": "Remove the link between {{nom}} and {{enfant}}?",
+        "confirmer_retrait_message": "The parent will no longer see this child. Their account stays a member of the daara.",
+        "erreurs": {
+            "droits": "Only an administrator who confirmed their identity can link parents.",
+            "deja_relie": "This parent is already linked to this child.",
+            "parent_invalide": "This member is not an active parent of the daara.",
+            "inattendue": "The action failed. Try again."
+        }
+    },
+    "enfants": {
+        "titre": "My children",
+        "erreur": "Your children could not be loaded.",
+        "vide_titre": "No child linked",
+        "vide_message": "The daara has not linked your children to your account yet. Contact its administrator.",
+        "sans_classe": "No class yet"
+    },
+    "import": {
+        "titre": "Import students",
+        "etape_modele": "Download the template",
+        "telecharger_modele": "Download the template (CSV)",
+        "etape_remplir": "Fill it in",
+        "aide_remplir": "Open it in Excel or Google Sheets, one row per student, then save it as CSV. At most {{max}} students per file.",
+        "colonne": "Column",
+        "noms_colonnes": {
+            "nom": "Last name",
+            "prenom": "First name",
+            "sexe": "Sex"
+        },
+        "exemple": "Example",
+        "colonnes": {
+            "nom": "Last name (required)",
+            "prenom": "First name (required)",
+            "sexe": "Sex (required)",
+            "date_naissance": "Date of birth",
+            "classe": "Class"
+        },
+        "exemples": {
+            "nom": "Ndiaye",
+            "prenom": "Awa",
+            "sexe": "Boy or Girl",
+            "date_naissance": "15/03/2016",
+            "classe": "CE1 A (name of a class of the current year)"
+        },
+        "etape_fichier": "Choose the file",
+        "classe_defaut": "Class for students without a class in the file",
+        "classe_aucune": "None (I will enrol them later)",
+        "choisir_fichier": "Choose the CSV file",
+        "choisir_autre": "Choose the corrected file",
+        "verification": "Checking the file…",
+        "erreurs_titre": "The file contains {{n}} error(s). Nothing was imported.",
+        "erreurs_aide": "Fix these rows in your file, save it, then choose it again.",
+        "ligne": "Row {{n}}",
+        "pret": "{{n}} student(s) ready to import. Check the preview:",
+        "et_autres": "… and {{n}} more.",
+        "importer": "Import the {{n}} student(s)",
+        "en_cours": "Importing {{n}} student(s)…",
+        "termine": "{{n}} student(s) imported. Their student numbers have been assigned.",
+        "voir_liste": "See the student list",
+        "autre_fichier": "Import another file",
+        "erreurs": {
+            "nom_requis": "the last name is empty.",
+            "nom_invalide": "the last name “{{valeur}}” contains forbidden characters or exceeds 100 characters.",
+            "prenom_requis": "the first name is empty.",
+            "prenom_invalide": "the first name “{{valeur}}” contains forbidden characters or exceeds 100 characters.",
+            "sexe_requis": "the sex is empty: write Boy or Girl.",
+            "sexe_invalide": "“{{valeur}}”: write Boy or Girl.",
+            "date_naissance_invalide": "“{{valeur}}” is not a valid date of birth: write DD/MM/YYYY (e.g. 15/03/2016).",
+            "classe_inconnue": "the class “{{valeur}}” does not exist in the current year: check its name in Structure.",
+            "ligne_doublon": "this student already exists in the daara (same last name, first name and date of birth). Remove the row.",
+            "ligne_doublon_fichier": "this student appears twice in the file. Remove one of the two rows.",
+            "ligne_invalide": "unreadable row."
+        },
+        "fatal": {
+            "vide": "The file contains no student: fill in one row per student under the column titles.",
+            "colonnes": "Columns not found: {{colonnes}}. Start from the template (step 1).",
+            "trop_de_lignes": "The file contains {{n}} students: at most 500 per import. Split it into several files.",
+            "trop_gros": "This file is too large (1 MB at most). Check that it is the student list.",
+            "lecture": "This file could not be read. Save it as CSV and try again.",
+            "classe_defaut": "The chosen class no longer exists in the current year. Choose another one."
+        }
+    },
+    "demarrage": {
+        "titre": "Getting started with DAARA",
+        "titre_fini": "Your daara is ready!",
+        "avancement": "{{faites}} of {{total}} step(s) done",
+        "masquer": "Hide this guide",
+        "afficher": "Show the getting started guide",
+        "y_aller": "Go",
+        "faite": "done",
+        "erreur": "The getting started guide could not be loaded.",
+        "etapes": {
+            "annee": {
+                "titre": "Create the school year",
+                "aide": "Its dates and terms: everything else depends on it.",
+                "action": "Create the year"
+            },
+            "matieres": {
+                "titre": "Add the subjects",
+                "aide": "The subjects taught (Quran, French, mathematics…).",
+                "action": "Add the subjects"
+            },
+            "classes": {
+                "titre": "Create the classes",
+                "aide": "One class per group of students, with its main teacher.",
+                "action": "Create the classes"
+            },
+            "eleves": {
+                "titre": "Add the students",
+                "aide": "One by one, or the whole list at once with an Excel file (CSV).",
+                "action": "Add the students"
+            },
+            "inscriptions": {
+                "titre": "Place the students in their class",
+                "aide": "Open a class, then “Enrol students”.",
+                "action": "Open the classes"
+            },
+            "enseignants": {
+                "titre": "Invite the teachers",
+                "aide": "They receive a link by WhatsApp or email.",
+                "action": "Invite the teachers"
+            },
+            "parents": {
+                "titre": "Link the parents",
+                "aide": "From each student’s record: “Add a parent”.",
+                "action": "Open the student list"
+            }
         }
     }
 }

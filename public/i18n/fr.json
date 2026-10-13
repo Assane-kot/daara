@@ -27,7 +27,8 @@
         "membres": "Membres",
         "parametres": "Paramètres",
         "structure": "Structure",
-        "eleves": "Élèves"
+        "eleves": "Élèves",
+        "enfants": "Mes enfants"
     },
     "titres": {
         "tableau_de_bord": "Tableau de bord",
@@ -53,7 +54,9 @@
         "structure_classes": "Classes",
         "structure_classe": "Classe",
         "apprenants": "Élèves",
-        "apprenant": "Fiche élève"
+        "apprenant": "Fiche élève",
+        "enfants": "Mes enfants",
+        "import": "Importer des élèves"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -818,7 +821,8 @@
         "sans_classe": "Pas encore de classe",
         "choisir_classe": "Choisir une classe",
         "pas_annee_active": "Aucune année active : rendez une année active dans Structure.",
-        "sexe_requis": "Choisissez Garçon ou Fille."
+        "sexe_requis": "Choisissez Garçon ou Fille.",
+        "importer": "Importer une liste"
     },
     "inscriptions": {
         "inscrire": "Inscrire des élèves",
@@ -842,6 +846,156 @@
             "eleve_parti": "Cet élève a quitté la daara : réinscrivez-le d’abord.",
             "autre_annee": "Choisissez une classe de la même année.",
             "inattendue": "L’action a échoué. Réessayez."
+        }
+    },
+    "parents": {
+        "titre": "Parents",
+        "ajouter": "Ajouter un parent",
+        "ajouter_pour": "Ajouter un parent pour {{nom}}",
+        "lien": "Lien avec l’enfant",
+        "liens": {
+            "pere": "Père",
+            "mere": "Mère",
+            "tuteur": "Tuteur"
+        },
+        "parent_inscrit": "Parent déjà inscrit dans la daara",
+        "choisir_parent": "Choisissez un parent",
+        "relier": "Relier ce parent",
+        "ou": "ou",
+        "inviter_nouveau": "Inviter un nouveau parent (WhatsApp ou e-mail)",
+        "choisir_lien": "Choisissez d’abord le lien (père, mère ou tuteur).",
+        "aucun": "Aucun parent relié pour l’instant.",
+        "retirer": "Retirer",
+        "relie_ok": "Parent relié à l’enfant.",
+        "retire_ok": "Lien retiré.",
+        "invite_ok": "Invitation envoyée : l’enfant sera relié au parent dès qu’il l’acceptera.",
+        "invitation_enfant": "{{nom}} sera relié à ce parent dès qu’il acceptera l’invitation.",
+        "confirmer_retrait": "Retirer le lien entre {{nom}} et {{enfant}} ?",
+        "confirmer_retrait_message": "Le parent ne verra plus cet enfant. Son compte reste membre de la daara.",
+        "erreurs": {
+            "droits": "Seul un administrateur ayant confirmé son identité peut relier les parents.",
+            "deja_relie": "Ce parent est déjà relié à cet enfant.",
+            "parent_invalide": "Ce membre n’est pas un parent actif de la daara.",
+            "inattendue": "L’action a échoué. Réessayez."
+        }
+    },
+    "enfants": {
+        "titre": "Mes enfants",
+        "erreur": "Vos enfants n’ont pas pu être chargés.",
+        "vide_titre": "Aucun enfant relié",
+        "vide_message": "La daara n’a pas encore relié vos enfants à votre compte. Contactez son administrateur.",
+        "sans_classe": "Pas encore de classe"
+    },
+    "import": {
+        "titre": "Importer des élèves",
+        "etape_modele": "Téléchargez le modèle",
+        "telecharger_modele": "Télécharger le modèle (CSV)",
+        "etape_remplir": "Remplissez-le",
+        "aide_remplir": "Ouvrez-le dans Excel ou Google Sheets, une ligne par élève, puis enregistrez-le au format CSV. {{max}} élèves au plus par fichier.",
+        "colonne": "Colonne",
+        "noms_colonnes": {
+            "nom": "Nom",
+            "prenom": "Prénom",
+            "sexe": "Sexe"
+        },
+        "exemple": "Exemple",
+        "colonnes": {
+            "nom": "Nom (obligatoire)",
+            "prenom": "Prénom (obligatoire)",
+            "sexe": "Sexe (obligatoire)",
+            "date_naissance": "Date de naissance",
+            "classe": "Classe"
+        },
+        "exemples": {
+            "nom": "Ndiaye",
+            "prenom": "Awa",
+            "sexe": "Garçon ou Fille",
+            "date_naissance": "15/03/2016",
+            "classe": "CE1 A (nom d’une classe de l’année en cours)"
+        },
+        "etape_fichier": "Choisissez le fichier",
+        "classe_defaut": "Classe des élèves sans classe dans le fichier",
+        "classe_aucune": "Aucune (je les inscrirai plus tard)",
+        "choisir_fichier": "Choisir le fichier CSV",
+        "choisir_autre": "Choisir le fichier corrigé",
+        "verification": "Vérification du fichier…",
+        "erreurs_titre": "Le fichier contient {{n}} erreur(s). Rien n’a été importé.",
+        "erreurs_aide": "Corrigez ces lignes dans votre fichier, enregistrez-le, puis choisissez-le à nouveau.",
+        "ligne": "Ligne {{n}}",
+        "pret": "{{n}} élève(s) prêt(s) à être importé(s). Vérifiez l’aperçu :",
+        "et_autres": "… et {{n}} autre(s).",
+        "importer": "Importer les {{n}} élève(s)",
+        "en_cours": "Import de {{n}} élève(s)…",
+        "termine": "{{n}} élève(s) importé(s). Leurs matricules ont été attribués.",
+        "voir_liste": "Voir la liste des élèves",
+        "autre_fichier": "Importer un autre fichier",
+        "erreurs": {
+            "nom_requis": "le nom est vide.",
+            "nom_invalide": "le nom « {{valeur}} » contient des caractères non autorisés ou dépasse 100 caractères.",
+            "prenom_requis": "le prénom est vide.",
+            "prenom_invalide": "le prénom « {{valeur}} » contient des caractères non autorisés ou dépasse 100 caractères.",
+            "sexe_requis": "le sexe est vide : écrivez Garçon ou Fille.",
+            "sexe_invalide": "« {{valeur}} » : écrivez Garçon ou Fille.",
+            "date_naissance_invalide": "« {{valeur}} » n’est pas une date de naissance valide : écrivez JJ/MM/AAAA (ex. 15/03/2016).",
+            "classe_inconnue": "la classe « {{valeur}} » n’existe pas dans l’année en cours : vérifiez son nom dans Structure.",
+            "ligne_doublon": "cet élève existe déjà dans la daara (même nom, prénom et date de naissance). Retirez la ligne.",
+            "ligne_doublon_fichier": "cet élève apparaît deux fois dans le fichier. Retirez une des deux lignes.",
+            "ligne_invalide": "ligne illisible."
+        },
+        "fatal": {
+            "vide": "Le fichier ne contient aucun élève : remplissez une ligne par élève sous les titres de colonnes.",
+            "colonnes": "Colonnes introuvables : {{colonnes}}. Partez du modèle à télécharger (étape 1).",
+            "trop_de_lignes": "Le fichier contient {{n}} élèves : 500 au plus par import. Coupez-le en plusieurs fichiers.",
+            "trop_gros": "Ce fichier est trop gros (1 Mo au plus). Vérifiez qu’il s’agit bien de la liste des élèves.",
+            "lecture": "Ce fichier n’a pas pu être lu. Enregistrez-le au format CSV puis réessayez.",
+            "classe_defaut": "La classe choisie n’existe plus dans l’année en cours. Choisissez-en une autre."
+        }
+    },
+    "demarrage": {
+        "titre": "Bien démarrer avec DAARA",
+        "titre_fini": "Votre daara est prête !",
+        "avancement": "{{faites}} étape(s) sur {{total}} faites",
+        "masquer": "Masquer ce guide",
+        "afficher": "Afficher le guide de démarrage",
+        "y_aller": "Y aller",
+        "faite": "faite",
+        "erreur": "Le guide de démarrage n’a pas pu être chargé.",
+        "etapes": {
+            "annee": {
+                "titre": "Créer l’année scolaire",
+                "aide": "Ses dates et ses trimestres : tout le reste s’y rattache.",
+                "action": "Créer l’année"
+            },
+            "matieres": {
+                "titre": "Ajouter les matières",
+                "aide": "Les matières enseignées (Coran, français, mathématiques…).",
+                "action": "Ajouter les matières"
+            },
+            "classes": {
+                "titre": "Créer les classes",
+                "aide": "Une classe par groupe d’élèves, avec son enseignant titulaire.",
+                "action": "Créer les classes"
+            },
+            "eleves": {
+                "titre": "Ajouter les élèves",
+                "aide": "Un par un, ou toute la liste d’un coup avec un fichier Excel (CSV).",
+                "action": "Ajouter les élèves"
+            },
+            "inscriptions": {
+                "titre": "Placer les élèves dans leur classe",
+                "aide": "Ouvrez une classe puis « Inscrire des élèves ».",
+                "action": "Ouvrir les classes"
+            },
+            "enseignants": {
+                "titre": "Inviter les enseignants",
+                "aide": "Ils reçoivent un lien par WhatsApp ou par e-mail.",
+                "action": "Inviter les enseignants"
+            },
+            "parents": {
+                "titre": "Relier les parents",
+                "aide": "Depuis la fiche de chaque élève : « Ajouter un parent ».",
+                "action": "Ouvrir la liste des élèves"
+            }
         }
     }
 }

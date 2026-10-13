@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { roleGuard } from './core/daara/daara.guards';
 import { authGuard, avecDaaraGuard, mfaGuard, sansDaaraGuard } from './core/auth/auth.guards';
 import { daaraGuard, racineGuard } from './core/daara/daara.guards';
 
@@ -30,6 +31,12 @@ export const routes: Routes = [
             {
                 path: 'membres',
                 loadChildren: () => import('./features/membres/membres.routes').then((m) => m.MEMBRES_ROUTES),
+            },
+            {
+                path: 'enfants',
+                title: 'titres.enfants',
+                canActivate: [roleGuard(['parent'])],
+                loadComponent: () => import('./features/enfants/mes-enfants-page').then((m) => m.MesEnfantsPage),
             },
             {
                 path: 'apprenants',

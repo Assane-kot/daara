@@ -438,7 +438,7 @@
     }
 
     .btn-outline-dark {
-        @apply border-dark text-dark shadow-none hover:bg-dark hover:text-white;
+        @apply border-dark text-dark shadow-none hover:bg-dark hover:text-white dark:border-white-light/60 dark:text-white-light dark:hover:bg-white-light dark:hover:text-black;
     }
 
     /* Badge */

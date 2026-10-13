@@ -471,6 +471,55 @@ export type Database = {
                     },
                 ];
             };
+            invitation_enfants: {
+                Row: {
+                    apprenant_id: string;
+                    created_at: string;
+                    daara_id: string;
+                    id: string;
+                    invitation_id: string;
+                    lien: Database['public']['Enums']['lien_parent'];
+                };
+                Insert: {
+                    apprenant_id: string;
+                    created_at?: string;
+                    daara_id: string;
+                    id?: string;
+                    invitation_id: string;
+                    lien: Database['public']['Enums']['lien_parent'];
+                };
+                Update: {
+                    apprenant_id?: string;
+                    created_at?: string;
+                    daara_id?: string;
+                    id?: string;
+                    invitation_id?: string;
+                    lien?: Database['public']['Enums']['lien_parent'];
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'invitation_enfants_apprenant_id_fkey';
+                        columns: ['apprenant_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'apprenants';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'invitation_enfants_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'invitation_enfants_invitation_id_fkey';
+                        columns: ['invitation_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'invitations';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             invitations: {
                 Row: {
                     accepted_at: string | null;
@@ -629,6 +678,51 @@ export type Database = {
                     },
                 ];
             };
+            parent_links: {
+                Row: {
+                    apprenant_id: string;
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    id: string;
+                    lien: Database['public']['Enums']['lien_parent'];
+                    parent_user_id: string;
+                };
+                Insert: {
+                    apprenant_id: string;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id: string;
+                    id?: string;
+                    lien: Database['public']['Enums']['lien_parent'];
+                    parent_user_id: string;
+                };
+                Update: {
+                    apprenant_id?: string;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id?: string;
+                    id?: string;
+                    lien?: Database['public']['Enums']['lien_parent'];
+                    parent_user_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'parent_links_apprenant_id_fkey';
+                        columns: ['apprenant_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'apprenants';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'parent_links_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             periodes: {
                 Row: {
                     annee_id: string;
@@ -748,6 +842,7 @@ export type Database = {
             };
             changer_role: { Args: { p_membership: string; p_role: Database['public']['Enums']['role_membre'] }; Returns: undefined };
             chiffres: { Args: { p_texte: string }; Returns: string };
+            classe_d_un_enfant: { Args: { p_classe: string }; Returns: boolean };
             compte_du_contact: { Args: { p_email: string; p_telephone: string }; Returns: string };
             consommer_code_acces: {
                 Args: { p_code: string; p_identifiant: string };
@@ -811,6 +906,7 @@ export type Database = {
             hacher_code_acces: { Args: { p_code: string; p_user: string }; Returns: string };
             hacher_jeton: { Args: { p_token: string }; Returns: string };
             has_role: { Args: { p_daara: string; p_roles: Database['public']['Enums']['role_membre'][] }; Returns: boolean };
+            importer_apprenants: { Args: { p_classe?: string; p_daara: string; p_lignes: Json; p_simuler?: boolean }; Returns: Json };
             invitation_par_jeton: {
                 Args: { p_token: string };
                 Returns: {
@@ -825,6 +921,7 @@ export type Database = {
                 }[];
             };
             is_member: { Args: { p_daara: string }; Returns: boolean };
+            is_parent_of: { Args: { p_apprenant: string }; Returns: boolean };
             is_platform_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
             libelle_valide: { Args: { p_max: number; p_texte: string }; Returns: boolean };
             membership_administre: {
@@ -854,6 +951,10 @@ export type Database = {
             photo_apprenant_administree: { Args: { p_nom: string }; Returns: boolean };
             photo_apprenant_lisible: { Args: { p_nom: string }; Returns: boolean };
             prerequis_module: { Args: { p_module: Database['public']['Enums']['module_daara'] }; Returns: Database['public']['Enums']['module_daara'][] };
+            rattacher_enfant_invitation: {
+                Args: { p_apprenant: string; p_invitation: string; p_lien: Database['public']['Enums']['lien_parent'] };
+                Returns: undefined;
+            };
             rechercher_membres: {
                 Args: {
                     p_daara: string;
@@ -883,6 +984,7 @@ export type Database = {
             texte_sur: { Args: { p_texte: string }; Returns: boolean };
         };
         Enums: {
+            lien_parent: 'pere' | 'mere' | 'tuteur';
             module_daara: 'structure' | 'absences' | 'notes' | 'bulletins' | 'coran_cahier' | 'coran_recitations' | 'coran_nafar' | 'notifications';
             role_membre: 'admin' | 'enseignant' | 'parent' | 'apprenant';
             sexe_apprenant: 'F' | 'M';
@@ -996,6 +1098,7 @@ export const Constants = {
     },
     public: {
         Enums: {
+            lien_parent: ['pere', 'mere', 'tuteur'],
             module_daara: ['structure', 'absences', 'notes', 'bulletins', 'coran_cahier', 'coran_recitations', 'coran_nafar', 'notifications'],
             role_membre: ['admin', 'enseignant', 'parent', 'apprenant'],
             sexe_apprenant: ['F', 'M'],

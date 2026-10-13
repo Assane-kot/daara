@@ -19,6 +19,8 @@ export interface NouvelleInvitation {
 
 /** Réponse de `invite-member` : le lien est toujours rendu à l'admin (copie, WhatsApp). */
 export interface InvitationCreee {
+    /** Identifiant de l'invitation (rattachement d'un enfant, S4.3). */
+    readonly id: string;
     readonly lien: string;
     readonly emailEnvoye: boolean;
     readonly messageWhatsapp: string;
@@ -81,6 +83,7 @@ export class InvitationsService {
 
     async inviter(saisie: NouvelleInvitation): Promise<InvitationCreee> {
         const { data, error } = await this.sb.functions.invoke<{
+            id: string;
             lien: string;
             email_envoye: boolean;
             message_whatsapp: string;
@@ -100,7 +103,7 @@ export class InvitationsService {
             throw erreurInvitations(error ? await codeErreurFonction(error) : undefined);
         }
         this.version.update((v) => v + 1);
-        return { lien: data.lien, emailEnvoye: data.email_envoye, messageWhatsapp: data.message_whatsapp, telephone: data.telephone };
+        return { id: data.id, lien: data.lien, emailEnvoye: data.email_envoye, messageWhatsapp: data.message_whatsapp, telephone: data.telephone };
     }
 
     async renvoyer(invitation: InvitationListee): Promise<InvitationCreee> {

@@ -15,6 +15,8 @@ interface DonneesDialog {
     /** Résultat à afficher directement (« Renvoyer » depuis l'onglet Invitations). */
     readonly resultat?: InvitationCreee;
     readonly destinataire?: string;
+    /** Invitation d'un parent depuis la fiche d'un enfant (S4.3) : rôle parent imposé, enfant rattaché à l'invitation. */
+    readonly pourEnfant?: { readonly nom: string; readonly apresInvitation: (invitation: InvitationCreee) => Promise<void> };
 }
 
 const telephoneValidateur = (c: AbstractControl<string>): ValidationErrors | null => (!c.value || normaliserTelephone(c.value) ? null : { pattern: true });
@@ -73,7 +75,10 @@ export class InviterDialog {
         this.envoi.set(true);
         this.erreur.set(null);
         try {
-            this.resultat.set(await this.service.inviter({ role: s.role, email, telephone, prenom: s.prenom.trim(), nom: s.nom.trim(), langue: s.langue }));
+            const role = this.donnees.pourEnfant ? 'parent' : s.role;
+            const invitation = await this.service.inviter({ role, email, telephone, prenom: s.prenom.trim(), nom: s.nom.trim(), langue: s.langue });
+            await this.donnees.pourEnfant?.apresInvitation(invitation);
+            this.resultat.set(invitation);
             this.destinataire.set(email ?? telephone ?? '');
         } catch (erreur) {
             this.erreur.set(erreur instanceof ErreurInvitations ? erreur.cle : 'invitations.erreurs.inattendue');

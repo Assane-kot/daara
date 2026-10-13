@@ -52,22 +52,28 @@
             </div>
         } @else {
             <form class="grid gap-4" [formGroup]="form" (ngSubmit)="inviter()" novalidate>
-                <fieldset class="m-0 border-0 p-0">
-                    <legend class="mb-1.5 font-semibold">{{ 'invitations.inviter.role' | translate }}</legend>
-                    <div class="grid grid-cols-3 gap-2">
-                        @for (role of roles; track role) {
-                            <label
-                                class="mb-0! flex min-h-11 cursor-pointer items-center justify-center rounded-md border border-white-light px-2 text-center text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:text-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary dark:border-night-border"
-                            >
-                                <input class="sr-only" type="radio" formControlName="role" [value]="role" />
-                                {{ 'roles.' + role | translate }}
-                            </label>
+                @if (donnees.pourEnfant; as enfant) {
+                    <p class="m-0 rounded-md border border-primary/30 bg-primary/10 p-3 text-black dark:text-white-light">
+                        {{ 'parents.invitation_enfant' | translate: { nom: enfant.nom } }}
+                    </p>
+                } @else {
+                    <fieldset class="m-0 border-0 p-0">
+                        <legend class="mb-1.5 font-semibold">{{ 'invitations.inviter.role' | translate }}</legend>
+                        <div class="grid grid-cols-3 gap-2">
+                            @for (role of roles; track role) {
+                                <label
+                                    class="mb-0! flex min-h-11 cursor-pointer items-center justify-center rounded-md border border-white-light px-2 text-center text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:text-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary dark:border-night-border"
+                                >
+                                    <input class="sr-only" type="radio" formControlName="role" [value]="role" />
+                                    {{ 'roles.' + role | translate }}
+                                </label>
+                            }
+                        </div>
+                        @if (form.controls.role.value === 'admin') {
+                            <p class="mt-2 mb-0 text-xs text-muted dark:text-night-muted">{{ 'invitations.inviter.aide_admin' | translate }}</p>
                         }
-                    </div>
-                    @if (form.controls.role.value === 'admin') {
-                        <p class="mt-2 mb-0 text-xs text-muted dark:text-night-muted">{{ 'invitations.inviter.aide_admin' | translate }}</p>
-                    }
-                </fieldset>
+                    </fieldset>
+                }
 
                 <fieldset class="m-0 border-0 p-0">
                     <legend class="mb-1.5 font-semibold">{{ 'invitations.inviter.par' | translate }}</legend>

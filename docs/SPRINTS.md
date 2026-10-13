@@ -83,9 +83,9 @@ Un commit par story ; audit unique en fin de sprint.
 - [x] S4.0 Conception : LLD §3.4, ADR-010 (données des apprenants), spec, règle d'ergonomie
 - [x] S4.1 Fiches apprenants : matricule généré, statut, photo privée, liste (`data-table`), saisie en série
 - [x] S4.2 Inscriptions dans les classes, élèves d'une classe, `enseigne_apprenant`
-- [ ] S4.3 Liens parents (`is_parent_of`), invitation d'un parent depuis la fiche, « Mes enfants »
-- [ ] S4.4 Import CSV des apprenants (modèle, rapport d'erreurs, tout ou rien)
-- [ ] S4.5 Démarrage guidé de l'admin (tableau de bord : étapes et avancement)
+- [x] S4.3 Liens parents (`is_parent_of`), invitation d'un parent depuis la fiche, « Mes enfants »
+- [x] S4.4 Import CSV des apprenants (modèle, rapport d'erreurs, tout ou rien)
+- [x] S4.5 Démarrage guidé de l'admin (tableau de bord : étapes et avancement)
 - [ ] S4.6 Revue ergonomique des écrans des sprints 1 à 3 (grille `.claude/rules/ux.md`) et corrections
 Livrable : une classe remplie avec ses parents invités.
 

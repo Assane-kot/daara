@@ -4,6 +4,7 @@ import { Database } from '../../../core/supabase/database.types';
 import { SupabaseService } from '../../../core/supabase/supabase.service';
 import { PageTable, RequeteTable, motifIlike, sansAccents } from '../../../shared/ui/data-table/data-table';
 import { ImageLogoService } from '../../parametres/data/image-logo.service';
+import { ChampImport, LigneImport } from './import-csv';
 
 export type Sexe = Database['public']['Enums']['sexe_apprenant'];
 export type StatutApprenant = Database['public']['Enums']['statut_apprenant'];
@@ -26,6 +27,12 @@ export interface SaisieApprenant {
     readonly prenom: string;
     readonly dateNaissance: string | null;
     readonly sexe: Sexe;
+}
+
+/** Réponse de `importer_apprenants` : `ligne` = rang dans le tableau envoyé (à partir de 1). */
+export interface ResultatImport {
+    readonly crees: number;
+    readonly erreurs: readonly { readonly ligne: number; readonly champ: ChampImport; readonly code: string }[];
 }
 
 /** Erreur traduite des apprenants (clé `apprenants.erreurs.*`). */
@@ -216,6 +223,25 @@ export class ApprenantsService {
         }
         const { data } = await this.sb.storage.from('photos').createSignedUrl(chemin, 3600);
         return data?.signedUrl ?? null;
+    }
+
+    /**
+     * Import CSV (S4.4) : la base revalide tout et n'écrit rien s'il reste une erreur (tout ou rien) ; `simuler` vérifie
+     * seulement (doublons, classes). Les numéros de ligne renvoyés sont ceux du tableau envoyé (1 = première ligne).
+     */
+    async importer(lignes: readonly LigneImport[], classeId: string | null, simuler: boolean): Promise<ResultatImport> {
+        const { data, error } = await this.sb.rpc('importer_apprenants', {
+            p_daara: this.daaraId(),
+            p_lignes: lignes.map((l) => ({ nom: l.nom, prenom: l.prenom, sexe: l.sexe, date_naissance: l.date_naissance, classe: l.classe })),
+            p_classe: classeId ?? undefined,
+            p_simuler: simuler,
+        });
+        if (error) {
+            // Taille et lignes déjà contrôlées dans le navigateur ; reste la classe par défaut supprimée entre-temps.
+            throw error.message === 'classe_inconnue' ? new ErreurApprenants('import.fatal.classe_defaut') : erreurApprenants(error);
+        }
+        const r = data as unknown as ResultatImport;
+        return { crees: r.crees, erreurs: r.erreurs };
     }
 
     /** Aucune ligne renvoyée = refus RLS. */

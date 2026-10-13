@@ -38,7 +38,10 @@ Détail : LLD §3.4, §4, §5 ; ADR-010 (minimisation, journal sans valeurs, pho
 - Classe (détail, S3.3) : onglet / liste des élèves inscrits, « Inscrire des élèves ».
 - Import `/d/:slug/apprenants/import` : étape fichier → aperçu et erreurs → confirmation.
 - Parent : « Mes enfants » (`/d/:slug/enfants`) : cartes enfant (photo, classe), barre basse mobile.
-- S4.5 : « Démarrage guidé » de l'admin sur le tableau de bord. S4.6 : revue ergonomique des écrans des sprints 1 à 3.
+- S4.5 : « Démarrage guidé » de l'admin sur le tableau de bord (« Bien démarrer avec DAARA ») : étapes année, matières
+  (module notes), classes, élèves, inscriptions, enseignants, parents (sans module structure : élèves, enseignants,
+  parents), faites d'après des comptages de la base ; avancement, un seul bouton plein vers la prochaine étape ;
+  « Masquer ce guide » (préférence du navigateur) et « Afficher le guide de démarrage ». S4.6 : revue ergonomique des écrans des sprints 1 à 3.
 États : chargement, erreur, vide (avec action), 375 px, sombre, fr / en.
 
 ## Temps réel / notifications

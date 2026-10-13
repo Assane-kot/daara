@@ -10,7 +10,7 @@ import { Apprenant, ApprenantsService, StatutApprenant } from '../data/apprenant
 
 /**
  * `/d/:slug/apprenants` (S4.1, admin) : élèves de la daara (`data-table` : recherche sans accents prénom / nom /
- * matricule, statut, tri), « Ajouter un élève » (saisie en série). Fiche : `:apprenantId`.
+ * matricule, statut, tri), « Ajouter un élève » (saisie en série), « Importer » (CSV, S4.4). Fiche : `:apprenantId`.
  */
 @Component({
     selector: 'app-apprenants-page',
@@ -18,7 +18,10 @@ import { Apprenant, ApprenantsService, StatutApprenant } from '../data/apprenant
     template: `
         <app-page-header [titre]="'apprenants.titre' | translate">
             @if (admin()) {
-                <button actions type="button" class="btn btn-primary" (click)="ajouter()">{{ 'apprenants.ajouter' | translate }}</button>
+                <div actions class="flex flex-wrap gap-2">
+                    <a class="btn btn-outline-primary" routerLink="import">{{ 'apprenants.importer' | translate }}</a>
+                    <button type="button" class="btn btn-primary" (click)="ajouter()">{{ 'apprenants.ajouter' | translate }}</button>
+                </div>
             }
         </app-page-header>
         <div class="panel">

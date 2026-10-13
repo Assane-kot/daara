@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { TranslatePipe } from '@ngx-translate/core';
 import { CurrentDaaraService } from '../../core/daara/current-daara.service';
 import { PageHeader } from '../../shared/ui/page-header/page-header';
+import { DemarrageGuide } from './demarrage-guide';
 
-// Page provisoire : les tableaux de bord par rôle arrivent au sprint 8.
+// Page provisoire : les tableaux de bord par rôle arrivent au sprint 8. Admin : démarrage guidé (S4.5).
 @Component({
     selector: 'app-dashboard-page',
-    imports: [TranslatePipe, PageHeader],
+    imports: [TranslatePipe, PageHeader, DemarrageGuide],
     template: `
         <app-page-header [titre]="courante.daara()?.nom ?? ('dashboard.titre' | translate)" />
         @if (message(); as message) {
@@ -16,6 +17,9 @@ import { PageHeader } from '../../shared/ui/page-header/page-header';
             >
                 {{ message | translate }}
             </div>
+        }
+        @if (courante.hasRole('admin')) {
+            <app-demarrage-guide />
         }
         <div class="panel">
             <p class="text-muted dark:text-night-muted">{{ 'dashboard.bienvenue' | translate }}</p>
