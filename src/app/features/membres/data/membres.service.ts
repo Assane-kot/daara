@@ -20,6 +20,8 @@ export interface Membre {
     readonly depuis: string;
     /** Membership de l'utilisateur connecté. */
     readonly moi: boolean;
+    /** Parent actif sans aucun enfant inscrit dans la daara (ne voit plus que l'historique de ses enfants). */
+    readonly ancienParent: boolean;
 }
 
 /** Erreur traduite de l'écran Membres (codes de `changer_role` / `definir_actif`, LLD §4). */
@@ -58,7 +60,7 @@ export class MembresService {
      * Page de membres pour `data-table` (S3.4, RPC `rechercher_membres`) : recherche sans accents sur le nom et le
      * téléphone, filtres rôle et état, tri rôle (par défaut) / nom / ancienneté, pagination et total côté serveur.
      */
-    async page(r: RequeteTable, role: RoleMembre | '', etat: 'actifs' | 'desactives' | 'tous'): Promise<PageTable<Membre>> {
+    async page(r: RequeteTable, role: RoleMembre | '', etat: 'actifs' | 'desactives' | 'tous' | 'anciens_parents'): Promise<PageTable<Membre>> {
         const tri = r.tri && ['nom', 'depuis'].includes(r.tri.cle) ? `${r.tri.desc ? '-' : ''}${r.tri.cle}` : 'role';
         const { data, error } = await this.sb.rpc('rechercher_membres', {
             p_daara: this.daaraId(),
@@ -84,6 +86,7 @@ export class MembresService {
                 telephone: m.telephone,
                 depuis: m.depuis,
                 moi: m.user_id === moi,
+                ancienParent: m.ancien_parent,
             })),
             total: Number(data[0]?.total ?? 0),
         };

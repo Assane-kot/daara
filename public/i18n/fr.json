@@ -147,7 +147,7 @@
             "titre": "Vérifiez votre boîte mail",
             "intro": "Si cette adresse peut être utilisée, un code à 6 chiffres vient d’y être envoyé. Il reste valable 30 minutes.",
             "intro_email": "Saisissez votre adresse et le code à 6 chiffres reçu par e-mail. Il reste valable 30 minutes.",
-            "bouton": "Confirmer",
+            "bouton": "Confirmer mon adresse",
             "renvoyer": "Renvoyer le code",
             "renvoyer_dans": "Renvoyer le code dans {{secondes}} s",
             "renvoye": "Si l’adresse est en attente de confirmation, un nouveau code vient d’être envoyé.",
@@ -385,7 +385,8 @@
             "etat": "Filtrer par état",
             "actifs": "Actifs",
             "desactives": "Désactivés",
-            "tous": "Tous"
+            "tous": "Tous",
+            "anciens_parents": "Anciens parents (aucun enfant inscrit)"
         },
         "colonnes": {
             "nom": "Nom",
@@ -396,7 +397,9 @@
         },
         "etat": {
             "actif": "Actif",
-            "desactive": "Désactivé"
+            "desactive": "Désactivé",
+            "ancien_parent": "Ancien parent",
+            "ancien_parent_aide": "Ces parents n’ont plus aucun enfant inscrit : ils ne voient plus que l’historique de leurs enfants, rien de l’école. Désactivez leur compte s’ils n’en ont plus besoin."
         },
         "vide": {
             "titre": "Aucun membre ne correspond",
@@ -484,15 +487,16 @@
         },
         "actions": {
             "renvoyer": "Renvoyer",
-            "revoquer": "Révoquer"
+            "revoquer": "Retirer l’invitation"
         },
         "confirmer": {
-            "titre": "Révoquer l’invitation de {{nom}} ?",
+            "titre": "Retirer l’invitation de {{nom}} ?",
             "message": "Le lien ne fonctionnera plus. Vous pourrez inviter à nouveau cette personne."
         },
         "vide": {
             "titre": "Aucune invitation en attente",
-            "message": "Cliquez sur « Inviter » pour ajouter un enseignant, un parent ou un administrateur."
+            "message": "Invitez un enseignant, un parent ou un administrateur : il reçoit un lien par WhatsApp ou par e-mail.",
+            "action": "Inviter un membre"
         },
         "erreurs": {
             "chargement": "Les invitations n’ont pas pu être chargées.",
@@ -505,7 +509,8 @@
             "contact_invalide": "Indiquez un e-mail ou un téléphone.",
             "reseau": "Connexion impossible au serveur. Vérifiez votre connexion Internet.",
             "inattendue": "L’invitation n’a pas pu être créée. Réessayez."
-        }
+        },
+        "revoquee_ok": "Invitation retirée : le lien ne fonctionne plus."
     },
     "invitation": {
         "surtitre": "Invitation",
@@ -640,7 +645,8 @@
             "vide_message": "Créez votre première année scolaire, puis ses périodes.",
             "confirmer_suppression": "Supprimer l’année {{libelle}} ?",
             "confirmer_suppression_message": "Ses périodes et ses classes seront supprimées aussi.",
-            "supprimee": "Année supprimée."
+            "supprimee": "Année supprimée.",
+            "creer_premiere": "Créer la première année scolaire"
         },
         "periodes": {
             "titre": "Périodes",
@@ -708,7 +714,8 @@
             "confirmer_suppression_message": "Elle sera supprimée du catalogue. Une matière utilisée dans une classe ne peut pas être supprimée : archivez-la.",
             "vide_titre": "Aucune matière",
             "vide_message": "Créez les matières enseignées dans votre daara (scolaires, Coran, religieuses).",
-            "rechercher": "Rechercher une matière (nom, code)"
+            "rechercher": "Rechercher une matière (nom, code)",
+            "creer_premiere": "Créer la première matière"
         },
         "classes": {
             "annee": "Année scolaire",
@@ -729,9 +736,11 @@
             "vide_titre": "Aucune classe",
             "vide_message": "Créez les classes de cette année.",
             "sans_annee_titre": "Aucune année scolaire",
-            "sans_annee_message": "Créez d’abord une année scolaire (onglet Années).",
+            "sans_annee_message": "Les classes appartiennent à une année scolaire : créez-la d’abord.",
             "rechercher": "Rechercher une classe (nom, niveau)",
-            "matieres": "Matières"
+            "matieres": "Matières",
+            "creer_annee": "Créer l’année scolaire",
+            "creer_premiere": "Créer la première classe"
         },
         "affectations": {
             "titre": "Matières enseignées",
@@ -748,7 +757,8 @@
             "confirmer_retrait": "Retirer {{nom}} de la classe ?",
             "confirmer_retrait_message": "La matière ne sera plus enseignée dans cette classe.",
             "vide_titre": "Aucune matière",
-            "vide_message": "Ajoutez les matières enseignées dans cette classe."
+            "vide_message": "Ajoutez les matières enseignées dans cette classe.",
+            "ajouter_premiere": "Ajouter la première matière"
         }
     },
     "table": {

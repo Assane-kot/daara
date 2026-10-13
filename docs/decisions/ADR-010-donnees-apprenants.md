@@ -26,6 +26,18 @@ Statut : acceptée (2026-10-09) · Mise en œuvre : sprint 4 (fiches, journal), 
 6. **Comptes apprenants** (connexion des élèves) : reportés au sprint 9 (récitations) ; d'ici là, `apprenants.user_id`
    reste nul.
 7. **Pas de données d'enfant** dans les journaux applicatifs, Sentry ni les messages d'erreur (règle de sécurité).
+8. **Durée des accès** (décision du développeur, 2026-10-13, audit de fin de sprint 4) :
+   - **enseignant** : fiche et photo d'un élève seulement s'il est inscrit (statut `inscrit`) dans une de ses classes de
+     l'**année active** ; plus d'accès aux élèves des années passées ni aux élèves partis (`enseigne_apprenant`) ;
+   - **parent** : accès à son enfant **sans limite de temps** (années passées, enfant parti : anciens bulletins,
+     historique des absences), tant que le lien existe et que son compte est actif ; l'admin ferme l'accès en retirant le
+     lien ou en désactivant le compte. Une coupure après le départ de l'enfant pourra être revue avec les pilotes.
+9. **Ancien parent** (décision du développeur, 2026-10-13) : un parent dont aucun enfant n'est inscrit dans la daara
+   (tous partis, liens retirés, ou parent invité pas encore relié) garde son compte et l'historique de ses enfants, mais ne
+   voit plus rien de ce qui concerne toute l'école (`membre_actuel` au lieu de `is_member` : années, périodes, matières,
+   puis annonces, notifications, calendrier). Il redevient parent actuel dès qu'un de ses enfants est inscrit ou relié.
+   L'admin le repère dans Membres (badge « Ancien parent », filtre) et peut le désactiver. Sprint 12 : désactivation
+   automatique après 12 mois sans enfant inscrit, avec avis à l'admin (délai à confirmer avec les pilotes).
 
 ## Conséquences
 + Exposition limitée en cas de fuite ; conformité plus simple (CDP).

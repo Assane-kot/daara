@@ -271,8 +271,9 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 | `session_suffisante()` (sprint 2) | session `aal2`, **ou** utilisateur sans facteur TOTP vérifié (lecture de `auth.mfa_factors`) : qui a activé la double authentification doit l'utiliser pour tout accès à une daara et pour modifier son profil (`profiles_update_soi`, S2.7 ; exécutable par `authenticated` depuis, ne renseigne que sur sa propre session) |
 | `is_member(daara_id)` | membre actif de la daara et `session_suffisante()` |
 | `has_role(daara_id, roles[])` | membre actif avec un des rôles et `session_suffisante()` ; pour `admin`, exige `aal2` dans tous les cas (ADR-006) |
+| `parent_actuel(daara)` / `membre_actuel(daara)` (2026-10-13, ADR-010 §9) | parent actif ayant au moins un enfant **inscrit** dans la daara / admin, enseignant, apprenant ou parent actuel : toute lecture « pour toute l'école » (années, périodes, matières ; annonces, notifications, calendrier à venir) passe par `membre_actuel`, jamais `is_member` ; `rechercher_membres` renvoie `ancien_parent` et accepte le filtre `anciens_parents` |
 | `is_parent_of(apprenant_id)` (S4.3) | lien dans `parent_links` pour `auth.uid()`, membre actif `parent` de la daara de l'enfant, `session_suffisante()` |
-| `enseigne_apprenant(apprenant_id)` (S4.2) | enseignant actif qui `teaches_class` la classe d'une inscription de l'enfant (année active ou toutes années : toutes) |
+| `enseigne_apprenant(apprenant_id)` (S4.2) | enseignant actif qui `teaches_class` la classe d'une inscription de l'enfant dans l'**année active**, enfant au statut `inscrit` (ADR-010 §8, 2026-10-13) ; le parent (`is_parent_of`) n'a pas de limite de temps |
 | `teaches_class(classe_id)` (S3.3) | membre actif `enseignant` de la daara (`has_role`), titulaire de la classe ou affecté à une de ses `classe_matieres` ; faux si le module `structure` est inactif |
 | `membres_administres()` → setof uuid | membres **actifs** des daaras dont l'appelant est admin actif (`aal2`) ; lecture des profils via `id in (select membres_administres())`, évalué une fois par requête. Un membre désactivé n'est plus lisible (minimisation) |
 | `is_platform_admin()` | présent dans `platform_admins` **et** session en `aal2` (ADR-006) |
@@ -339,7 +340,7 @@ d'oracle), `22023 role_invalide`, `23505 role_deja_attribue`, `23514 dernier_adm
 ### Structure scolaire (sprint 3) : politiques
 | Table | Lecture | Écriture (insert / update / delete) |
 |---|---|---|
-| `annees_scolaires`, `periodes`, `matieres` | `is_member(daara_id)` et `module_actif(daara_id, 'structure')` | `has_role(daara_id, admin)` et module actif, `with check` identique (le `daara_id` écrit est vérifié) ; `annees_scolaires.active` exclue des droits par colonne |
+| `annees_scolaires`, `periodes`, `matieres` | `membre_actuel(daara_id)` (2026-10-13 : pas l'ancien parent) et `module_actif(daara_id, 'structure')` | `has_role(daara_id, admin)` et module actif, `with check` identique (le `daara_id` écrit est vérifié) ; `annees_scolaires.active` exclue des droits par colonne |
 | `classes`, `classe_matieres` | `has_role(daara_id, [admin, enseignant])` et module actif | admin et module actif, comme ci-dessus |
 Une politique par opération et par profil. Erreurs : `42501` (droits, RLS), `23505` (doublon : libellé, ordre, code,
 nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `autre_daara`, `enseignant_invalide`,

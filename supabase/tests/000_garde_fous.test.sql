@@ -151,7 +151,7 @@ select set_eq(
           and has_function_privilege('authenticated', p.oid, 'execute')
           and not exists (select 1 from pg_depend d where d.objid = p.oid and d.deptype = 'e')
     $$,
-    array['accepter_invitation', 'activer_annee', 'basculer_module', 'changer_role', 'classe_d_un_enfant', 'creer_code_acces', 'creer_daara', 'creer_invitation', 'definir_actif', 'definir_modules', 'enseignants_daara', 'enseigne_apprenant', 'has_role', 'importer_apprenants', 'is_member', 'is_parent_of', 'is_platform_admin', 'libelle_valide', 'membres_administres', 'module_actif', 'photo_apprenant_administree', 'photo_apprenant_lisible', 'rattacher_enfant_invitation', 'rechercher_membres', 'revoquer_invitation', 'sans_accents', 'session_suffisante', 'teaches_class', 'texte_sur'],
+    array['accepter_invitation', 'activer_annee', 'basculer_module', 'changer_role', 'classe_d_un_enfant', 'creer_code_acces', 'creer_daara', 'creer_invitation', 'definir_actif', 'definir_modules', 'enseignants_daara', 'enseigne_apprenant', 'has_role', 'importer_apprenants', 'is_member', 'is_parent_of', 'is_platform_admin', 'libelle_valide', 'membre_actuel', 'membres_administres', 'module_actif', 'parent_actuel', 'photo_apprenant_administree', 'photo_apprenant_lisible', 'rattacher_enfant_invitation', 'rechercher_membres', 'revoquer_invitation', 'sans_accents', 'session_suffisante', 'teaches_class', 'texte_sur'],
     'Seules les fonctions de la liste blanche sont exécutables par authenticated'
 );
 

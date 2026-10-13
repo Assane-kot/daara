@@ -13,8 +13,7 @@
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
 - Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
-- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) ; une décision attendue (accès des enseignants,
-  « Problèmes ouverts »). Sprint suivant : 5 — Absences et espace parent (planification à faire). **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint suivant : 5 — Absences et espace parent (planification à faire). **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -69,12 +68,10 @@
     droits aussi lors du `on delete set null` (suppression d'un compte) : une suppression de compte faite en session
     utilisateur non admin serait refusée (sans effet en service_role) → à prendre en compte dans la purge CDP (sprint 12).
   - Audit de fin de sprint 4 (2026-10-13), points ouverts :
-    - **décision du développeur** : `enseigne_apprenant` donne à un enseignant la fiche et la photo de tout élève inscrit un
-      jour dans une de ses classes, toutes années et élèves partis compris → limiter à l'année active (recommandé, ADR-010
-      minimisation) ou garder l'historique et l'écrire dans ADR-010 ;
     - export CSV / PDF (sprint 7 ou avant) : neutraliser `= + - @`, tabulation et retour chariot en tête de cellule (les noms
       importés sont stockés tels quels) ;
-    - sprint 12 : purge planifiée des `invitation_enfants` des invitations expirées (acceptées et retirées : purgées).
+    - sprint 12 : purge planifiée des `invitation_enfants` des invitations expirées (acceptées et retirées : purgées) ;
+      désactivation automatique des anciens parents après 12 mois sans enfant inscrit, avec avis à l'admin (ADR-010 §9).
   - Audit RLS S3.1 (2026-10-09) : la contrainte « caractères interdits » du socle (`daaras`, `profiles`, `invitations`)
     laisse passer U+061C (marque de lettre arabe), U+034F, U+180E, U+2028, U+2029 ; `texte_sur` (S3.1) les refuse →
     aligner les contraintes du socle sur `texte_sur` dans une migration (avant les libellés en arabe).
@@ -191,7 +188,16 @@ vers Sentry. Corrigés :
 - migration `corrections_sprint4` : import borné à 1 Mo et nom de classe à 100 caractères ; enfants rattachés à une
   invitation acceptée ou retirée effacés par un trigger **différé** (« Renvoyer » retire l'ancienne invitation avant d'en
   reporter les enfants) ; 4 tests pgTAP (665 ; `set constraints all immediate` pour déclencher la purge dans le test).
-Ouverts : voir « Problèmes ouverts » (accès des enseignants à décider, neutralisation à l'export, purge des expirées).
+Décision du développeur (2026-10-13) sur le 5e constat : **enseignants limités à l'année active** (élèves inscrits de leurs
+classes de l'année active, plus les partis), **parents sans limite** de temps → migration `enseignant_annee_active`
+(`enseigne_apprenant` recréée ; politiques et photos suivent), ADR-010 §8, LLD ; 3 tests pgTAP (changement d'année et
+élève parti côté enseignant, enfant parti sans année active côté parent ; 668 au total).
+Décision du développeur (2026-10-13) : **ancien parent** (aucun enfant inscrit) → garde son compte et l'historique de
+ses enfants, ne voit plus rien de l'école → migration `parents_actuels` : `parent_actuel` / `membre_actuel` (lecture des
+années, périodes, matières ; règle ajoutée à `supabase-rls.md` pour les annonces et notifications à venir),
+`rechercher_membres` avec `ancien_parent` et le filtre `anciens_parents` ; Membres : badge « Ancien parent », filtre et
+explication ; ADR-010 §9, LLD ; 3 tests pgTAP (671).
+Ouverts : voir « Problèmes ouverts » (neutralisation à l'export, purge des expirées, désactivation automatique).
 
 **Objectif** : une classe remplie avec ses parents invités. **Atteint en local** (navigateur + pgTAP).
 
@@ -205,7 +211,7 @@ Ouverts : voir « Problèmes ouverts » (accès des enseignants à décider, neu
 | S4.5 Démarrage guidé de l'admin | Fait |
 | S4.6 Revue ergonomique des sprints 1 à 3 | Fait |
 
-**Chiffres** : 665 tests pgTAP (577 au sprint 3) ; 264 tests unitaires (242) ; chargement initial 151,0 kB (150,7) ; 1 ADR
+**Chiffres** : 671 tests pgTAP (577 au sprint 3) ; 264 tests unitaires (242) ; chargement initial 151,0 kB (150,7) ; 1 ADR
 (010) ; aucun paquet npm ajouté (analyse CSV maison).
 
 **Ce qui a bien marché** : la règle d'ergonomie écrite (`ux.md`) dès S4.0, appliquée puis vérifiée à chaque story ; le

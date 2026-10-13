@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(13);
+select plan(14);
 
 create schema tests;
 grant usage on schema tests to authenticated, anon;
@@ -59,6 +59,10 @@ select results_eq(
     $$ values ('Awa Fall'::text, 4::bigint), ('Émile Ndiaye', 4) $$, 'pagination : décalage et limite, total de la recherche');
 select is((select count(*)::int from public.rechercher_membres('00000000-0000-0000-0000-0000000d000a', '%', null, 'tous', 'role', 0, 20)), 0,
     'caractère % neutralisé (pas de joker)');
+select results_eq(
+    $$ select user_id, ancien_parent from public.rechercher_membres('00000000-0000-0000-0000-0000000d000a', '', null, 'anciens_parents', 'role', 0, 20) $$,
+    $$ values ('00000000-0000-0000-0000-00000000d0c1'::uuid, true) $$,
+    'filtre « anciens parents » : parent actif sans enfant inscrit (le parent désactivé n''y est pas)');
 select throws_ok($$ select * from public.rechercher_membres('00000000-0000-0000-0000-0000000d000a', '', null, 'tous', 'role', 0, 500) $$,
     '22023', 'parametre_invalide', 'limite > 100 : refusée');
 

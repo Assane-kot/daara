@@ -31,4 +31,7 @@ paths:
 - Table d'un module (ADR-008 : structure, absences, notes, bulletins, coran_*, notifications) : ajouter
   `(select public.module_actif(daara_id, '<module>'))` à TOUTES ses politiques, lecture comprise, et un test
   pgTAP « module désactivé » (lecture et écriture refusées, même pour l'admin ; données retrouvées après réactivation).
+- Lecture « pour tous les membres de l'école » (structure, annonces, notifications, calendrier…) : `membre_actuel(daara_id)`,
+  jamais `is_member` (un ancien parent, sans enfant inscrit, ne la voit pas : ADR-010 §9). `is_member` reste pour la daara
+  elle-même, ses modules et ce qui est personnel.
 - Calculs (moyennes, rangs) : vues `security_invoker = true` ou fonctions SQL, jamais dupliqués côté front.

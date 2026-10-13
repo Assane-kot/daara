@@ -13,7 +13,7 @@ import { CarteTable, CelluleTable, ColonneTable, DataTable, PageTable, RequeteTa
 import { CodeAccesDialogService } from '../../components/code-acces-dialog';
 import { ErreurMembres, Membre, MembresService, ROLES_ATTRIBUABLES } from '../../data/membres.service';
 
-export type FiltreEtat = 'actifs' | 'desactives' | 'tous';
+export type FiltreEtat = 'actifs' | 'desactives' | 'tous' | 'anciens_parents';
 
 export const VARIANTE_ROLE: Record<RoleMembre, BadgeVariante> = { admin: 'secondary', enseignant: 'primary', parent: 'info', apprenant: 'dark' };
 
@@ -43,7 +43,7 @@ export class MembresPage {
     protected readonly filtreRole = signal<RoleMembre | ''>('');
     protected readonly filtreEtat = signal<FiltreEtat>('actifs');
     protected readonly roles: readonly RoleMembre[] = ['admin', 'enseignant', 'parent', 'apprenant'];
-    protected readonly etats: readonly FiltreEtat[] = ['actifs', 'desactives', 'tous'];
+    protected readonly etats: readonly FiltreEtat[] = ['actifs', 'anciens_parents', 'desactives', 'tous'];
     protected readonly colonnes: readonly ColonneTable[] = [
         { cle: 'nom', libelle: 'membres.colonnes.nom', triable: true },
         { cle: 'role', libelle: 'membres.colonnes.role' },

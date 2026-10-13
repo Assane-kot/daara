@@ -13,6 +13,9 @@
         </div>
     }
 
+    @if (filtreEtat() === 'anciens_parents') {
+        <p class="mb-4 text-muted dark:text-night-muted">{{ 'membres.etat.ancien_parent_aide' | translate }}</p>
+    }
     <app-data-table
         [colonnes]="colonnes"
         [chargeur]="chargeur"
@@ -56,6 +59,9 @@
             <app-badge [variante]="membre.actif ? 'success' : 'dark'">{{
                 (membre.actif ? 'membres.etat.actif' : 'membres.etat.desactive') | translate
             }}</app-badge>
+            @if (membre.ancienParent) {
+                <app-badge variante="warning" class="ltr:ml-1.5 rtl:mr-1.5">{{ 'membres.etat.ancien_parent' | translate }}</app-badge>
+            }
         </ng-template>
         <ng-template appCellule="depuis" let-membre>{{ date(membre.depuis) }}</ng-template>
         <ng-template appCellule="actions" let-membre>
@@ -79,6 +85,9 @@
                         <app-badge [variante]="membre.actif ? 'success' : 'dark'">{{
                             (membre.actif ? 'membres.etat.actif' : 'membres.etat.desactive') | translate
                         }}</app-badge>
+                        @if (membre.ancienParent) {
+                            <app-badge variante="warning">{{ 'membres.etat.ancien_parent' | translate }}</app-badge>
+                        }
                     </div>
                 </div>
                 <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: membre }" />

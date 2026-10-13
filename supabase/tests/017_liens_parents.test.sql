@@ -5,7 +5,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(25);
+select plan(26);
 
 create schema tests;
 grant usage on schema tests to authenticated;
@@ -126,7 +126,14 @@ select results_eq($$ select prenom from public.apprenants order by prenom $$, $$
 reset role;
 select is((select count(*)::int from public.invitation_enfants where daara_id = '00000000-0000-0000-0000-00000000170a'), 0,
     'invitation acceptée : enfants rattachés effacés (liens créés)');
+-- Décision du 2026-10-13 (ADR-010) : le parent garde son enfant sans limite de temps (élève parti, aucune année active).
+select set_config('request.jwt.claims', '', true);
+update public.apprenants set statut = 'parti' where id = '00000000-0000-0000-0000-0000000017e8';
+update public.annees_scolaires set active = false where daara_id = '00000000-0000-0000-0000-00000000170a';
 set local role authenticated;
+select tests.connecter('00000000-0000-0000-0000-0000000017d1', 'aal1');
+select results_eq($$ select prenom from public.apprenants order by prenom $$, $$ values ('Awa'::text), ('Bineta'::text) $$,
+    'parent : enfant parti toujours visible, sans année active');
 
 -- Parent désactivé : plus rien.
 reset role;

@@ -9,7 +9,17 @@ describe('MembresService', () => {
     const auth = { user: vi.fn(), rechargerDaaraCourante: vi.fn() };
     const client = { rpc: vi.fn() };
 
-    const membre = (moi: boolean): Membre => ({ id: 'm-1', userId: 'u-1', role: 'admin', actif: true, nom: 'Awa Diop', telephone: null, depuis: '', moi });
+    const membre = (moi: boolean): Membre => ({
+        id: 'm-1',
+        userId: 'u-1',
+        role: 'admin',
+        actif: true,
+        nom: 'Awa Diop',
+        telephone: null,
+        depuis: '',
+        moi,
+        ancienParent: false,
+    });
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -37,8 +47,8 @@ describe('MembresService', () => {
     it('page de membres : paramètres de la RPC (tri, filtres, pagination) et « moi »', async () => {
         client.rpc.mockResolvedValueOnce({
             data: [
-                { id: 'm-1', user_id: 'u-1', role: 'admin', actif: true, nom: 'Awa Diop', telephone: '77', depuis: 't1', total: 12 },
-                { id: 'm-2', user_id: 'u-2', role: 'parent', actif: false, nom: 'Fatou Ndiaye', telephone: null, depuis: 't2', total: 12 },
+                { id: 'm-1', user_id: 'u-1', role: 'admin', actif: true, nom: 'Awa Diop', telephone: '77', depuis: 't1', ancien_parent: false, total: 12 },
+                { id: 'm-2', user_id: 'u-2', role: 'parent', actif: false, nom: 'Fatou Ndiaye', telephone: null, depuis: 't2', ancien_parent: true, total: 12 },
             ],
             error: null,
         });
@@ -54,9 +64,9 @@ describe('MembresService', () => {
             p_limite: 5,
         });
         expect(page.total).toBe(12);
-        expect(page.lignes.map((m) => [m.nom, m.moi])).toEqual([
-            ['Awa Diop', true],
-            ['Fatou Ndiaye', false],
+        expect(page.lignes.map((m) => [m.nom, m.moi, m.ancienParent])).toEqual([
+            ['Awa Diop', true, false],
+            ['Fatou Ndiaye', false, true],
         ]);
     });
 

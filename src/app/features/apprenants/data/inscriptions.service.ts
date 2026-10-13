@@ -52,7 +52,11 @@ export class InscriptionsService {
     private readonly courante = inject(CurrentDaaraService);
 
     async eleves(classeId: string): Promise<EleveInscrit[]> {
-        const { data, error } = await this.sb.from('inscriptions').select('id, apprenant_id, apprenants(nom, prenom, matricule)').eq('classe_id', classeId);
+        // `!inner` : seulement les élèves lisibles (un enseignant ne lit plus ceux d'une classe d'une année passée, ADR-010 §8).
+        const { data, error } = await this.sb
+            .from('inscriptions')
+            .select('id, apprenant_id, apprenants!inner(nom, prenom, matricule)')
+            .eq('classe_id', classeId);
         if (error) {
             throw erreurInscriptions(error);
         }

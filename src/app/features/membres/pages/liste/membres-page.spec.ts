@@ -22,6 +22,7 @@ describe('MembresPage', () => {
         telephone: null,
         depuis: '2026-10-05T10:00:00Z',
         moi,
+        ancienParent: false,
     });
     const membres = [
         m('1', 'Awa Diop', 'admin', true, true),

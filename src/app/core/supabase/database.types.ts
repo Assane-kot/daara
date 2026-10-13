@@ -944,10 +944,12 @@ export type Database = {
                     isSetofReturn: false;
                 };
             };
+            membre_actuel: { Args: { p_daara: string }; Returns: boolean };
             membres_administres: { Args: Record<PropertyKey, never>; Returns: string[] };
             module_actif: { Args: { p_daara: string; p_module: Database['public']['Enums']['module_daara'] }; Returns: boolean };
             modules_valides: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: boolean };
             normaliser_code_acces: { Args: { p_code: string }; Returns: string };
+            parent_actuel: { Args: { p_daara: string }; Returns: boolean };
             photo_apprenant_administree: { Args: { p_nom: string }; Returns: boolean };
             photo_apprenant_lisible: { Args: { p_nom: string }; Returns: boolean };
             prerequis_module: { Args: { p_module: Database['public']['Enums']['module_daara'] }; Returns: Database['public']['Enums']['module_daara'][] };
@@ -967,6 +969,7 @@ export type Database = {
                 };
                 Returns: {
                     actif: boolean;
+                    ancien_parent: boolean;
                     depuis: string;
                     id: string;
                     nom: string;

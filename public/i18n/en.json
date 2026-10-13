@@ -147,7 +147,7 @@
             "titre": "Check your inbox",
             "intro": "If this address can be used, a 6-digit code has just been sent to it. It is valid for 30 minutes.",
             "intro_email": "Enter your address and the 6-digit code received by email. It is valid for 30 minutes.",
-            "bouton": "Confirm",
+            "bouton": "Confirm my address",
             "renvoyer": "Resend the code",
             "renvoyer_dans": "Resend the code in {{secondes}} s",
             "renvoye": "If the address is awaiting confirmation, a new code has just been sent.",
@@ -385,7 +385,8 @@
             "etat": "Filter by status",
             "actifs": "Active",
             "desactives": "Deactivated",
-            "tous": "All"
+            "tous": "All",
+            "anciens_parents": "Former parents (no child enrolled)"
         },
         "colonnes": {
             "nom": "Name",
@@ -396,7 +397,9 @@
         },
         "etat": {
             "actif": "Active",
-            "desactive": "Deactivated"
+            "desactive": "Deactivated",
+            "ancien_parent": "Former parent",
+            "ancien_parent_aide": "These parents no longer have any child enrolled: they only see their children’s history, nothing about the school. Deactivate their account if no longer needed."
         },
         "vide": {
             "titre": "No matching member",
@@ -484,15 +487,16 @@
         },
         "actions": {
             "renvoyer": "Resend",
-            "revoquer": "Revoke"
+            "revoquer": "Withdraw the invitation"
         },
         "confirmer": {
-            "titre": "Revoke {{nom}}’s invitation?",
+            "titre": "Withdraw {{nom}}’s invitation?",
             "message": "The link will stop working. You can invite this person again."
         },
         "vide": {
             "titre": "No pending invitation",
-            "message": "Click “Invite” to add a teacher, a parent or an administrator."
+            "message": "Invite a teacher, a parent or an administrator: they receive a link by WhatsApp or email.",
+            "action": "Invite a member"
         },
         "erreurs": {
             "chargement": "The invitations could not be loaded.",
@@ -505,7 +509,8 @@
             "contact_invalide": "Enter an email or a phone number.",
             "reseau": "Cannot reach the server. Check your Internet connection.",
             "inattendue": "The invitation could not be created. Please try again."
-        }
+        },
+        "revoquee_ok": "Invitation withdrawn: the link no longer works."
     },
     "invitation": {
         "surtitre": "Invitation",
@@ -640,7 +645,8 @@
             "vide_message": "Create your first school year, then its terms.",
             "confirmer_suppression": "Delete the year {{libelle}}?",
             "confirmer_suppression_message": "Its terms and classes will be deleted too.",
-            "supprimee": "Year deleted."
+            "supprimee": "Year deleted.",
+            "creer_premiere": "Create the first school year"
         },
         "periodes": {
             "titre": "Terms",
@@ -708,7 +714,8 @@
             "confirmer_suppression_message": "It will be removed from the catalogue. A subject used in a class cannot be deleted: archive it.",
             "vide_titre": "No subject",
             "vide_message": "Create the subjects taught in your daara (school, Quran, religious).",
-            "rechercher": "Search a subject (name, code)"
+            "rechercher": "Search a subject (name, code)",
+            "creer_premiere": "Create the first subject"
         },
         "classes": {
             "annee": "School year",
@@ -729,9 +736,11 @@
             "vide_titre": "No class",
             "vide_message": "Create the classes of this year.",
             "sans_annee_titre": "No school year",
-            "sans_annee_message": "First create a school year (Years tab).",
+            "sans_annee_message": "Classes belong to a school year: create it first.",
             "rechercher": "Search a class (name, level)",
-            "matieres": "Subjects"
+            "matieres": "Subjects",
+            "creer_annee": "Create the school year",
+            "creer_premiere": "Create the first class"
         },
         "affectations": {
             "titre": "Subjects taught",
@@ -748,7 +757,8 @@
             "confirmer_retrait": "Remove {{nom}} from the class?",
             "confirmer_retrait_message": "The subject will no longer be taught in this class.",
             "vide_titre": "No subject",
-            "vide_message": "Add the subjects taught in this class."
+            "vide_message": "Add the subjects taught in this class.",
+            "ajouter_premiere": "Add the first subject"
         }
     },
     "table": {

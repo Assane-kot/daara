@@ -5,7 +5,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(20);
+select plan(22);
 
 create schema tests;
 grant usage on schema tests to authenticated;
@@ -30,10 +30,10 @@ insert into public.memberships (daara_id, user_id, role) values
     ('00000000-0000-0000-0000-00000000100a', '00000000-0000-0000-0000-0000000010e1', 'enseignant'),
     ('00000000-0000-0000-0000-00000000100a', '00000000-0000-0000-0000-0000000010e2', 'enseignant'),
     ('00000000-0000-0000-0000-00000000100b', '00000000-0000-0000-0000-0000000010b1', 'admin');
-insert into public.annees_scolaires (id, daara_id, libelle, date_debut, date_fin) values
-    ('00000000-0000-0000-0000-000000001100', '00000000-0000-0000-0000-00000000100a', '2026-2027', '2026-10-01', '2027-07-31'),
-    ('00000000-0000-0000-0000-000000001200', '00000000-0000-0000-0000-00000000100a', '2027-2028', '2027-10-01', '2028-07-31'),
-    ('00000000-0000-0000-0000-000000001300', '00000000-0000-0000-0000-00000000100b', '2026-2027', '2026-10-01', '2027-07-31');
+insert into public.annees_scolaires (id, daara_id, libelle, date_debut, date_fin, active) values
+    ('00000000-0000-0000-0000-000000001100', '00000000-0000-0000-0000-00000000100a', '2026-2027', '2026-10-01', '2027-07-31', true),
+    ('00000000-0000-0000-0000-000000001200', '00000000-0000-0000-0000-00000000100a', '2027-2028', '2027-10-01', '2028-07-31', false),
+    ('00000000-0000-0000-0000-000000001300', '00000000-0000-0000-0000-00000000100b', '2026-2027', '2026-10-01', '2027-07-31', true);
 insert into public.classes (id, daara_id, annee_id, nom, titulaire_id) values
     ('00000000-0000-0000-0000-0000000011c1', '00000000-0000-0000-0000-00000000100a', '00000000-0000-0000-0000-000000001100', 'C1', '00000000-0000-0000-0000-0000000010e1'),
     ('00000000-0000-0000-0000-0000000011c2', '00000000-0000-0000-0000-00000000100a', '00000000-0000-0000-0000-000000001100', 'C2', null),
@@ -92,6 +92,29 @@ select throws_ok($$ insert into public.inscriptions (daara_id, apprenant_id, cla
 select tests.connecter('00000000-0000-0000-0000-0000000010e2');
 select is((select count(*)::int from public.apprenants) + (select count(*)::int from storage.objects where bucket_id = 'photos'), 0,
     'enseignant sans classe : ni élève ni photo');
+
+-- Décision du 2026-10-13 (ADR-010) : l'enseignant ne lit que les élèves inscrits de ses classes de l'année active.
+reset role;
+select set_config('request.jwt.claims', '', true);
+update public.annees_scolaires set active = false where id = '00000000-0000-0000-0000-000000001100';
+update public.annees_scolaires set active = true where id = '00000000-0000-0000-0000-000000001200';
+set local role authenticated;
+select tests.connecter('00000000-0000-0000-0000-0000000010e1');
+select is((select count(*)::int from public.apprenants) + (select count(*)::int from storage.objects where bucket_id = 'photos'), 0,
+    'changement d''année : l''enseignant ne lit plus les élèves de sa classe de l''an passé (ni leur photo)');
+reset role;
+select set_config('request.jwt.claims', '', true);
+update public.annees_scolaires set active = false where id = '00000000-0000-0000-0000-000000001200';
+update public.annees_scolaires set active = true where id = '00000000-0000-0000-0000-000000001100';
+update public.apprenants set statut = 'parti' where id = '00000000-0000-0000-0000-0000000014a1';
+set local role authenticated;
+select tests.connecter('00000000-0000-0000-0000-0000000010e1');
+select is((select count(*)::int from public.apprenants) + (select count(*)::int from storage.objects where bucket_id = 'photos'), 0,
+    'élève parti : l''enseignant ne lit plus sa fiche ni sa photo');
+reset role;
+select set_config('request.jwt.claims', '', true);
+update public.apprenants set statut = 'inscrit' where id = '00000000-0000-0000-0000-0000000014a1';
+set local role authenticated;
 
 -- Autre daara.
 select tests.connecter('00000000-0000-0000-0000-0000000010b1');

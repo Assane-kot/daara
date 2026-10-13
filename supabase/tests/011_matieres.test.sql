@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(25);
+select plan(26);
 
 create schema tests;
 grant usage on schema tests to authenticated, anon;
@@ -31,6 +31,10 @@ insert into public.memberships (daara_id, user_id, role) values
     ('00000000-0000-0000-0000-0000000b000a', '00000000-0000-0000-0000-00000000b0e1', 'enseignant'),
     ('00000000-0000-0000-0000-0000000b000a', '00000000-0000-0000-0000-00000000b0c1', 'parent'),
     ('00000000-0000-0000-0000-0000000b000b', '00000000-0000-0000-0000-00000000b0b1', 'admin');
+
+-- Parent actuel : un enfant inscrit relié (décision du 2026-10-13 : l'ancien parent ne lit plus ce qui concerne l'école).
+insert into public.apprenants (id, daara_id, nom, prenom, sexe) values ('00000000-0000-0000-0000-00000000be01', '00000000-0000-0000-0000-0000000b000a', 'Ndiaye', 'Awa', 'F');
+insert into public.parent_links (daara_id, parent_user_id, apprenant_id, lien) values ('00000000-0000-0000-0000-0000000b000a', '00000000-0000-0000-0000-00000000b0c1', '00000000-0000-0000-0000-00000000be01', 'mere');
 
 set local role authenticated;
 
@@ -81,6 +85,16 @@ select tests.connecter('00000000-0000-0000-0000-00000000b0e1');
 select is((select nom from public.matieres), 'Mathématiques', 'enseignant : lit la matière, intacte malgré les écritures refusées');
 select tests.connecter('00000000-0000-0000-0000-00000000b0c1', 'aal1');
 select is((select count(*)::int from public.matieres), 1, 'parent : lit les matières');
+reset role;
+select set_config('request.jwt.claims', '', true);
+update public.apprenants set statut = 'parti' where id = '00000000-0000-0000-0000-00000000be01';
+set local role authenticated;
+select tests.connecter('00000000-0000-0000-0000-00000000b0c1', 'aal1');
+select is((select count(*)::int from public.matieres), 0, 'ancien parent (plus d''enfant inscrit) : ne lit plus les matières');
+reset role;
+select set_config('request.jwt.claims', '', true);
+update public.apprenants set statut = 'inscrit' where id = '00000000-0000-0000-0000-00000000be01';
+set local role authenticated;
 set local role anon;
 select tests.connecter(null);
 select throws_ok($$ select id from public.matieres $$, '42501', null, 'anon : refusé');
