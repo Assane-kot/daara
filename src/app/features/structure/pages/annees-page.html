@@ -29,7 +29,11 @@
 
     @if (annees().length === 0) {
         <div class="panel">
-            <app-empty-state [titre]="'structure.annees.vide_titre' | translate" [message]="'structure.annees.vide_message' | translate" />
+            <app-empty-state [titre]="'structure.annees.vide_titre' | translate" [message]="'structure.annees.vide_message' | translate">
+                <button type="button" class="btn btn-primary" [disabled]="enCours()" (click)="nouvelleAnnee()">
+                    {{ 'structure.annees.creer_premiere' | translate }}
+                </button>
+            </app-empty-state>
         </div>
     }
 

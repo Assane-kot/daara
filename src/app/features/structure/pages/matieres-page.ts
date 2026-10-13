@@ -40,6 +40,8 @@ const VARIANTE_TYPE: Record<TypeMatiere, BadgeVariante> = { scolaire: 'primary',
                 rechercheLibelle="structure.matieres.rechercher"
                 titreVide="structure.matieres.vide_titre"
                 messageVide="structure.matieres.vide_message"
+                [actionVide]="admin() ? 'structure.matieres.creer_premiere' : null"
+                (actionVideClic)="saisir(undefined)"
             >
                 <div filtres class="contents">
                     <label class="mb-0! flex min-h-11 cursor-pointer items-center gap-2 font-normal">

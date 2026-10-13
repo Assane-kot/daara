@@ -175,7 +175,16 @@ export interface DonneesAffectation {
                 }
                 <div class="grid gap-4 sm:grid-cols-[8rem_minmax(0,1fr)]">
                     <app-form-field [label]="'structure.affectations.coefficient' | translate">
-                        <input appFormControl class="form-input" type="number" formControlName="coefficient" min="0.5" max="20" step="0.5" />
+                        <input
+                            appFormControl
+                            class="form-input"
+                            type="number"
+                            inputmode="decimal"
+                            formControlName="coefficient"
+                            min="0.5"
+                            max="20"
+                            step="0.5"
+                        />
                     </app-form-field>
                     <app-form-field [label]="'structure.affectations.enseignant' | translate">
                         <select appFormControl class="form-select" formControlName="enseignantId">

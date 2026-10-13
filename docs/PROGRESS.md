@@ -13,7 +13,8 @@
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
 - Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
-- Sprint 4 — Apprenants et parents : S4.0 à S4.5 faits (conception, fiches, inscriptions, liens parents, import CSV, démarrage guidé). Suivante : S4.6 revue ergonomique. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) ; une décision attendue (accès des enseignants,
+  « Problèmes ouverts »). Sprint suivant : 5 — Absences et espace parent (planification à faire). **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -67,6 +68,13 @@
   - Audit de fin de sprint 3 (2026-10-09), point reporté : les triggers de `classes` / `classe_matieres` contrôlent les
     droits aussi lors du `on delete set null` (suppression d'un compte) : une suppression de compte faite en session
     utilisateur non admin serait refusée (sans effet en service_role) → à prendre en compte dans la purge CDP (sprint 12).
+  - Audit de fin de sprint 4 (2026-10-13), points ouverts :
+    - **décision du développeur** : `enseigne_apprenant` donne à un enseignant la fiche et la photo de tout élève inscrit un
+      jour dans une de ses classes, toutes années et élèves partis compris → limiter à l'année active (recommandé, ADR-010
+      minimisation) ou garder l'historique et l'écrire dans ADR-010 ;
+    - export CSV / PDF (sprint 7 ou avant) : neutraliser `= + - @`, tabulation et retour chariot en tête de cellule (les noms
+      importés sont stockés tels quels) ;
+    - sprint 12 : purge planifiée des `invitation_enfants` des invitations expirées (acceptées et retirées : purgées).
   - Audit RLS S3.1 (2026-10-09) : la contrainte « caractères interdits » du socle (`daaras`, `profiles`, `invitations`)
     laisse passer U+061C (marque de lettre arabe), U+034F, U+180E, U+2028, U+2029 ; `texte_sur` (S3.1) les refuse →
     aligner les contraintes du socle sur `texte_sur` dans une migration (avant les libellés en arabe).
@@ -173,6 +181,63 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-13 — Audit de fin de sprint 4 et bilan du sprint 4 (Apprenants et parents)
+**Audit** (un seul agent `auditeur-securite`, mode économe) : 0 critique, 0 important, 5 mineurs. Vérifié sans problème : le
+marqueur `daara.acceptation_invitation` n'est pas positionnable par un client, report des enfants limité aux invitations
+parent, droits en tête des triggers, bucket `photos`, journal sans valeurs des 4 tables d'enfants, aucune donnée d'élève
+vers Sentry. Corrigés :
+- « Mes enfants » d'un parent aussi admin ou enseignant affichait tous les élèves qu'il peut lire → jointure
+  `parent_links!inner` filtrée sur l'utilisateur connecté (+ test unitaire) ;
+- migration `corrections_sprint4` : import borné à 1 Mo et nom de classe à 100 caractères ; enfants rattachés à une
+  invitation acceptée ou retirée effacés par un trigger **différé** (« Renvoyer » retire l'ancienne invitation avant d'en
+  reporter les enfants) ; 4 tests pgTAP (665 ; `set constraints all immediate` pour déclencher la purge dans le test).
+Ouverts : voir « Problèmes ouverts » (accès des enseignants à décider, neutralisation à l'export, purge des expirées).
+
+**Objectif** : une classe remplie avec ses parents invités. **Atteint en local** (navigateur + pgTAP).
+
+| Story | État |
+|---|---|
+| S4.0 Conception (LLD §3.4, ADR-010, spec, règles d'ergonomie) | Fait |
+| S4.1 Fiches apprenants (matricule, photo privée, saisie en série) | Fait |
+| S4.2 Inscriptions, élèves d'une classe, `enseigne_apprenant` | Fait (+ sexe obligatoire, décision du développeur) |
+| S4.3 Liens parents, invitation depuis la fiche, « Mes enfants » | Fait |
+| S4.4 Import CSV (tout ou rien) | Fait |
+| S4.5 Démarrage guidé de l'admin | Fait |
+| S4.6 Revue ergonomique des sprints 1 à 3 | Fait |
+
+**Chiffres** : 665 tests pgTAP (577 au sprint 3) ; 264 tests unitaires (242) ; chargement initial 151,0 kB (150,7) ; 1 ADR
+(010) ; aucun paquet npm ajouté (analyse CSV maison).
+
+**Ce qui a bien marché** : la règle d'ergonomie écrite (`ux.md`) dès S4.0, appliquée puis vérifiée à chaque story ; le
+mode simulation de l'import (la base vérifie avant d'écrire, toutes les erreurs en une fois) ; l'audit unique de fin de
+sprint, court et sans important.
+
+**À améliorer** : les tests pgTAP qui cherchent une ligne par son libellé (4e occurrence évitée en filtrant toujours sur
+la daara du test) ; vérifier les écrans en sombre plus tôt (`btn-outline-dark` illisible depuis le sprint 0) ; les
+captures du navigateur piloté échouent parfois (mesures par script à la place).
+
+**Pièges à retenir** : un trigger « après » qui nettoie doit parfois être **différé** quand une même fonction retire puis
+reporte (ordre des opérations) ; un parent peut aussi être admin ou enseignant : filtrer explicitement sur ses liens,
+la RLS additionne les politiques ; l'outil Write convertit les échappements Unicode (`\uFEFF`, `\u200b`) en
+caractères réels : contrôle `grep -P` avant chaque livraison.
+
+### 2026-10-13 — S4.6 Revue ergonomique des écrans des sprints 1 à 3
+- Grille `.claude/rules/ux.md` passée sur les écrans des sprints 1 à 3 (textes fr / en, états vides, claviers mobiles,
+  retours après action) ; pas de jargon trouvé dans les textes affichés.
+- Corrigé :
+  - états vides sans action → « Créer la première année scolaire » (Années), « Créer l’année scolaire » (Classes sans
+    année, admin), « Créer la première classe », « Créer la première matière », « Ajouter la première matière » (détail
+    d’une classe), « Inviter un membre » (Invitations, message reformulé) ;
+  - « Révoquer » (jargon) → « Retirer l’invitation » (pas « Annuler l’invitation » : confusion avec le bouton « Annuler »
+    de la confirmation) ; message de succès après retrait ;
+  - « Confirmer » → « Confirmer mon adresse » (confirmation de l’e-mail) ;
+  - claviers numériques : coefficient (`decimal`), ordre d’une période (`numeric`).
+- Vu sans correction : les modales se ferment en touchant à côté (formulaires courts, un écran) ; les champs téléphone
+  (`type="tel"`) ont déjà le bon clavier.
+- Vérifié dans le navigateur : Matières vide → « Créer la première matière » ; Invitations vide → « Inviter un membre »
+  ouvre la modale ; démarrage guidé de Keur Thiès (structure sans notes : 6 étapes, sans « Matières »).
+- 263 tests unitaires. Pas d'audit (fin de sprint).
+
 ### 2026-10-13 — S4.5 Démarrage guidé de l'admin
 - Front seul (aucune migration) : sur le tableau de bord de l'admin, « Bien démarrer avec DAARA » : étapes dans l'ordre
   (année, matières si module notes, classes, élèves, élèves placés dans une classe, enseignants invités ou membres,

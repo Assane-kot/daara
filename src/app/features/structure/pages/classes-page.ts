@@ -35,7 +35,11 @@ import { AnneeChoix, ClasseResume, ClassesService, Enseignant } from '../data/cl
                     </div>
                 </div>
             } @else if (annees().length === 0) {
-                <app-empty-state [titre]="'structure.classes.sans_annee_titre' | translate" [message]="'structure.classes.sans_annee_message' | translate" />
+                <app-empty-state [titre]="'structure.classes.sans_annee_titre' | translate" [message]="'structure.classes.sans_annee_message' | translate">
+                    @if (admin()) {
+                        <a class="btn btn-primary" routerLink="../annees">{{ 'structure.classes.creer_annee' | translate }}</a>
+                    }
+                </app-empty-state>
             } @else {
                 @if (erreur(); as erreur) {
                     <div
@@ -57,6 +61,8 @@ import { AnneeChoix, ClasseResume, ClassesService, Enseignant } from '../data/cl
                     rechercheLibelle="structure.classes.rechercher"
                     titreVide="structure.classes.vide_titre"
                     messageVide="structure.classes.vide_message"
+                    [actionVide]="admin() ? 'structure.classes.creer_premiere' : null"
+                    (actionVideClic)="nouvelle()"
                 >
                     <div filtres class="contents">
                         <label class="mb-0!">

@@ -65,7 +65,13 @@ import { Matiere, MatieresService } from '../data/matieres.service';
                 }
 
                 @if (c.affectations.length === 0) {
-                    <app-empty-state [titre]="'structure.affectations.vide_titre' | translate" [message]="'structure.affectations.vide_message' | translate" />
+                    <app-empty-state [titre]="'structure.affectations.vide_titre' | translate" [message]="'structure.affectations.vide_message' | translate">
+                        @if (admin() && proposables().length > 0) {
+                            <button type="button" class="btn btn-primary" [disabled]="enCours()" (click)="ajouter(c)">
+                                {{ 'structure.affectations.ajouter_premiere' | translate }}
+                            </button>
+                        }
+                    </app-empty-state>
                 } @else {
                     <ul class="m-0 grid list-none gap-2 p-0">
                         @for (a of c.affectations; track a.id) {

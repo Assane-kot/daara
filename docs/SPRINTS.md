@@ -86,7 +86,8 @@ Un commit par story ; audit unique en fin de sprint.
 - [x] S4.3 Liens parents (`is_parent_of`), invitation d'un parent depuis la fiche, « Mes enfants »
 - [x] S4.4 Import CSV des apprenants (modèle, rapport d'erreurs, tout ou rien)
 - [x] S4.5 Démarrage guidé de l'admin (tableau de bord : étapes et avancement)
-- [ ] S4.6 Revue ergonomique des écrans des sprints 1 à 3 (grille `.claude/rules/ux.md`) et corrections
+- [x] S4.6 Revue ergonomique des écrans des sprints 1 à 3 (grille `.claude/rules/ux.md`) et corrections
+Audit de fin de sprint fait et corrigé (2026-10-13).
 Livrable : une classe remplie avec ses parents invités.
 
 ## Sprint 5 — Absences et espace parent (fin R1 → pilote)

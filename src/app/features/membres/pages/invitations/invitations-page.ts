@@ -38,8 +38,15 @@ import { VARIANTE_ROLE } from '../liste/membres-page';
                         {{ erreur | translate }}
                     </div>
                 }
+                @if (succes(); as succes) {
+                    <div class="mb-4 rounded-md border border-primary/30 bg-primary/10 p-3.5 text-black dark:text-white-light" role="status">
+                        {{ succes | translate }}
+                    </div>
+                }
                 @if (invitations().length === 0) {
-                    <app-empty-state [titre]="'invitations.vide.titre' | translate" [message]="'invitations.vide.message' | translate" />
+                    <app-empty-state [titre]="'invitations.vide.titre' | translate" [message]="'invitations.vide.message' | translate">
+                        <button type="button" class="btn btn-primary" (click)="inviter()">{{ 'invitations.vide.action' | translate }}</button>
+                    </app-empty-state>
                 } @else {
                     <ul class="m-0 grid list-none gap-3 p-0">
                         @for (inv of invitations(); track inv.id) {
@@ -92,6 +99,7 @@ export class InvitationsPage {
     protected readonly chargement = signal(true);
     protected readonly erreurChargement = signal(false);
     protected readonly erreur = signal<string | null>(null);
+    protected readonly succes = signal<string | null>(null);
     protected readonly enCours = signal<string | null>(null);
     protected readonly variante = VARIANTE_ROLE;
 
@@ -112,6 +120,10 @@ export class InvitationsPage {
         } finally {
             this.chargement.set(false);
         }
+    }
+
+    protected inviter(): void {
+        void this.dialog.ouvrir();
     }
 
     protected nom(inv: InvitationListee): string {
@@ -138,12 +150,16 @@ export class InvitationsPage {
         });
         if (confirme) {
             await this.agir(inv, () => this.service.revoquer(inv.id));
+            if (!this.erreur()) {
+                this.succes.set('invitations.revoquee_ok');
+            }
         }
     }
 
     private async agir(inv: InvitationListee, action: () => Promise<void>): Promise<void> {
         this.enCours.set(inv.id);
         this.erreur.set(null);
+        this.succes.set(null);
         try {
             await action();
         } catch (e) {

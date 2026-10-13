@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { AuthService } from '../../../core/auth/auth.service';
 import { CurrentDaaraService } from '../../../core/daara/current-daara.service';
 import { Database } from '../../../core/supabase/database.types';
 import { SupabaseService } from '../../../core/supabase/supabase.service';
@@ -54,6 +55,7 @@ export function erreurParents(erreur: { code?: string; message?: string } | null
 export class ParentsService {
     private readonly sb = inject(SupabaseService).client;
     private readonly courante = inject(CurrentDaaraService);
+    private readonly auth = inject(AuthService);
 
     async parentsDe(apprenantId: string): Promise<ParentRelie[]> {
         const { data, error } = await this.sb.from('parent_links').select('id, parent_user_id, lien').eq('apprenant_id', apprenantId);
@@ -126,8 +128,10 @@ export class ParentsService {
     async mesEnfants(): Promise<MonEnfant[]> {
         const { data, error } = await this.sb
             .from('apprenants')
-            .select('id, prenom, nom, photo_path, inscriptions(annee_id, classes(nom), annees_scolaires(active))')
+            .select('id, prenom, nom, photo_path, parent_links!inner(parent_user_id), inscriptions(annee_id, classes(nom), annees_scolaires(active))')
             .eq('daara_id', this.daaraId())
+            // Seulement SES enfants : un parent aussi admin ou enseignant lit d'autres élèves (audit de fin de sprint 4).
+            .eq('parent_links.parent_user_id', this.utilisateurId())
             .order('prenom');
         if (error) {
             throw erreurParents(error);
@@ -139,6 +143,14 @@ export class ParentsService {
             photoPath: a.photo_path,
             classe: a.inscriptions.find((i) => i.annees_scolaires?.active)?.classes?.nom ?? null,
         }));
+    }
+
+    private utilisateurId(): string {
+        const id = this.auth.user()?.id;
+        if (!id) {
+            throw new ErreurApprenants('parents.erreurs.inattendue');
+        }
+        return id;
     }
 
     private daaraId(): string {

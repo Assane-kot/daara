@@ -48,7 +48,7 @@ const datesOrdonnees = (groupe: AbstractControl): ValidationErrors | null => {
                     </app-form-field>
                     @if (d.avecOrdre) {
                         <app-form-field [label]="'structure.champs.ordre' | translate">
-                            <input appFormControl class="form-input" type="number" formControlName="ordre" min="1" max="12" />
+                            <input appFormControl class="form-input" type="number" inputmode="numeric" formControlName="ordre" min="1" max="12" />
                         </app-form-field>
                     }
                 </div>
