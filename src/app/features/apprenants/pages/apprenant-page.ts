@@ -1,3 +1,4 @@
+import { SignauxDaaraService } from '../../../core/daara/signaux-daara.service';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -99,13 +100,13 @@ import { InscriptionEleve, InscriptionsService } from '../data/inscriptions.serv
                                     <select
                                         class="form-select max-w-64"
                                         [attr.aria-label]="'apprenants.choisir_classe' | translate"
-                                        [value]="inscription()?.classeId ?? ''"
                                         [disabled]="enCours()"
                                         (change)="choisirClasse(a, $event)"
                                     >
-                                        <option value="">{{ 'apprenants.sans_classe' | translate }}</option>
+                                        <!-- [selected] sur chaque option : un [value] sur le select s'applique avant que @for crée les options. -->
+                                        <option value="" [selected]="!inscription()">{{ 'apprenants.sans_classe' | translate }}</option>
                                         @for (c of classes(); track c.id) {
-                                            <option [value]="c.id">{{ c.nom }}</option>
+                                            <option [value]="c.id" [selected]="c.id === inscription()?.classeId">{{ c.nom }}</option>
                                         }
                                     </select>
                                 } @else {
@@ -146,6 +147,11 @@ export class ApprenantPage implements OnInit {
     private readonly id = this.route.snapshot.paramMap.get('apprenantId') ?? '';
     private readonly inscriptions = inject(InscriptionsService);
     private readonly courante = inject(CurrentDaaraService);
+
+    constructor() {
+        // Mise à jour automatique quand un autre profil modifie ces données (S5.0b).
+        inject(SignauxDaaraService).surveiller(['apprenants', 'inscriptions', 'classes'], () => this.charger());
+    }
 
     protected readonly admin = computed(() => this.courante.roles().includes('admin'));
     protected readonly anneeActiveId = signal<string | null>(null);

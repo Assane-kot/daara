@@ -1,3 +1,4 @@
+import { SignauxDaaraService } from '../../../../core/daara/signaux-daara.service';
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@angular/core';
@@ -35,6 +36,11 @@ export class MembresPage {
     private readonly translate = inject(TranslateService);
     private readonly router = inject(Router);
     private readonly langue = inject(LanguageService).langue;
+
+    constructor() {
+        // Mise à jour automatique quand un autre profil modifie ces données (S5.0b).
+        inject(SignauxDaaraService).surveiller(['memberships'], () => this.table()?.recharger());
+    }
 
     protected readonly enCours = signal<string | null>(null);
     protected readonly erreur = signal<string | null>(null);

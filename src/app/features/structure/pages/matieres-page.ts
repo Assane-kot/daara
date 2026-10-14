@@ -1,3 +1,4 @@
+import { SignauxDaaraService } from '../../../core/daara/signaux-daara.service';
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -108,6 +109,11 @@ export class MatieresPage {
     private readonly confirmation = inject(ConfirmDialogService);
     private readonly translate = inject(TranslateService);
     private readonly courante = inject(CurrentDaaraService);
+
+    constructor() {
+        // Mise à jour automatique quand un autre profil modifie ces données (S5.0b).
+        inject(SignauxDaaraService).surveiller(['matieres', 'classe_matieres'], () => this.table()?.recharger());
+    }
     private readonly table = viewChild(DataTable);
 
     protected readonly admin = computed(() => this.courante.roles().includes('admin'));

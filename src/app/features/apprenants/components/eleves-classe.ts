@@ -1,3 +1,4 @@
+import { SignauxDaaraService } from '../../../core/daara/signaux-daara.service';
 import { ChangeDetectionStrategy, Component, OnInit, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -74,6 +75,11 @@ export class ElevesClasse implements OnInit {
     private readonly dialogue = inject(InscrireDialogService);
     private readonly confirmation = inject(ConfirmDialogService);
     private readonly translate = inject(TranslateService);
+
+    constructor() {
+        // Mise à jour automatique quand un autre profil modifie ces données (S5.0b).
+        inject(SignauxDaaraService).surveiller(['inscriptions', 'apprenants'], () => this.charger());
+    }
 
     protected readonly eleves = signal<EleveInscrit[]>([]);
     protected readonly enCours = signal(false);

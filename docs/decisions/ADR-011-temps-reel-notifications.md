@@ -16,9 +16,14 @@ Statut : accepté (2026-10-13, validé par le développeur avec le plan du sprin
 2. **Quand on prévient** : à la fin de l'appel (« Terminer l'appel »), pas à chaque appui ; une correction faite après la
    fin de l'appel prévient aussi (« absence annulée », « nouvelle absence »). Destinataires : les **parents actuels**
    (ADR-010 §9), membres actifs.
-3. **Temps réel** : Realtime `postgres_changes` sur `notifications` (filtre `user_id`, cloche et centre de notifications)
-   et sur `absences` (liste de l'admin, filtre `daara_id`). Un canal par écran, fermé à la sortie (`removeChannel`) ;
-   rien d'autre dans la publication `supabase_realtime`.
+3. **Temps réel** (révisé le 2026-10-13, S5.0b) : **un seul canal privé Realtime Broadcast par utilisateur et par
+   daara** (`daara:<uuid>`). Des triggers par instruction publient « la table X a changé » (`realtime.send`, **aucune
+   donnée** dans le message, un signal par instruction et par daara) ; chaque écran ouvert recharge ses données par une
+   requête normale (RLS), regroupée (400 ms). Écoute réservée aux membres actuels (`canal_daara_autorise`, politique sur
+   `realtime.messages`) ; aucun envoi par le client. Filet : rechargement au retour sur l'onglet et après une
+   reconnexion. Les absences (S5.1) passent par ce canal ; les notifications (S5.3) par un canal privé propre à
+   l'utilisateur (`utilisateur:<uuid>`), même principe. Pas de `postgres_changes` (contrôle RLS par abonné et par
+   changement, plus coûteux).
 4. **Hors de l'application** (Web Push, liens WhatsApp, e-mail) : sprint 8. Leur texte ne contiendra **aucun nom
    d'enfant** (« Nouvelle information sur votre enfant » + lien vers l'application).
 5. **Conservation** : notifications lues effacées après 90 jours, non lues après 1 an (purge planifiée, sprint 12).

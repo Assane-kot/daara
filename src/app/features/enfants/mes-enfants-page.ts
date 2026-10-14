@@ -1,3 +1,4 @@
+import { SignauxDaaraService } from '../../core/daara/signaux-daara.service';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { EmptyState } from '../../shared/ui/empty-state/empty-state';
@@ -63,6 +64,11 @@ export class MesEnfantsPage implements OnInit {
     private readonly parents = inject(ParentsService);
     private readonly apprenants = inject(ApprenantsService);
 
+    constructor() {
+        // Mise à jour automatique quand un autre profil modifie ces données (S5.0b).
+        inject(SignauxDaaraService).surveiller(['parent_links', 'apprenants', 'inscriptions', 'classes'], () => this.charger(true));
+    }
+
     protected readonly enfants = signal<CarteEnfant[]>([]);
     protected readonly chargement = signal(true);
     protected readonly erreur = signal(false);
@@ -71,8 +77,8 @@ export class MesEnfantsPage implements OnInit {
         void this.charger();
     }
 
-    protected async charger(): Promise<void> {
-        this.chargement.set(true);
+    protected async charger(silencieux = false): Promise<void> {
+        this.chargement.set(!silencieux);
         this.erreur.set(false);
         try {
             const enfants = await this.parents.mesEnfants();

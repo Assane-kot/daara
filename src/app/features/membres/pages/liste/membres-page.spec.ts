@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { provideTranslateTesting } from '../../../../../testing/translate-testing';
+import { provideSignauxTesting } from '../../../../../testing/signaux-testing';
 import { ConfirmDialogService } from '../../../../shared/ui/confirm-dialog/confirm-dialog.service';
 import { CodeAccesDialogService } from '../../components/code-acces-dialog';
 import { ErreurMembres, Membre, MembresService } from '../../data/membres.service';
@@ -63,6 +64,7 @@ describe('MembresPage', () => {
         TestBed.configureTestingModule({
             providers: [
                 provideTranslateTesting(),
+                provideSignauxTesting(),
                 provideRouter([]),
                 { provide: MembresService, useValue: service },
                 { provide: ConfirmDialogService, useValue: confirmation },

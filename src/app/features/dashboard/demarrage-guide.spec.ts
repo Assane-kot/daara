@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideTranslateTesting } from '../../../testing/translate-testing';
+import { provideSignauxTesting } from '../../../testing/signaux-testing';
 import { CurrentDaaraService } from '../../core/daara/current-daara.service';
 import { DemarrageGuide } from './demarrage-guide';
 import { DemarrageService, EtatDaara, etapesDemarrage } from './demarrage.service';
@@ -49,6 +50,7 @@ describe('DemarrageGuide', () => {
         TestBed.configureTestingModule({
             providers: [
                 provideTranslateTesting(),
+                provideSignauxTesting(),
                 provideRouter([]),
                 { provide: DemarrageService, useValue: service },
                 { provide: CurrentDaaraService, useValue: courante },

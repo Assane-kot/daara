@@ -1,3 +1,4 @@
+import { SignauxDaaraService } from '../../../core/daara/signaux-daara.service';
 import { DIALOG_DATA, Dialog, DialogRef } from '@angular/cdk/dialog';
 import { ChangeDetectionStrategy, Component, Injectable, OnInit, computed, inject, input, signal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -177,6 +178,11 @@ export class ParentsEnfant implements OnInit {
     private readonly inviterDialog = inject(InviterDialogService);
     private readonly confirmation = inject(ConfirmDialogService);
     private readonly translate = inject(TranslateService);
+
+    constructor() {
+        // Mise à jour automatique quand un autre profil modifie ces données (S5.0b).
+        inject(SignauxDaaraService).surveiller(['parent_links', 'invitation_enfants', 'memberships'], () => this.charger());
+    }
 
     protected readonly parents = signal<ParentRelie[]>([]);
     protected readonly enCours = signal(false);

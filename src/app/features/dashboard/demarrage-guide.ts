@@ -1,3 +1,4 @@
+import { SignauxDaaraService } from '../../core/daara/signaux-daara.service';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -87,6 +88,14 @@ export class DemarrageGuide implements OnInit {
     private readonly service = inject(DemarrageService);
     private readonly courante = inject(CurrentDaaraService);
 
+    constructor() {
+        // Mise à jour automatique quand un autre profil modifie ces données (S5.0b).
+        inject(SignauxDaaraService).surveiller(
+            ['annees_scolaires', 'matieres', 'classes', 'apprenants', 'inscriptions', 'memberships', 'invitations', 'parent_links', 'invitation_enfants'],
+            () => this.charger(true),
+        );
+    }
+
     protected readonly etapes = signal<EtapeDemarrage[]>([]);
     protected readonly chargement = signal(true);
     protected readonly erreur = signal(false);
@@ -100,8 +109,8 @@ export class DemarrageGuide implements OnInit {
         }
     }
 
-    protected async charger(): Promise<void> {
-        this.chargement.set(true);
+    protected async charger(silencieux = false): Promise<void> {
+        this.chargement.set(!silencieux);
         this.erreur.set(false);
         try {
             const etat = await this.service.etat();

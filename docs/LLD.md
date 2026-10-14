@@ -236,7 +236,9 @@ valeurs (`audit_trigger_colonnes`, ADR-010). Droits contrôlés en tête des tri
 | `absences` | appel_id (fk cascade), apprenant_id (fk cascade), classe_id, date_absence, creneau (copiés de l'appel), type `type_absence`, motif text null (≤ 300, `texte_sur`), motif_at, etat `etat_justification` (défaut `aucune`), decide_par uuid null, decide_at, created_at, created_by | unique (appel_id, apprenant_id) ; unique (apprenant_id, date_absence, creneau) ; trigger `absences_coherentes` : mêmes droits et fenêtre que l'appel, élève **inscrit** (statut `inscrit`) dans la classe pour l'année de l'appel, colonnes copiées de l'appel ; motif, état et décision seulement par RPC ; index (daara_id), (apprenant_id, date_absence), (classe_id, date_absence) |
 | `notifications` | user_id (destinataire, fk cascade), type `type_notification`, apprenant_id null (fk cascade), absence_id null (fk cascade), lien text, lu_at null, created_at | aucun texte ni nom d'enfant (message composé à l'écran) ; créées seulement par la base ; index (user_id, created_at desc), (daara_id) ; publication `supabase_realtime` ; purge : lues 90 j, non lues 1 an (sprint 12) |
 
-Realtime (ADR-011) : publication `supabase_realtime` = `notifications` et `absences` seulement.
+Realtime (ADR-011 révisé, S5.0b) : pas de `postgres_changes` ; signaux Broadcast privés « table modifiée » sans donnée
+(`daara:<uuid>`, triggers `*_signal_ins|maj|sup` → `signaler_changement`, écoute `canal_daara_autorise`) ; notifications
+sur un canal privé par utilisateur (S5.3).
 
 #### Évaluations et bulletins (sprints 6-7)
 | Table | Colonnes principales | Contraintes |
@@ -404,6 +406,7 @@ nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `au
 | `activer_annee(p_annee)` (S3.1) | rend l'année active et désactive l'autre, en une transaction (verrou de la daara) | admin `aal2` ; module `structure` actif |
 | `enseignants_daara(p_daara)` → (user_id, prenom, nom, actif) (S3.3) | noms des enseignants et admins de la daara (titulaire, enseignant d'une matière) : l'enseignant ne lit pas les profils de ses collègues | `has_role(p_daara, [admin, enseignant])` + module ; désactivés : nom figé (`nom_affiche`), tous pour l'admin, pour un enseignant seulement ceux encore titulaires ou enseignants d'une classe (audit de fin de sprint 3) |
 | `rechercher_membres(p_daara, p_texte, p_role, p_etat, p_tri, p_offset, p_limite)` → lignes (id, user_id, role, actif, nom, telephone, depuis, total) (S3.4) | liste paginée des membres pour `data-table` : recherche sans accents (`unaccent`) sur le nom et le téléphone (actifs seulement), filtres rôle / état, tri `role` / `nom` / `depuis` (± ), total par fenêtre ; nom figé et pas de téléphone pour un désactivé | admin `aal2` ; limite ≤ 100, texte ≤ 100, paramètres contrôlés (`22023 parametre_invalide`) |
+| `canal_daara_autorise(p_topic)` (S5.0b) | vrai si le canal est `daara:<uuid>` et l'utilisateur en est membre actuel (`membre_actuel`) ; utilisée par la politique de lecture de `realtime.messages` | exécutable par `authenticated` (politique) ; canal malformé → faux |
 | `terminer_appel(p_appel)` (S5.1) | marque l'appel terminé (`termine_at`, `termine_par`) et crée les notifications `absence` / `retard` des parents actuels (module `notifications`) ; rappel sur un appel déjà terminé : sans effet | admin aal2 ou enseignant `teaches_class`, fenêtre de 7 jours ; verrou de l'appel |
 | `justifier_absence(p_absence, p_motif)` (S5.2) | le parent envoie ou modifie le motif (≤ 300, texte sûr) → `envoyee` ; notifie admins et titulaire | `is_parent_of` ; refus après décision (`deja_decidee`) |
 | `decider_justification(p_absence, p_justifiee bool)` (S5.2) | `justifiee` / `non_justifiee`, `decide_par`, `decide_at` ; notifie les parents actuels | admin aal2 ou **titulaire** de la classe (`classes.titulaire_id`) ; module |
@@ -423,6 +426,7 @@ nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `au
 | `audit_trigger` | daaras (sprint 1, `daara_id` = `id`), memberships ; puis absences, notes, bulletins, cahier_entrees | journal d'audit ; copie la ligne entière : exclusion des colonnes sensibles et durée de conservation à décider (ADR) avant de le brancher sur des données d'apprenants |
 | `check_same_daara` | tables avec FK métier | refuse une référence vers une autre daara |
 | `lock_closed_period` | notes, evaluations | refuse les modifications si période clôturée |
+| `signaler_changement` (S5.0b) | daaras, daara_modules, memberships, invitations, annees_scolaires, periodes, matieres, classes, classe_matieres, apprenants, inscriptions, parent_links, invitation_enfants (après insert / update / delete, **par instruction**, tables de transition) | `realtime.send({table}, 'changement', 'daara:<uuid>', privé)` par daara touchée ; aucune donnée ; n'interrompt jamais l'écriture |
 | `notifier_absences` (S5.3) | absences (insert / delete / update de `type` après la fin de l'appel) | notifications `absence`, `retard`, `absence_annulee` aux parents actuels (ADR-011) ; rien pendant l'appel |
 | `notify_*` | bulletins (publication), recitations | crée les lignes `notifications` (sprints 7, 9) |
 

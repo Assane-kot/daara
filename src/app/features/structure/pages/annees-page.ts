@@ -1,3 +1,4 @@
+import { SignauxDaaraService } from '../../../core/daara/signaux-daara.service';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '../../../core/i18n/language.service';
@@ -24,6 +25,11 @@ export class AnneesPage implements OnInit {
     private readonly confirmation = inject(ConfirmDialogService);
     private readonly translate = inject(TranslateService);
     private readonly langue = inject(LanguageService).langue;
+
+    constructor() {
+        // Mise à jour automatique quand un autre profil modifie ces données (S5.0b).
+        inject(SignauxDaaraService).surveiller(['annees_scolaires', 'periodes'], () => this.charger());
+    }
 
     protected readonly annees = signal<Annee[]>([]);
     protected readonly chargement = signal(true);

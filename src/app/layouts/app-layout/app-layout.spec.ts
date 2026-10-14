@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideSignauxTesting } from '../../../testing/signaux-testing';
 import { provideTranslateTesting } from '../../../testing/translate-testing';
 import { LanguageService } from '../../core/i18n/language.service';
 import { LayoutService } from '../layout.service';
@@ -13,7 +14,7 @@ describe('AppLayout', () => {
         localStorage.clear();
         await TestBed.configureTestingModule({
             imports: [AppLayout],
-            providers: [provideRouter([]), provideTranslateTesting()],
+            providers: [provideRouter([]), provideTranslateTesting(), provideSignauxTesting()],
         }).compileComponents();
 
         await TestBed.inject(LanguageService).init();

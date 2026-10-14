@@ -1,3 +1,4 @@
+import { SignauxDaaraService } from '../../../core/daara/signaux-daara.service';
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -67,9 +68,11 @@ import { AnneeChoix, ClasseResume, ClassesService, Enseignant } from '../data/cl
                     <div filtres class="contents">
                         <label class="mb-0!">
                             <span class="sr-only">{{ 'structure.classes.annee' | translate }}</span>
-                            <select class="form-select min-w-48" [value]="anneeId()" (change)="choisirAnnee($event)">
+                            <select class="form-select min-w-48" (change)="choisirAnnee($event)">
                                 @for (a of annees(); track a.id) {
-                                    <option [value]="a.id">{{ a.libelle }}{{ a.active ? ' — ' + ('structure.annees.active' | translate) : '' }}</option>
+                                    <option [value]="a.id" [selected]="a.id === anneeId()">
+                                        {{ a.libelle }}{{ a.active ? ' — ' + ('structure.annees.active' | translate) : '' }}
+                                    </option>
                                 }
                             </select>
                         </label>
@@ -123,6 +126,11 @@ export class ClassesPage implements OnInit {
     private readonly confirmation = inject(ConfirmDialogService);
     private readonly translate = inject(TranslateService);
     private readonly courante = inject(CurrentDaaraService);
+
+    constructor() {
+        // Mise à jour automatique quand un autre profil modifie ces données (S5.0b).
+        inject(SignauxDaaraService).surveiller(['classes', 'classe_matieres', 'annees_scolaires'], () => this.table()?.recharger());
+    }
     private readonly table = viewChild(DataTable);
 
     protected readonly admin = computed(() => this.courante.roles().includes('admin'));

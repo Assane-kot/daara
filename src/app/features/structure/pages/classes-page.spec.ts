@@ -2,10 +2,12 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import { provideTranslateTesting } from '../../../../testing/translate-testing';
+import { provideSignauxTesting } from '../../../../testing/signaux-testing';
 import { CurrentDaaraService } from '../../../core/daara/current-daara.service';
 import { RoleMembre } from '../../../core/daara/daara.model';
 import { InscriptionsService } from '../../apprenants/data/inscriptions.service';
 import { ConfirmDialogService } from '../../../shared/ui/confirm-dialog/confirm-dialog.service';
+import { AjoutMatieresDialogService } from '../components/ajout-matieres-dialog';
 import { ClasseDialogsService } from '../components/classe-dialogs';
 import { ClasseDetail, ClassesService } from '../data/classes.service';
 import { MatieresService } from '../data/matieres.service';
@@ -16,6 +18,7 @@ const roles = signal<RoleMembre[]>(['admin']);
 const service = { annees: vi.fn(), enseignants: vi.fn(), page: vi.fn(), detail: vi.fn(), supprimer: vi.fn() };
 const matieresService = { lister: vi.fn() };
 const dialogues = { classe: vi.fn(), affectation: vi.fn() };
+const ajoutMatieres = { ouvrir: vi.fn() };
 
 async function stable(fixture: ComponentFixture<unknown>): Promise<void> {
     await new Promise((r) => setTimeout(r));
@@ -36,8 +39,10 @@ function configurer(): void {
     TestBed.configureTestingModule({
         providers: [
             provideTranslateTesting(),
+            provideSignauxTesting(),
             provideRouter([]),
             { provide: ClassesService, useValue: service },
+            { provide: AjoutMatieresDialogService, useValue: ajoutMatieres },
             { provide: MatieresService, useValue: matieresService },
             { provide: ClasseDialogsService, useValue: dialogues },
             { provide: ConfirmDialogService, useValue: { confirmer: vi.fn() } },
@@ -101,7 +106,7 @@ describe('ClasseDetailPage', () => {
     });
 
     it('affiche la classe ; à l’ajout, seules les matières non archivées et absentes sont proposées', async () => {
-        dialogues.affectation.mockResolvedValue(false);
+        ajoutMatieres.ouvrir.mockResolvedValue(false);
         const fixture = TestBed.createComponent(ClasseDetailPage);
         await stable(fixture);
         const element = fixture.nativeElement as HTMLElement;
@@ -109,8 +114,8 @@ describe('ClasseDetailPage', () => {
         expect(element.textContent).toContain('Titulaire : Ancien Maître');
         expect(element.textContent).toContain('Coefficient 2');
         expect(element.textContent).toContain('Sans enseignant');
-        ([...element.querySelectorAll('button')].find((b) => b.textContent!.trim() === 'Ajouter une matière') as HTMLButtonElement).click();
+        ([...element.querySelectorAll('button')].find((b) => b.textContent!.trim() === 'Ajouter des matières') as HTMLButtonElement).click();
         await stable(fixture);
-        expect(dialogues.affectation.mock.calls[0][0].matieres.map((m: { id: string }) => m.id)).toEqual(['m3']);
+        expect(ajoutMatieres.ouvrir.mock.calls[0][0].matieres.map((m: { id: string }) => m.id)).toEqual(['m3']);
     });
 });

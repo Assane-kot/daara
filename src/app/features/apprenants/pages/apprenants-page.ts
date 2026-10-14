@@ -1,3 +1,4 @@
+import { SignauxDaaraService } from '../../../core/daara/signaux-daara.service';
 import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -101,6 +102,8 @@ export class ApprenantsPage {
     protected readonly classeId = signal('');
 
     constructor() {
+        // Mise à jour automatique quand un autre profil modifie ces données (S5.0b).
+        inject(SignauxDaaraService).surveiller(['apprenants', 'inscriptions'], () => this.table()?.recharger());
         // Classes de l'année active pour le filtre (module structure inactif : pas de filtre).
         void this.service.classesAnneeActive().then(
             (c) => this.classes.set(c),

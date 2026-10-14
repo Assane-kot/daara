@@ -181,14 +181,18 @@ export class ClassesService {
         await this.ecrire(this.sb.from('classes').delete().eq('id', id).select('id'));
     }
 
-    async affecter(classeId: string, s: SaisieAffectation): Promise<void> {
-        const { error } = await this.sb.from('classe_matieres').insert({
-            daara_id: this.daaraId(),
-            classe_id: classeId,
-            matiere_id: s.matiereId,
-            coefficient: s.coefficient,
-            enseignant_id: s.enseignantId,
-        });
+    /** Plusieurs matières en un seul envoi (tout ou rien). */
+    async affecterPlusieurs(classeId: string, saisies: readonly SaisieAffectation[]): Promise<void> {
+        const daaraId = this.daaraId();
+        const { error } = await this.sb.from('classe_matieres').insert(
+            saisies.map((s) => ({
+                daara_id: daaraId,
+                classe_id: classeId,
+                matiere_id: s.matiereId,
+                coefficient: s.coefficient,
+                enseignant_id: s.enseignantId,
+            })),
+        );
         if (error) {
             throw erreurStructure(error);
         }

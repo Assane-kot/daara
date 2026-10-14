@@ -1,3 +1,4 @@
+import { SignauxDaaraService } from '../../../core/daara/signaux-daara.service';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -7,6 +8,7 @@ import { ConfirmDialogService } from '../../../shared/ui/confirm-dialog/confirm-
 import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { ElevesClasse } from '../../apprenants/components/eleves-classe';
+import { AjoutMatieresDialogService } from '../components/ajout-matieres-dialog';
 import { ClasseDialogsService } from '../components/classe-dialogs';
 import { ErreurStructure } from '../data/annees.service';
 import { Affectation, ClasseDetail, ClassesService, Enseignant } from '../data/classes.service';
@@ -44,9 +46,11 @@ import { Matiere, MatieresService } from '../data/matieres.service';
                 <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
                     <h3 class="m-0 text-base font-bold dark:text-white-light">{{ 'structure.affectations.titre' | translate }}</h3>
                     @if (admin()) {
-                        <button type="button" class="btn btn-sm btn-primary min-h-11" [disabled]="enCours() || proposables().length === 0" (click)="ajouter(c)">
-                            {{ 'structure.affectations.ajouter' | translate }}
-                        </button>
+                        @if (proposables().length > 0) {
+                            <button type="button" class="btn btn-sm btn-primary min-h-11" [disabled]="enCours()" (click)="ajouter(c)">
+                                {{ 'structure.affectations.ajouter_plusieurs' | translate }}
+                            </button>
+                        }
                     }
                 </div>
 
@@ -68,8 +72,11 @@ import { Matiere, MatieresService } from '../data/matieres.service';
                     <app-empty-state [titre]="'structure.affectations.vide_titre' | translate" [message]="'structure.affectations.vide_message' | translate">
                         @if (admin() && proposables().length > 0) {
                             <button type="button" class="btn btn-primary" [disabled]="enCours()" (click)="ajouter(c)">
-                                {{ 'structure.affectations.ajouter_premiere' | translate }}
+                                {{ 'structure.affectations.ajouter_plusieurs' | translate }}
                             </button>
+                        } @else if (admin()) {
+                            <p class="m-0 mb-3 text-muted dark:text-night-muted">{{ 'structure.affectations.catalogue_vide' | translate }}</p>
+                            <a class="btn btn-primary" routerLink="../../matieres">{{ 'structure.affectations.creer_matieres' | translate }}</a>
                         }
                     </app-empty-state>
                 } @else {
@@ -112,9 +119,15 @@ export class ClasseDetailPage implements OnInit {
     private readonly service = inject(ClassesService);
     private readonly matieresService = inject(MatieresService);
     private readonly dialogues = inject(ClasseDialogsService);
+    private readonly ajoutMatieres = inject(AjoutMatieresDialogService);
     private readonly confirmation = inject(ConfirmDialogService);
     private readonly translate = inject(TranslateService);
     private readonly courante = inject(CurrentDaaraService);
+
+    constructor() {
+        // Mise à jour automatique quand un autre profil modifie ces données (S5.0b).
+        inject(SignauxDaaraService).surveiller(['classes', 'classe_matieres', 'matieres', 'memberships'], () => this.charger());
+    }
 
     protected readonly admin = computed(() => this.courante.roles().includes('admin'));
     protected readonly slug = computed(() => this.courante.slug() ?? '');
@@ -159,7 +172,18 @@ export class ClasseDetailPage implements OnInit {
     }
 
     protected async ajouter(classe: ClasseDetail): Promise<void> {
-        await this.saisir(undefined, (s) => this.service.affecter(classe.id, s));
+        this.erreur.set(null);
+        this.succes.set(null);
+        const ok = await this.ajoutMatieres.ouvrir({
+            classeNom: classe.nom,
+            matieres: this.proposables(),
+            enseignants: this.enseignants(),
+            ajouter: (saisies) => this.service.affecterPlusieurs(classe.id, saisies),
+        });
+        if (ok) {
+            this.succes.set('structure.affectations.ajoutees');
+            await this.recharger();
+        }
     }
 
     protected async modifier(a: Affectation): Promise<void> {
@@ -190,16 +214,20 @@ export class ClasseDetailPage implements OnInit {
         }
     }
 
-    private async saisir(affectation: Affectation | undefined, enregistrer: Parameters<ClasseDialogsService['affectation']>[0]['enregistrer']): Promise<void> {
+    private async saisir(affectation: Affectation, enregistrer: Parameters<ClasseDialogsService['affectation']>[0]['enregistrer']): Promise<void> {
         this.erreur.set(null);
         this.succes.set(null);
-        if (await this.dialogues.affectation({ affectation, matieres: this.proposables(), enseignants: this.enseignants(), enregistrer })) {
+        if (await this.dialogues.affectation({ affectation, enseignants: this.enseignants(), enregistrer })) {
             this.succes.set('structure.enregistre');
-            try {
-                this.classe.set(await this.service.detail(this.classeId()));
-            } catch (e) {
-                this.erreur.set(e instanceof ErreurStructure ? e.cle : 'structure.erreurs.inattendue');
-            }
+            await this.recharger();
+        }
+    }
+
+    private async recharger(): Promise<void> {
+        try {
+            this.classe.set(await this.service.detail(this.classeId()));
+        } catch (e) {
+            this.erreur.set(e instanceof ErreurStructure ? e.cle : 'structure.erreurs.inattendue');
         }
     }
 }

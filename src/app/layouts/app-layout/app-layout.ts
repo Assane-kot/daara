@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { RouterOutlet } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CurrentDaaraService } from '../../core/daara/current-daara.service';
+import { SignauxDaaraService } from '../../core/daara/signaux-daara.service';
 import { LayoutService } from '../layout.service';
 import { BarreBasse } from './barre-basse';
 import { Footer } from './footer';
@@ -23,6 +24,8 @@ export class AppLayout {
     protected readonly layout = inject(LayoutService);
     /** Parents et apprenants : barre basse en mobile à la place de la sidebar (LLD §2). */
     protected readonly famille = inject(CurrentDaaraService).famille;
+    /** Canal des signaux de la daara ouvert pendant toute la visite de l'espace (S5.0b). */
+    private readonly signaux = inject(SignauxDaaraService);
     private readonly document = inject(DOCUMENT);
     protected readonly showTopButton = signal(false);
 

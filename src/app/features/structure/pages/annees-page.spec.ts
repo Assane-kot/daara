@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideTranslateTesting } from '../../../../testing/translate-testing';
+import { provideSignauxTesting } from '../../../../testing/signaux-testing';
 import { ConfirmDialogService } from '../../../shared/ui/confirm-dialog/confirm-dialog.service';
 import { DatesDialogService } from '../components/dates-dialog';
 import { Annee, AnneesService, ErreurStructure } from '../data/annees.service';
@@ -34,6 +35,7 @@ describe('AnneesPage', () => {
         TestBed.configureTestingModule({
             providers: [
                 provideTranslateTesting(),
+                provideSignauxTesting(),
                 { provide: AnneesService, useValue: service },
                 { provide: ConfirmDialogService, useValue: confirmation },
                 { provide: DatesDialogService, useValue: dates },

@@ -94,6 +94,7 @@ Livrable : une classe remplie avec ses parents invités.
 Planification validée le 2026-10-13 (LLD §3.5, §4, §7.2 ; specs `absences.md`, `notifications.md` ; ADR-011). Modules
 `absences` et `notifications` (ADR-008). Un commit par story ; audit unique en fin de sprint.
 - [x] S5.0 Conception : LLD, specs, ADR-011 (temps réel et notifications)
+- [x] S5.0b Mise à jour automatique entre profils (signaux Realtime par daara, ajouté le 2026-10-13)
 - [ ] S5.1 Appel du jour : `appels`, `absences`, réglage demi-journée, écran d'appel mobile, « Terminer l'appel »
 - [ ] S5.2 Justification (parent) et décision (admin, titulaire), historique, écran Absences, statistiques simples
 - [ ] S5.3 Notifications dans l'application : `notifications`, cloche, centre, temps réel

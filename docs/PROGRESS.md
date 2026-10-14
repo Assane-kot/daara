@@ -13,7 +13,7 @@
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
 - Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
-- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 fait (conception). Suivante : S5.1 appel du jour. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 et S5.0b faits (conception, mise à jour automatique). Suivante : S5.1 appel du jour. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -189,6 +189,41 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-13 — S5.0b Mise à jour automatique entre profils
+- Demande du développeur : les changements faits par un autre profil (invitation acceptée, matières ou élèves ajoutés)
+  n'apparaissaient qu'après actualisation. ADR-011 révisé (validé) : signaux Realtime Broadcast privés par daara.
+- Migration `signaux_daara` : `canal_daara_autorise` (membres actuels), politique de lecture sur `realtime.messages`
+  (aucun envoi client), `signaler_changement` + 3 triggers par instruction (tables de transition) sur 13 tables : un
+  signal « table modifiée » par instruction et par daara, **sans donnée**. 13 tests pgTAP (684 ; messages vérifiés si la
+  partition du jour de `realtime.messages` existe, sinon test neutre : la CI ne lance que la base).
+- Front : `SignauxDaaraService` (canal `daara:<uuid>` privé, ouvert par le layout de l'espace, changé avec la daara ;
+  `surveiller(tables, action)` regroupé à 400 ms ; retour sur l'onglet et reconnexion → tout recharger ; daara, modules
+  ou membres modifiés → contexte de la daara rechargé pour tous : menus, rôles). Branché sur Membres, Invitations, Années,
+  Matières, Classes, détail d'une classe, élèves d'une classe, Élèves, fiche élève, parents d'un élève, Mes enfants,
+  démarrage guidé (rechargements silencieux, sans squelette). `provideSignauxTesting()` pour les tests de composants.
+- Vérifié dans le navigateur (admin, écran ouvert, écritures faites par la base comme par un autre profil) : 2 matières
+  et 3 élèves ajoutés à CE1 A apparaissent en moins de 2 s sans recharger ; un parent qui rejoint la daara apparaît dans
+  Membres. 273 tests unitaires.
+
+### 2026-10-13 — Correctif : classe absente de la fiche élève
+- Signalé par le développeur : la fiche d'un élève inscrit affichait « Pas encore de classe ». Cause : `[value]` posé sur
+  le `<select>` s'applique avant que `@for` crée les options → le navigateur retombe sur la première option. Corrigé par
+  `[selected]` sur chaque option (fiche élève, sélecteur d'année des Classes). Test de composant ajouté (contre-épreuve :
+  il échoue avec l'ancien code). **Piège** : jamais `[value]` sur un `<select>` dont les options viennent d'un `@for` si
+  la valeur initiale n'est pas la première option → `[selected]` sur les options.
+
+### 2026-10-13 — Ajout de plusieurs matières à une classe (retour du développeur)
+- Retour : ajouter les matières d'une classe une par une, avec aller-retour, est fatigant → **règle générale** ajoutée à
+  `.claude/rules/ux.md` : tout ajout d'éléments pris dans une liste = une modale avec recherche sans accents, cases à
+  cocher, « Tout sélectionner », réglages de chaque élément sur sa ligne une fois coché, un bouton « Ajouter n … ».
+- Détail d'une classe : « Ajouter des matières » (`AjoutMatieresDialog`) : recherche (nom, code), cases, « Tout
+  sélectionner », coefficient (défaut 1, 0,5 à 20 par demi-points, erreur sur la ligne) et enseignant par matière
+  cochée ; un seul envoi (tout ou rien, `affecterPlusieurs`). La modale « Modifier » ne sert plus qu'à la modification.
+  Catalogue vide : message et bouton « Créer les matières » (vers l'onglet Matières).
+- Vérifié dans le navigateur : CE1 A, Coran (coefficient 3) et Français ajoutés en un envoi. 267 tests unitaires.
+- Autre cas « un par un » repéré : relier un même parent à plusieurs enfants se fait fiche par fiche → à traiter avec la
+  règle (modale multi-enfants depuis la fiche d'un parent ou la liste des élèves) lors d'une prochaine story.
+
 ### 2026-10-13 — S5.0 Conception du sprint 5
 - Plan du sprint 5 validé (décisions ci-dessus). ADR-011 (temps réel et notifications : notifications en base sans texte
   ni nom d'enfant, prévenir à la fin de l'appel, un canal Realtime par écran, seuils de passage à Pro, conservation).

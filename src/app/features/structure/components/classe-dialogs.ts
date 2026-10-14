@@ -6,7 +6,6 @@ import { firstValueFrom } from 'rxjs';
 import { FormField, FormFieldControl } from '../../../shared/ui/form-field/form-field';
 import { ErreurStructure } from '../data/annees.service';
 import { Affectation, ClasseResume, Enseignant, NIVEAUX_SUGGERES, SaisieAffectation, SaisieClasse } from '../data/classes.service';
-import { Matiere } from '../data/matieres.service';
 
 /** Enregistre puis ferme ; une `ErreurStructure` reste affichée dans la modale. */
 abstract class ModaleSaisie<T> {
@@ -132,14 +131,12 @@ export class ClasseDialog extends ModaleSaisie<SaisieClasse> {
 // Matière enseignée dans une classe
 // ---------------------------------------------------------------------------------------------------------------
 export interface DonneesAffectation {
-    readonly affectation?: Affectation;
-    /** Matières proposées à l'ajout : non archivées et pas encore dans la classe. */
-    readonly matieres: readonly Matiere[];
+    readonly affectation: Affectation;
     readonly enseignants: readonly Enseignant[];
     readonly enregistrer: (s: SaisieAffectation) => Promise<void>;
 }
 
-/** Modale d'une matière de classe (S3.3) : matière (à l'ajout), coefficient (0,5 à 20), enseignant. */
+/** Modification d'une matière de classe (S3.3) : coefficient (0,5 à 20), enseignant. Ajout : `AjoutMatieresDialog`. */
 @Component({
     selector: 'app-affectation-dialog',
     imports: [ReactiveFormsModule, TranslatePipe, FormField, FormFieldControl],
@@ -149,7 +146,7 @@ export interface DonneesAffectation {
         >
             <div class="flex items-center justify-between gap-4 bg-gray-50 px-5 py-3 dark:bg-night-hover">
                 <h2 id="structure-modale-titre" class="text-lg font-bold dark:text-white-light">
-                    {{ (d.affectation ? 'structure.affectations.modifier' : 'structure.affectations.ajouter') | translate }}
+                    {{ 'structure.affectations.modifier' | translate }}
                 </h2>
                 <button
                     type="button"
@@ -161,18 +158,7 @@ export interface DonneesAffectation {
                 </button>
             </div>
             <form class="grid gap-4 overflow-y-auto px-5 py-5" [formGroup]="form" (ngSubmit)="valider()" novalidate>
-                @if (d.affectation; as a) {
-                    <p class="m-0 font-semibold">{{ a.matiereNom }}</p>
-                } @else {
-                    <app-form-field [label]="'structure.affectations.matiere' | translate">
-                        <select appFormControl class="form-select" formControlName="matiereId">
-                            <option value="" disabled>{{ 'structure.affectations.choisir' | translate }}</option>
-                            @for (m of d.matieres; track m.id) {
-                                <option [value]="m.id">{{ m.nom }} ({{ m.code }})</option>
-                            }
-                        </select>
-                    </app-form-field>
-                }
+                <p class="m-0 font-semibold">{{ d.affectation.matiereNom }}</p>
                 <div class="grid gap-4 sm:grid-cols-[8rem_minmax(0,1fr)]">
                     <app-form-field [label]="'structure.affectations.coefficient' | translate">
                         <input
@@ -220,11 +206,10 @@ export interface DonneesAffectation {
 })
 export class AffectationDialog extends ModaleSaisie<SaisieAffectation> {
     protected readonly d = inject<DonneesAffectation>(DIALOG_DATA);
-    protected readonly enseignantsProposes = this.d.enseignants.filter((e) => e.actif || e.id === this.d.affectation?.enseignantId);
+    protected readonly enseignantsProposes = this.d.enseignants.filter((e) => e.actif || e.id === this.d.affectation.enseignantId);
     protected readonly form = inject(NonNullableFormBuilder).group({
-        matiereId: [this.d.affectation?.matiereId ?? '', Validators.required],
-        coefficient: [this.d.affectation?.coefficient ?? 1, [Validators.required, Validators.min(0.5), Validators.max(20)]],
-        enseignantId: [this.d.affectation?.enseignantId ?? ''],
+        coefficient: [this.d.affectation.coefficient, [Validators.required, Validators.min(0.5), Validators.max(20)]],
+        enseignantId: [this.d.affectation.enseignantId ?? ''],
     });
 
     protected valider(): Promise<void> {
@@ -232,7 +217,7 @@ export class AffectationDialog extends ModaleSaisie<SaisieAffectation> {
         const v = this.form.getRawValue();
         return this.soumettre(
             this.form.valid,
-            () => ({ matiereId: v.matiereId, coefficient: Number(v.coefficient), enseignantId: v.enseignantId || null }),
+            () => ({ matiereId: this.d.affectation.matiereId, coefficient: Number(v.coefficient), enseignantId: v.enseignantId || null }),
             this.d.enregistrer,
         );
     }

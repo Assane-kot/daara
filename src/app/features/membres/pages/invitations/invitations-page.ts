@@ -1,3 +1,4 @@
+import { SignauxDaaraService } from '../../../../core/daara/signaux-daara.service';
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '../../../../core/i18n/language.service';
@@ -104,6 +105,8 @@ export class InvitationsPage {
     protected readonly variante = VARIANTE_ROLE;
 
     constructor() {
+        // Mise à jour automatique quand un autre profil modifie ces données (S5.0b).
+        inject(SignauxDaaraService).surveiller(['invitations'], () => this.charger());
         // Recharge à l'ouverture et après chaque invitation créée ou révoquée (modale « Inviter » comprise).
         effect(() => {
             this.service.version();
