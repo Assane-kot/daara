@@ -28,7 +28,9 @@
         "parametres": "Settings",
         "structure": "Structure",
         "eleves": "Students",
-        "enfants": "My children"
+        "enfants": "My children",
+        "appel": "Roll call",
+        "absences": "Absences"
     },
     "titres": {
         "tableau_de_bord": "Dashboard",
@@ -56,7 +58,9 @@
         "apprenants": "Students",
         "apprenant": "Student record",
         "enfants": "My children",
-        "import": "Import students"
+        "import": "Import students",
+        "appel": "Roll call",
+        "absences": "Absences"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -370,7 +374,10 @@
                 "inattendue": "Saving failed. Please try again.",
                 "logo_illisible": "This file is not a readable image.",
                 "logo_suppression": "The logo could not be deleted. Please try again."
-            }
+            },
+            "appel": "Roll call",
+            "appel_jour": "Once a day",
+            "appel_demi": "Morning and afternoon"
         }
     },
     "membres": {
@@ -744,10 +751,7 @@
         },
         "affectations": {
             "titre": "Subjects taught",
-            "ajouter": "Add a subject",
             "modifier": "Edit the class subject",
-            "matiere": "Subject",
-            "choisir": "Choose a subject",
             "coefficient": "Coefficient",
             "enseignant": "Teacher",
             "coef_x": "Coefficient {{coef}}",
@@ -758,7 +762,16 @@
             "confirmer_retrait_message": "The subject will no longer be taught in this class.",
             "vide_titre": "No subject",
             "vide_message": "Add the subjects taught in this class.",
-            "ajouter_premiere": "Add the first subject"
+            "ajouter_plusieurs": "Add subjects",
+            "ajouter_dans": "Add subjects to {{classe}}",
+            "rechercher": "Search a subject (name, code)",
+            "tout_selectionner": "Select all ({{n}})",
+            "ajouter_n": "Add {{n}} subject(s)",
+            "aucune_trouvee": "No subject matches the search.",
+            "coefficient_invalide": "Coefficient from 0.5 to 20 (in half points).",
+            "ajoutees": "Subjects added to the class.",
+            "catalogue_vide": "Your daara has no subjects yet (or they are all already in this class): create them first.",
+            "creer_matieres": "Create the subjects"
         }
     },
     "table": {
@@ -894,7 +907,9 @@
         "erreur": "Your children could not be loaded.",
         "vide_titre": "No child linked",
         "vide_message": "The daara has not linked your children to your account yet. Contact its administrator.",
-        "sans_classe": "No class yet"
+        "sans_classe": "No class yet",
+        "retour": "Back to my children",
+        "introuvable": "This child is not linked to your account."
     },
     "import": {
         "titre": "Import students",
@@ -1006,6 +1021,137 @@
                 "aide": "From each student’s record: “Add a parent”.",
                 "action": "Open the student list"
             }
+        }
+    },
+    "appel": {
+        "titre": "Today’s roll call",
+        "date": "Date",
+        "aujourdhui": "Today",
+        "creneau": "Session",
+        "creneaux": {
+            "journee": "Day",
+            "matin": "Morning",
+            "apres_midi": "Afternoon"
+        },
+        "etats": {
+            "a_faire": "To do",
+            "en_cours": "In progress",
+            "fait": "Done"
+        },
+        "resume": "{{absents}} absent, {{retards}} late",
+        "vide_titre": "No class to call",
+        "vide_admin": "Create the classes of the current year and enrol the students.",
+        "vide_enseignant": "You are not the main or subject teacher of any class this year. Ask the administrator to assign you.",
+        "voir_classes": "See the classes",
+        "retour": "Back to classes",
+        "compte": {
+            "presents": "{{n}} present",
+            "absents": "{{n}} absent",
+            "retards": "{{n}} late"
+        },
+        "presences": {
+            "present": "Present",
+            "absence": "Absent",
+            "retard": "Late"
+        },
+        "aide": "Everyone is present. Tap a student: absent, tap again: late, again: present.",
+        "aucun_eleve_titre": "No student in this class",
+        "aucun_eleve_message": "First enrol the students in the class (Structure → Classes).",
+        "termine": "Roll call done",
+        "enregistre_auto": "Each tap is saved.",
+        "deja_termine": "Roll call done: you can still correct it.",
+        "terminer": "Finish the roll call",
+        "confirmer_titre": "Finish the roll call of {{classe}}?",
+        "confirmer_message": "{{absents}} absent and {{retards}} late. You can still correct it afterwards.",
+        "confirmer_tous_presents": "All students are present. You can still correct it afterwards.",
+        "fait_ok": "Roll call of {{classe}} done.",
+        "erreurs": {
+            "droits": "You cannot take the roll call of this class.",
+            "inattendue": "Saving failed. Check the connection and try again.",
+            "appel_trop_ancien": "A teacher can take or correct the roll call up to 7 days back. Beyond that, ask the administrator.",
+            "date_hors_annee": "This date is outside the current school year (or in the future).",
+            "annee_inactive": "This class does not belong to the current school year.",
+            "eleve_hors_classe": "This student is no longer enrolled in this class. The list has been refreshed.",
+            "creneau_invalide": "The roll call setting (day or morning / afternoon) has just changed. Go back to the class list."
+        }
+    },
+    "absences": {
+        "titre": "Absences",
+        "historique": "Absence history",
+        "aucune": "No absence for {{prenom}}.",
+        "etats": {
+            "aucune": "No justification",
+            "envoyee": "Justification sent",
+            "justifiee": "Justified",
+            "non_justifiee": "Not justified"
+        },
+        "justifier": {
+            "bouton": "Justify",
+            "modifier": "Change the reason",
+            "titre_absence": "{{prenom}}’s absence on {{date}}",
+            "titre_retard": "{{prenom}} late on {{date}}",
+            "choisir": "Tap a reason or write it:",
+            "motif": "Reason",
+            "aide": "{{n}} characters left.",
+            "envoyer": "Send the reason",
+            "envoye": "Reason sent. The daara will confirm it.",
+            "motifs": {
+                "malade": "Sick",
+                "medecin": "Medical appointment",
+                "famille": "Family event",
+                "voyage": "Travel",
+                "transport": "Transport problem"
+            }
+        },
+        "decider": {
+            "justifiee": "Justified",
+            "non_justifiee": "Not justified",
+            "ok_justifiee": "Absence marked justified.",
+            "ok_non_justifiee": "Absence marked not justified."
+        },
+        "appels_a_faire": "Roll call not finished today in {{n}} class(es):",
+        "vide_titre": "No absence",
+        "vide_message": "No absence or lateness for this period and these filters.",
+        "filtres": {
+            "periode": "Period",
+            "classe": "Class",
+            "toutes_classes": "All classes",
+            "etat": "Justification",
+            "etats": {
+                "tous": "All",
+                "a_decider": "To decide (reason received)",
+                "aucune": "No justification",
+                "justifiee": "Justified",
+                "non_justifiee": "Not justified"
+            }
+        },
+        "periodes": {
+            "semaine": "Last 7 days",
+            "mois": "Last 30 days",
+            "annee": "Since the start of the year"
+        },
+        "colonnes": {
+            "date": "Date",
+            "eleve": "Student",
+            "classe": "Class",
+            "type": "Type",
+            "etat": "Justification"
+        },
+        "stats": {
+            "titre": "Statistics ({{periode}})",
+            "classe": "Class",
+            "appels": "Roll calls done",
+            "absences": "Absences",
+            "retards": "Late",
+            "non_justifiees": "Not justified",
+            "taux": "Absence rate",
+            "plus_absents": "Most absent students"
+        },
+        "erreurs": {
+            "droits": "You cannot do this action.",
+            "inattendue": "The action failed. Try again.",
+            "motif_invalide": "Write a reason (300 characters at most).",
+            "deja_decidee": "The daara has already decided on this absence: the reason can no longer be changed."
         }
     }
 }

@@ -24,7 +24,17 @@ describe('ParametresDaaraService', () => {
     const client = { from: vi.fn(() => requete), storage: { from: vi.fn(() => bucket) } };
 
     function ouvrir(logoPath: string | null): void {
-        courante.definir({ id: 'd-1', slug: 'daara', nom: 'Daara', ville: null, logoPath, logoUrl: null, roles: ['admin'], modules: [] });
+        courante.definir({
+            id: 'd-1',
+            slug: 'daara',
+            nom: 'Daara',
+            ville: null,
+            logoPath,
+            logoUrl: null,
+            appelDemiJournee: false,
+            roles: ['admin'],
+            modules: [],
+        });
     }
 
     function image(type: string, taille = 1000): File {
@@ -50,20 +60,29 @@ describe('ParametresDaaraService', () => {
     });
 
     it('charge les informations de la daara ouverte (vides → chaînes vides)', async () => {
-        resultat = { data: { nom: 'Daara', ville: null, telephone: '77 000 00 00', langue_defaut: 'en', bareme: 10 }, error: null };
-        expect(await service.charger()).toEqual({ nom: 'Daara', ville: '', telephone: '77 000 00 00', langueDefaut: 'en', bareme: 10 });
+        resultat = { data: { nom: 'Daara', ville: null, telephone: '77 000 00 00', langue_defaut: 'en', bareme: 10, appel_demi_journee: true }, error: null };
+        expect(await service.charger()).toEqual({ nom: 'Daara', ville: '', telephone: '77 000 00 00', langueDefaut: 'en', bareme: 10, appelDemiJournee: true });
         expect(requete.eq).toHaveBeenCalledWith('id', 'd-1');
     });
 
     it('enregistre (espaces retirés, vides → null) puis recharge la daara courante', async () => {
-        await service.enregistrer({ nom: '  Daara Touba ', ville: ' ', telephone: '', langueDefaut: 'fr', bareme: 20 });
-        expect(requete.update).toHaveBeenCalledWith({ nom: 'Daara Touba', ville: null, telephone: null, langue_defaut: 'fr', bareme: 20 });
+        await service.enregistrer({ nom: '  Daara Touba ', ville: ' ', telephone: '', langueDefaut: 'fr', bareme: 20, appelDemiJournee: false });
+        expect(requete.update).toHaveBeenCalledWith({
+            nom: 'Daara Touba',
+            ville: null,
+            telephone: null,
+            langue_defaut: 'fr',
+            bareme: 20,
+            appel_demi_journee: false,
+        });
         expect(auth.rechargerDaaraCourante).toHaveBeenCalled();
     });
 
     it('une mise à jour filtrée par la RLS (aucune ligne) est un refus', async () => {
         resultat = { data: [], error: null };
-        await expect(service.enregistrer({ nom: 'Daara', ville: '', telephone: '', langueDefaut: 'fr', bareme: 20 })).rejects.toMatchObject({
+        await expect(
+            service.enregistrer({ nom: 'Daara', ville: '', telephone: '', langueDefaut: 'fr', bareme: 20, appelDemiJournee: false }),
+        ).rejects.toMatchObject({
             cle: 'parametres.general.erreurs.droits',
         });
         expect(auth.rechargerDaaraCourante).not.toHaveBeenCalled();

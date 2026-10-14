@@ -29,6 +29,8 @@ export interface DaaraAccessible {
     readonly roles: readonly RoleMembre[];
     /** Modules actifs de la daara (ADR-008). */
     readonly modules: readonly ModuleDaara[];
+    /** Appel matin et après-midi (S5.1) ; sinon un appel par jour. */
+    readonly appelDemiJournee: boolean;
 }
 
 const CLE_DERNIERE_DAARA = 'daara.derniere';

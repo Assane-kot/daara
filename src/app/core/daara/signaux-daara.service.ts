@@ -19,7 +19,9 @@ export type TableSignal =
     | 'apprenants'
     | 'inscriptions'
     | 'parent_links'
-    | 'invitation_enfants';
+    | 'invitation_enfants'
+    | 'appels'
+    | 'absences';
 
 /** Délai de regroupement : un import de 20 élèves ou plusieurs écritures rapprochées = un seul rechargement. */
 const REGROUPEMENT_MS = 400;

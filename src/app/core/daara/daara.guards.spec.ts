@@ -12,6 +12,7 @@ const TOUBA: DaaraAccessible = {
     ville: 'Touba',
     logoPath: null,
     logoUrl: null,
+    appelDemiJournee: false,
     roles: ['enseignant'],
     modules: ['structure', 'notes'],
 };
@@ -22,6 +23,7 @@ const THIES: DaaraAccessible = {
     ville: null,
     logoPath: null,
     logoUrl: null,
+    appelDemiJournee: false,
     roles: ['parent'],
     modules: ['coran_cahier'],
 };

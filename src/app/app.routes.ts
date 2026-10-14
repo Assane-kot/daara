@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { roleGuard } from './core/daara/daara.guards';
+import { moduleGuard, roleGuard } from './core/daara/daara.guards';
 import { authGuard, avecDaaraGuard, mfaGuard, sansDaaraGuard } from './core/auth/auth.guards';
 import { daaraGuard, racineGuard } from './core/daara/daara.guards';
 
@@ -33,10 +33,26 @@ export const routes: Routes = [
                 loadChildren: () => import('./features/membres/membres.routes').then((m) => m.MEMBRES_ROUTES),
             },
             {
+                path: 'appel',
+                loadChildren: () => import('./features/appel/appel.routes').then((m) => m.APPEL_ROUTES),
+            },
+            {
                 path: 'enfants',
                 title: 'titres.enfants',
                 canActivate: [roleGuard(['parent'])],
                 loadComponent: () => import('./features/enfants/mes-enfants-page').then((m) => m.MesEnfantsPage),
+            },
+            {
+                path: 'enfants/:apprenantId',
+                title: 'titres.enfants',
+                canActivate: [roleGuard(['parent'])],
+                loadComponent: () => import('./features/enfants/enfant-page').then((m) => m.EnfantPage),
+            },
+            {
+                path: 'absences',
+                title: 'titres.absences',
+                canActivate: [moduleGuard('absences'), roleGuard(['admin', 'enseignant'])],
+                loadComponent: () => import('./features/absences/pages/absences-page').then((m) => m.AbsencesPage),
             },
             {
                 path: 'apprenants',

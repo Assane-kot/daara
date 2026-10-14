@@ -11,6 +11,8 @@ export interface InfosDaara {
     readonly telephone: string;
     readonly langueDefaut: 'fr' | 'en';
     readonly bareme: 10 | 20;
+    /** Appel matin et après-midi (module absences). */
+    readonly appelDemiJournee: boolean;
 }
 
 /** Erreur traduite de l'écran Paramètres → Général. */
@@ -63,7 +65,11 @@ export class ParametresDaaraService {
     private readonly images = inject(ImageLogoService);
 
     async charger(): Promise<InfosDaara> {
-        const { data, error } = await this.sb.from('daaras').select('nom, ville, telephone, langue_defaut, bareme').eq('id', this.daaraId()).single();
+        const { data, error } = await this.sb
+            .from('daaras')
+            .select('nom, ville, telephone, langue_defaut, bareme, appel_demi_journee')
+            .eq('id', this.daaraId())
+            .single();
         if (error) {
             throw erreurParametres(error);
         }
@@ -73,6 +79,7 @@ export class ParametresDaaraService {
             telephone: data.telephone ?? '',
             langueDefaut: data.langue_defaut === 'en' ? 'en' : 'fr',
             bareme: data.bareme === 10 ? 10 : 20,
+            appelDemiJournee: data.appel_demi_journee,
         };
     }
 
@@ -84,6 +91,7 @@ export class ParametresDaaraService {
             telephone: infos.telephone.trim() || null,
             langue_defaut: infos.langueDefaut,
             bareme: infos.bareme,
+            appel_demi_journee: infos.appelDemiJournee,
         });
         await this.auth.rechargerDaaraCourante();
     }
@@ -147,6 +155,7 @@ export class ParametresDaaraService {
         telephone?: string | null;
         langue_defaut?: string;
         bareme?: number;
+        appel_demi_journee?: boolean;
         logo_path?: string | null;
     }): Promise<void> {
         const { data, error } = await this.sb.from('daaras').update(valeurs).eq('id', this.daaraId()).select('id');

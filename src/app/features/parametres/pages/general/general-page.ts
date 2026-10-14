@@ -40,6 +40,7 @@ export class GeneralPage implements OnInit {
         telephone: ['', Validators.pattern(MOTIF_TELEPHONE)],
         langueDefaut: ['fr' as 'fr' | 'en'],
         bareme: [20 as 10 | 20],
+        appelDemiJournee: [false],
     });
 
     ngOnInit(): void {

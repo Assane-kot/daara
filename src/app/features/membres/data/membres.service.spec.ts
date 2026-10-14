@@ -38,6 +38,7 @@ describe('MembresService', () => {
             ville: null,
             logoPath: null,
             logoUrl: null,
+            appelDemiJournee: false,
             roles: ['admin'],
             modules: [],
         });

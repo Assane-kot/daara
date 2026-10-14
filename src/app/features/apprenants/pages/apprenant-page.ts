@@ -7,6 +7,7 @@ import { Badge } from '../../../shared/ui/badge/badge';
 import { ConfirmDialogService } from '../../../shared/ui/confirm-dialog/confirm-dialog.service';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { ApprenantDialogService } from '../components/apprenant-dialog';
+import { HistoriqueAbsences } from '../../absences/components/historique-absences';
 import { ParentsEnfant } from '../components/parents-enfant';
 import { Apprenant, ApprenantsService, ErreurApprenants } from '../data/apprenants.service';
 import { InscriptionEleve, InscriptionsService } from '../data/inscriptions.service';
@@ -17,7 +18,7 @@ import { InscriptionEleve, InscriptionsService } from '../data/inscriptions.serv
  */
 @Component({
     selector: 'app-apprenant-page',
-    imports: [RouterLink, TranslatePipe, Badge, Skeleton, ParentsEnfant],
+    imports: [RouterLink, TranslatePipe, Badge, Skeleton, ParentsEnfant, HistoriqueAbsences],
     template: `
         <p class="mt-0 mb-3">
             <a class="font-semibold text-primary hover:underline" routerLink="..">← {{ 'apprenants.retour' | translate }}</a>
@@ -129,6 +130,12 @@ import { InscriptionEleve, InscriptionsService } from '../data/inscriptions.serv
                         }
                     </div>
                 </div>
+                @if (absencesActives()) {
+                    <section class="mt-6 border-t border-white-light pt-5 dark:border-night-border">
+                        <h3 class="m-0 mb-3 text-base font-bold dark:text-white-light">{{ 'absences.titre' | translate }}</h3>
+                        <app-historique-absences [apprenantId]="a.id" [prenom]="a.prenom" />
+                    </section>
+                }
                 @if (admin()) {
                     <app-parents-enfant [apprenantId]="a.id" [nomEnfant]="a.prenom + ' ' + a.nom" />
                 }
@@ -154,6 +161,7 @@ export class ApprenantPage implements OnInit {
     }
 
     protected readonly admin = computed(() => this.courante.roles().includes('admin'));
+    protected readonly absencesActives = computed(() => this.courante.moduleActif('absences'));
     protected readonly anneeActiveId = signal<string | null>(null);
     protected readonly classes = signal<readonly { id: string; nom: string }[]>([]);
     /** Inscription de l'année active. */

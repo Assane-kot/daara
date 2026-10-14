@@ -14,7 +14,17 @@ describe('ModulesPage', () => {
     const confirmation = { confirmer: vi.fn() };
 
     function ouvrir(modules: ModuleDaara[]): void {
-        courante.definir({ id: 'd-1', slug: 'daara', nom: 'Daara', ville: null, logoPath: null, logoUrl: null, roles: ['admin'], modules });
+        courante.definir({
+            id: 'd-1',
+            slug: 'daara',
+            nom: 'Daara',
+            ville: null,
+            logoPath: null,
+            logoUrl: null,
+            appelDemiJournee: false,
+            roles: ['admin'],
+            modules,
+        });
     }
 
     function interrupteur(module: ModuleDaara): HTMLInputElement {

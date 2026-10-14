@@ -1,5 +1,6 @@
 import { SignauxDaaraService } from '../../core/daara/signaux-daara.service';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { EmptyState } from '../../shared/ui/empty-state/empty-state';
 import { PageHeader } from '../../shared/ui/page-header/page-header';
@@ -17,7 +18,7 @@ interface CarteEnfant extends MonEnfant {
  */
 @Component({
     selector: 'app-mes-enfants-page',
-    imports: [TranslatePipe, EmptyState, PageHeader, Skeleton],
+    imports: [RouterLink, TranslatePipe, EmptyState, PageHeader, Skeleton],
     template: `
         <app-page-header [titre]="'enfants.titre' | translate" />
         @if (chargement()) {
@@ -39,20 +40,22 @@ interface CarteEnfant extends MonEnfant {
         } @else {
             <ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
                 @for (e of enfants(); track e.id) {
-                    <li class="panel flex items-center gap-4">
-                        <div
-                            class="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-full bg-primary/10 text-xl font-extrabold text-primary uppercase"
-                        >
-                            @if (e.photoUrl) {
-                                <img [src]="e.photoUrl" [alt]="'apprenants.photo_de' | translate: { nom: e.prenom }" class="h-full w-full object-cover" />
-                            } @else {
-                                {{ e.prenom[0] }}{{ e.nom[0] }}
-                            }
-                        </div>
-                        <div class="min-w-0">
-                            <p class="m-0 truncate text-lg font-bold text-black dark:text-white-light">{{ e.prenom }} {{ e.nom }}</p>
-                            <p class="m-0 text-muted dark:text-night-muted">{{ e.classe ?? ('enfants.sans_classe' | translate) }}</p>
-                        </div>
+                    <li>
+                        <a class="panel flex items-center gap-4 transition hover:ring-2 hover:ring-primary/40" [routerLink]="[e.id]">
+                            <div
+                                class="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-full bg-primary/10 text-xl font-extrabold text-primary uppercase"
+                            >
+                                @if (e.photoUrl) {
+                                    <img [src]="e.photoUrl" [alt]="'apprenants.photo_de' | translate: { nom: e.prenom }" class="h-full w-full object-cover" />
+                                } @else {
+                                    {{ e.prenom[0] }}{{ e.nom[0] }}
+                                }
+                            </div>
+                            <div class="min-w-0">
+                                <p class="m-0 truncate text-lg font-bold text-black dark:text-white-light">{{ e.prenom }} {{ e.nom }}</p>
+                                <p class="m-0 text-muted dark:text-night-muted">{{ e.classe ?? ('enfants.sans_classe' | translate) }}</p>
+                            </div>
+                        </a>
                     </li>
                 }
             </ul>

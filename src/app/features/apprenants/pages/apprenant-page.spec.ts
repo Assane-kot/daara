@@ -41,7 +41,7 @@ describe('ApprenantPage', () => {
                 { provide: ApprenantsService, useValue: service },
                 { provide: InscriptionsService, useValue: inscriptions },
                 { provide: ParentsService, useValue: { parentsDe: vi.fn().mockResolvedValue([]) } },
-                { provide: CurrentDaaraService, useValue: { roles: () => ['admin'], id: () => 'd1', slug: () => 'ma-daara' } },
+                { provide: CurrentDaaraService, useValue: { roles: () => ['admin'], id: () => 'd1', slug: () => 'ma-daara', moduleActif: () => false } },
             ],
         });
         fixture = TestBed.createComponent(ApprenantPage);

@@ -52,6 +52,12 @@
                         >
                             <div class="flex items-center">
                                 @switch (entree.icone) {
+                                    @case ('appel') {
+                                        <icon-list-check class="shrink-0 group-hover:text-primary!" />
+                                    }
+                                    @case ('absences') {
+                                        <icon-calendar class="shrink-0 group-hover:text-primary!" />
+                                    }
                                     @case ('membres') {
                                         <icon-users class="shrink-0 group-hover:text-primary!" />
                                     }

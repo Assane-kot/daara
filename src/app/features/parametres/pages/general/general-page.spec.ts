@@ -11,7 +11,7 @@ describe('GeneralPage', () => {
     let courante: CurrentDaaraService;
     const service = { charger: vi.fn(), enregistrer: vi.fn(), deposerLogo: vi.fn(), retirerLogo: vi.fn() };
     const confirmation = { confirmer: vi.fn() };
-    const infos = { nom: 'Daara Touba', ville: 'Touba', telephone: '', langueDefaut: 'fr', bareme: 20 };
+    const infos = { nom: 'Daara Touba', ville: 'Touba', telephone: '', langueDefaut: 'fr', bareme: 20, appelDemiJournee: false };
 
     function champ(nom: string): HTMLInputElement {
         return element.querySelector(`[formcontrolname="${nom}"]`) as HTMLInputElement;
@@ -45,7 +45,17 @@ describe('GeneralPage', () => {
             ],
         });
         courante = TestBed.inject(CurrentDaaraService);
-        courante.definir({ id: 'd-1', slug: 'daara', nom: 'Daara Touba', ville: null, logoPath: null, logoUrl: null, roles: ['admin'], modules: [] });
+        courante.definir({
+            id: 'd-1',
+            slug: 'daara',
+            nom: 'Daara Touba',
+            ville: null,
+            logoPath: null,
+            logoUrl: null,
+            appelDemiJournee: false,
+            roles: ['admin'],
+            modules: [],
+        });
     });
 
     it('pré-remplit le formulaire ; « Enregistrer » inactif tant que rien ne change', async () => {

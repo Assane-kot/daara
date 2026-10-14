@@ -28,7 +28,9 @@
         "parametres": "Paramètres",
         "structure": "Structure",
         "eleves": "Élèves",
-        "enfants": "Mes enfants"
+        "enfants": "Mes enfants",
+        "appel": "Appel",
+        "absences": "Absences"
     },
     "titres": {
         "tableau_de_bord": "Tableau de bord",
@@ -56,7 +58,9 @@
         "apprenants": "Élèves",
         "apprenant": "Fiche élève",
         "enfants": "Mes enfants",
-        "import": "Importer des élèves"
+        "import": "Importer des élèves",
+        "appel": "Appel",
+        "absences": "Absences"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -370,7 +374,10 @@
                 "inattendue": "L’enregistrement a échoué. Réessayez.",
                 "logo_illisible": "Ce fichier n’est pas une image lisible.",
                 "logo_suppression": "Le logo n’a pas pu être supprimé. Réessayez."
-            }
+            },
+            "appel": "Appel",
+            "appel_jour": "Une fois par jour",
+            "appel_demi": "Matin et après-midi"
         }
     },
     "membres": {
@@ -744,10 +751,7 @@
         },
         "affectations": {
             "titre": "Matières enseignées",
-            "ajouter": "Ajouter une matière",
             "modifier": "Modifier la matière de la classe",
-            "matiere": "Matière",
-            "choisir": "Choisissez une matière",
             "coefficient": "Coefficient",
             "enseignant": "Enseignant",
             "coef_x": "Coefficient {{coef}}",
@@ -758,7 +762,16 @@
             "confirmer_retrait_message": "La matière ne sera plus enseignée dans cette classe.",
             "vide_titre": "Aucune matière",
             "vide_message": "Ajoutez les matières enseignées dans cette classe.",
-            "ajouter_premiere": "Ajouter la première matière"
+            "ajouter_plusieurs": "Ajouter des matières",
+            "ajouter_dans": "Ajouter des matières à {{classe}}",
+            "rechercher": "Rechercher une matière (nom, code)",
+            "tout_selectionner": "Tout sélectionner ({{n}})",
+            "ajouter_n": "Ajouter {{n}} matière(s)",
+            "aucune_trouvee": "Aucune matière ne correspond à la recherche.",
+            "coefficient_invalide": "Coefficient de 0,5 à 20 (par demi-points).",
+            "ajoutees": "Matières ajoutées à la classe.",
+            "catalogue_vide": "Votre daara n’a pas encore de matières (ou elles sont toutes déjà dans cette classe) : créez-les d’abord.",
+            "creer_matieres": "Créer les matières"
         }
     },
     "table": {
@@ -894,7 +907,9 @@
         "erreur": "Vos enfants n’ont pas pu être chargés.",
         "vide_titre": "Aucun enfant relié",
         "vide_message": "La daara n’a pas encore relié vos enfants à votre compte. Contactez son administrateur.",
-        "sans_classe": "Pas encore de classe"
+        "sans_classe": "Pas encore de classe",
+        "retour": "Retour à mes enfants",
+        "introuvable": "Cet enfant n’est pas relié à votre compte."
     },
     "import": {
         "titre": "Importer des élèves",
@@ -1006,6 +1021,137 @@
                 "aide": "Depuis la fiche de chaque élève : « Ajouter un parent ».",
                 "action": "Ouvrir la liste des élèves"
             }
+        }
+    },
+    "appel": {
+        "titre": "Appel du jour",
+        "date": "Date",
+        "aujourdhui": "Aujourd’hui",
+        "creneau": "Créneau",
+        "creneaux": {
+            "journee": "Journée",
+            "matin": "Matin",
+            "apres_midi": "Après-midi"
+        },
+        "etats": {
+            "a_faire": "À faire",
+            "en_cours": "En cours",
+            "fait": "Fait"
+        },
+        "resume": "{{absents}} absent(s), {{retards}} retard(s)",
+        "vide_titre": "Aucune classe à appeler",
+        "vide_admin": "Créez les classes de l’année en cours et inscrivez-y les élèves.",
+        "vide_enseignant": "Vous n’êtes titulaire ou enseignant d’aucune classe cette année. Demandez à l’administrateur de vous affecter.",
+        "voir_classes": "Voir les classes",
+        "retour": "Retour aux classes",
+        "compte": {
+            "presents": "{{n}} présent(s)",
+            "absents": "{{n}} absent(s)",
+            "retards": "{{n}} retard(s)"
+        },
+        "presences": {
+            "present": "Présent",
+            "absence": "Absent",
+            "retard": "En retard"
+        },
+        "aide": "Tout le monde est présent. Touchez un élève : absent, touchez encore : en retard, encore : présent.",
+        "aucun_eleve_titre": "Aucun élève dans cette classe",
+        "aucun_eleve_message": "Inscrivez d’abord les élèves dans la classe (Structure → Classes).",
+        "termine": "Appel terminé",
+        "enregistre_auto": "Chaque toucher est enregistré.",
+        "deja_termine": "Appel terminé : vous pouvez encore corriger.",
+        "terminer": "Terminer l’appel",
+        "confirmer_titre": "Terminer l’appel de {{classe}} ?",
+        "confirmer_message": "{{absents}} absent(s) et {{retards}} retard(s). Vous pourrez encore corriger ensuite.",
+        "confirmer_tous_presents": "Tous les élèves sont présents. Vous pourrez encore corriger ensuite.",
+        "fait_ok": "Appel de {{classe}} terminé.",
+        "erreurs": {
+            "droits": "Vous ne pouvez pas faire l’appel de cette classe.",
+            "inattendue": "L’enregistrement a échoué. Vérifiez la connexion et réessayez.",
+            "appel_trop_ancien": "Un enseignant peut faire ou corriger l’appel jusqu’à 7 jours en arrière. Au-delà, demandez à l’administrateur.",
+            "date_hors_annee": "Cette date est en dehors de l’année scolaire en cours (ou dans le futur).",
+            "annee_inactive": "Cette classe n’appartient pas à l’année scolaire en cours.",
+            "eleve_hors_classe": "Cet élève n’est plus inscrit dans cette classe. La liste a été actualisée.",
+            "creneau_invalide": "Le réglage de l’appel (journée ou matin / après-midi) vient de changer. Revenez à la liste des classes."
+        }
+    },
+    "absences": {
+        "titre": "Absences",
+        "historique": "Historique des absences",
+        "aucune": "Aucune absence pour {{prenom}}.",
+        "etats": {
+            "aucune": "Sans justification",
+            "envoyee": "Justification envoyée",
+            "justifiee": "Justifiée",
+            "non_justifiee": "Non justifiée"
+        },
+        "justifier": {
+            "bouton": "Justifier",
+            "modifier": "Modifier le motif",
+            "titre_absence": "Absence de {{prenom}} le {{date}}",
+            "titre_retard": "Retard de {{prenom}} le {{date}}",
+            "choisir": "Touchez un motif ou écrivez-le :",
+            "motif": "Motif",
+            "aide": "{{n}} caractères restants.",
+            "envoyer": "Envoyer le motif",
+            "envoye": "Motif envoyé. La daara va le valider.",
+            "motifs": {
+                "malade": "Malade",
+                "medecin": "Rendez-vous médical",
+                "famille": "Événement familial",
+                "voyage": "Voyage",
+                "transport": "Problème de transport"
+            }
+        },
+        "decider": {
+            "justifiee": "Justifiée",
+            "non_justifiee": "Non justifiée",
+            "ok_justifiee": "Absence marquée justifiée.",
+            "ok_non_justifiee": "Absence marquée non justifiée."
+        },
+        "appels_a_faire": "Appel pas encore terminé aujourd’hui dans {{n}} classe(s) :",
+        "vide_titre": "Aucune absence",
+        "vide_message": "Aucune absence ni retard pour cette période et ces filtres.",
+        "filtres": {
+            "periode": "Période",
+            "classe": "Classe",
+            "toutes_classes": "Toutes les classes",
+            "etat": "Justification",
+            "etats": {
+                "tous": "Toutes",
+                "a_decider": "À décider (motif reçu)",
+                "aucune": "Sans justification",
+                "justifiee": "Justifiées",
+                "non_justifiee": "Non justifiées"
+            }
+        },
+        "periodes": {
+            "semaine": "7 derniers jours",
+            "mois": "30 derniers jours",
+            "annee": "Depuis la rentrée"
+        },
+        "colonnes": {
+            "date": "Date",
+            "eleve": "Élève",
+            "classe": "Classe",
+            "type": "Type",
+            "etat": "Justification"
+        },
+        "stats": {
+            "titre": "Statistiques ({{periode}})",
+            "classe": "Classe",
+            "appels": "Appels faits",
+            "absences": "Absences",
+            "retards": "Retards",
+            "non_justifiees": "Non justifiées",
+            "taux": "Taux d’absence",
+            "plus_absents": "Élèves les plus absents"
+        },
+        "erreurs": {
+            "droits": "Vous ne pouvez pas faire cette action.",
+            "inattendue": "L’action a échoué. Réessayez.",
+            "motif_invalide": "Écrivez un motif (300 caractères au plus).",
+            "deja_decidee": "La daara a déjà décidé pour cette absence : le motif ne peut plus être modifié."
         }
     }
 }

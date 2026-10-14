@@ -13,7 +13,7 @@
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
 - Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
-- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 et S5.0b faits (conception, mise à jour automatique). Suivante : S5.1 appel du jour. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 à S5.2 faits (conception, mise à jour automatique, appel du jour, justification et suivi). Suivante : S5.3 notifications. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -189,6 +189,47 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-14 — S5.2 Justification des absences et suivi
+- Migration `justification_absences` : RPC `justifier_absence` (parent de l'enfant, motif nettoyé de 300 caractères au
+  plus, refus après décision), `decider_justification` (admin aal2 ou **titulaire** de la classe ; décision corrigeable ;
+  sans motif possible), `statistiques_absences` (security invoker : l'enseignant ne voit que ses classes ; taux par
+  classe, 10 élèves les plus absents sans noms) ; `absences_coherentes` reprise : indicateur de transaction
+  `daara.rpc_absence` pour les écritures des RPC (type immuable). 20 tests pgTAP (732).
+- Front : menu « Absences » (icône Vristo `calendar`) → `/d/:slug/absences` (admin ; enseignant : ses classes) : appels pas
+  encore terminés aujourd'hui (liens directs vers l'appel), liste filtrée (7 / 30 jours / depuis la rentrée, classe,
+  justification dont « À décider »), « Justifiée » / « Non justifiée » en un toucher (admin, titulaire), statistiques ;
+  fiche élève → « Absences » ; parent → « Mes enfants » cliquable → `/d/:slug/enfants/:id` (absences, « Justifier » :
+  motifs proposés en un toucher ou texte libre, « Modifier le motif » tant que ce n'est pas décidé). Mise à jour
+  automatique partout (S5.0b).
+- Vérifié dans le navigateur : parent → « Justifier » → « Malade » → « Justification envoyée » ; décision du titulaire →
+  « Justifiée » apparaît chez le parent sans recharger ; enseignant → Absences : 3 lignes, décision « Non justifiée »,
+  statistiques (taux 50 %) ; 375 px sans débordement. 281 tests unitaires.
+
+### 2026-10-14 — S5.1 Appel du jour
+- Migration `appels_absences` (module `absences`) : `daaras.appel_demi_journee`, enums `creneau_appel`, `type_absence`,
+  `etat_justification`, tables `appels` (une par classe, date, créneau ; terminé par RPC) et `absences` (absents et
+  retards seulement ; classe, date, créneau copiés de l'appel ; motif / état / décision hors droits client, S5.2) ;
+  `verifier_appel` (droits en tête : admin aal2, enseignant `teaches_class` sur 7 jours, module ; année active ; date
+  pas future), triggers de cohérence et de suppression, journal sans valeurs, signaux (S5.0b), droits par colonne (`id`
+  non choisi par le client), RPC `terminer_appel` (droits vérifiés avant le verrou). 28 tests pgTAP (712).
+- Front : menu « Appel » (icône Vristo `list-check`), `/d/:slug/appel` (classes du jour : les siennes pour l'enseignant,
+  toutes pour l'admin ; état À faire / En cours / Fait avec absents et retards ; date du jour par défaut, 7 jours en
+  arrière pour l'enseignant ; créneau si matin et après-midi), `/d/:slug/appel/:classeId` (présent par défaut ; toucher :
+  absent → en retard → présent, enregistré à chaque toucher, retour arrière si l'enregistrement échoue ; compteurs ;
+  barre fixe « Terminer l'appel » avec résumé confirmé ; corrections possibles après) ; Paramètres → Général : « Appel :
+  une fois par jour / matin et après-midi » (module actif). `DaaraAccessible.appelDemiJournee`.
+- Vérifié dans le navigateur (enseignant titulaire) : appel de CE1 A (6 élèves), touchers très rapides → écran et base
+  identiques, résumé « 2 absent(s) et 2 retard(s) », appel « Fait » dans la liste ; 375 px (boutons de 60 px, pas de
+  débordement). Non vérifié dans le navigateur : le réglage demi-journée (tests unitaires et pgTAP).
+- Bug trouvé dans le navigateur et corrigé : un 2e toucher arrivé juste avant le rafraîchissement de l'écran repartait
+  de l'ancien état (insertion en double refusée) → état courant relu au toucher, un enregistrement à la fois par élève ;
+  insertion déjà faite par un collègue → mise à jour.
+- Pièges : les privilèges par défaut de Supabase donnent tout à `authenticated` sur une nouvelle table → `revoke` puis
+  droits par colonne (déjà fait pour `apprenants`) ; colonnes `not null` remplies par trigger → types générés exigeants
+  (insertion annotée côté service) ; le garde-fou de transaction de l'auditeur ne marche pas avec `psql -c` (un seul
+  message) → script passé par l'entrée standard.
+- 278 tests unitaires. Pas d'audit (fin de sprint).
+
 ### 2026-10-13 — S5.0b Mise à jour automatique entre profils
 - Demande du développeur : les changements faits par un autre profil (invitation acceptée, matières ou élèves ajoutés)
   n'apparaissaient qu'après actualisation. ADR-011 révisé (validé) : signaux Realtime Broadcast privés par daara.

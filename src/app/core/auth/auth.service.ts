@@ -355,7 +355,7 @@ export class AuthService {
         // l'écarte, et mfaRequise() l'envoie d'abord vers /auth/mfa.
         const { data, error } = await this.sb
             .from('memberships')
-            .select('role, daaras!inner(id, slug, nom, ville, logo_path, updated_at, daara_modules(module, actif))')
+            .select('role, daaras!inner(id, slug, nom, ville, logo_path, updated_at, appel_demi_journee, daara_modules(module, actif))')
             .eq('user_id', userId)
             .eq('actif', true);
         if (error) {
@@ -374,6 +374,7 @@ export class AuthService {
                 logoUrl: d.logo_path ? this.urlLogo(d.logo_path, d.updated_at) : null,
                 roles: [...(existante?.roles ?? []), ligne.role],
                 modules: MODULES.filter((m) => d.daara_modules.some((dm) => dm.module === m && dm.actif)),
+                appelDemiJournee: d.appel_demi_journee,
             });
         }
         return [...parId.values()].sort((a, b) => a.nom.localeCompare(b.nom));
