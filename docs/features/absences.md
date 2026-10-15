@@ -46,7 +46,10 @@ tables `appels` et `absences` (journal sans valeurs, ADR-010), RPC `terminer_app
 - `/d/:slug/absences` (admin ; titulaire : ses classes) : appels non faits aujourd'hui en tête, liste filtrable (dates,
   classe, type, justification), « À décider » (justifications envoyées), statistiques simples ; temps réel.
 - Fiche élève : onglet / section « Absences » (historique, état de la justification).
-- Parent (S5.4) : accueil = « Mes enfants » enrichi (présent / absent aujourd'hui, absences récentes, « Justifier »).
+- Parent (S5.4) : accueil = « Mes enfants » (le tableau de bord le redirige ; pas d'entrée « Tableau de bord » pour lui) :
+  par enfant, situation du jour (présent / absent / en retard, avec le créneau, d'après les appels terminés ; « l'appel
+  d'aujourd'hui n'est pas encore fait » sinon), absences à justifier des 30 derniers jours avec « Justifier », lien vers
+  toutes ses absences.
 - Paramètres → Général : « Appel : une fois par jour / matin et après-midi » (module `absences` actif).
 États : chargement, erreur, vide avec action, 375 px, sombre, fr / en.
 

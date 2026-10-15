@@ -31,6 +31,9 @@ export interface MonEnfant {
     readonly nom: string;
     readonly photoPath: string | null;
     readonly classe: string | null;
+    /** Classe de l'année active (appel du jour). */
+    readonly classeId: string | null;
+    readonly sexe: 'F' | 'M';
 }
 
 export function erreurParents(erreur: { code?: string; message?: string } | null): ErreurApprenants {
@@ -128,7 +131,9 @@ export class ParentsService {
     async mesEnfants(): Promise<MonEnfant[]> {
         const { data, error } = await this.sb
             .from('apprenants')
-            .select('id, prenom, nom, photo_path, parent_links!inner(parent_user_id), inscriptions(annee_id, classes(nom), annees_scolaires(active))')
+            .select(
+                'id, prenom, nom, sexe, photo_path, parent_links!inner(parent_user_id), inscriptions(annee_id, classe_id, classes(nom), annees_scolaires(active))',
+            )
             .eq('daara_id', this.daaraId())
             // Seulement SES enfants : un parent aussi admin ou enseignant lit d'autres élèves (audit de fin de sprint 4).
             .eq('parent_links.parent_user_id', this.utilisateurId())
@@ -136,13 +141,18 @@ export class ParentsService {
         if (error) {
             throw erreurParents(error);
         }
-        return data.map((a) => ({
-            id: a.id,
-            prenom: a.prenom,
-            nom: a.nom,
-            photoPath: a.photo_path,
-            classe: a.inscriptions.find((i) => i.annees_scolaires?.active)?.classes?.nom ?? null,
-        }));
+        return data.map((a) => {
+            const active = a.inscriptions.find((i) => i.annees_scolaires?.active);
+            return {
+                id: a.id,
+                prenom: a.prenom,
+                nom: a.nom,
+                sexe: a.sexe,
+                photoPath: a.photo_path,
+                classe: active?.classes?.nom ?? null,
+                classeId: active?.classe_id ?? null,
+            };
+        });
     }
 
     private utilisateurId(): string {

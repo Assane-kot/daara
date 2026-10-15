@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CurrentDaaraService } from '../../core/daara/current-daara.service';
 import { PageHeader } from '../../shared/ui/page-header/page-header';
@@ -32,7 +33,15 @@ export class DashboardPage implements OnInit {
     /** Message laissé par un guard (accès refusé), affiché une seule fois. */
     protected readonly message = signal<string | null>(null);
 
+    private readonly router = inject(Router);
+    private readonly route = inject(ActivatedRoute);
+
     ngOnInit(): void {
+        // Parent : son accueil est « Mes enfants » (S5.4), sauf s'il faut d'abord lui montrer un message d'accès refusé.
+        if (this.courante.famille() && this.courante.hasRole('parent') && !this.courante.message()) {
+            void this.router.navigate(['enfants'], { relativeTo: this.route, replaceUrl: true });
+            return;
+        }
         this.message.set(this.courante.message());
         this.courante.message.set(null);
     }

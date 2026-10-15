@@ -21,7 +21,8 @@ export interface EntreeMenu {
 }
 
 export const MENU: readonly EntreeMenu[] = [
-    { cle: 'menu.tableau_de_bord', icone: 'tableau', route: '', barreBasse: true },
+    // Parent : l'accueil est « Mes enfants » (S5.4).
+    { cle: 'menu.tableau_de_bord', icone: 'tableau', route: '', roles: ['admin', 'enseignant', 'apprenant'], barreBasse: true },
     { cle: 'menu.appel', icone: 'appel', route: 'appel', roles: ['admin', 'enseignant'], module: 'absences' },
     { cle: 'menu.absences', icone: 'absences', route: 'absences', roles: ['admin', 'enseignant'], module: 'absences' },
     { cle: 'menu.enfants', icone: 'eleves', route: 'enfants', roles: ['parent'], barreBasse: true },

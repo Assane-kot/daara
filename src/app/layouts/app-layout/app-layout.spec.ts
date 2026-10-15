@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideSignauxTesting } from '../../../testing/signaux-testing';
 import { provideTranslateTesting } from '../../../testing/translate-testing';
+import { CurrentDaaraService } from '../../core/daara/current-daara.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { LayoutService } from '../layout.service';
 import { AppLayout } from './app-layout';
@@ -20,6 +21,19 @@ describe('AppLayout', () => {
         await TestBed.inject(LanguageService).init();
         fixture = TestBed.createComponent(AppLayout);
         element = fixture.nativeElement as HTMLElement;
+        await fixture.whenStable();
+        // Après le démarrage (la session vide remet la daara à zéro) : membre admin d'une daara (le parent n'a pas de « Tableau de bord » : son accueil est « Mes enfants »).
+        TestBed.inject(CurrentDaaraService).definir({
+            id: 'd1',
+            slug: 'ma-daara',
+            nom: 'Daara',
+            ville: null,
+            logoPath: null,
+            logoUrl: null,
+            appelDemiJournee: false,
+            roles: ['admin'],
+            modules: [],
+        });
         await fixture.whenStable();
     });
 

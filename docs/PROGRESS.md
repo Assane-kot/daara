@@ -13,7 +13,8 @@
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
 - Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
-- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 à S5.3 faits (conception, mise à jour automatique, appel, justification et suivi, notifications). Suivante : S5.4 accueil parent. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 à S5.4 faits (conception, mise à jour automatique, appel, justification et suivi, notifications, accueil parent).
+  Suivante : S5.5 tests e2e Playwright. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -189,6 +190,19 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-15 — S5.4 Accueil parent mobile
+- Front seul : « Mes enfants » devient l'accueil du parent (le tableau de bord le redirige, l'entrée « Tableau de bord » est
+  retirée de son menu ; barre basse : Mes enfants, Notifications). Carte par enfant : situation du jour calculée par
+  `situationDuJour` (présent / absent / en retard selon le dernier créneau terminé, accord fille / garçon ; « l'appel
+  d'aujourd'hui n'est pas encore fait » ; rien pendant un appel en cours), absences à justifier des 30 derniers jours avec
+  « Justifier » (motif proposé en un toucher), lien vers toutes ses absences ; mise à jour automatique (appel terminé,
+  décision). `MonEnfant` porte le sexe et la classe ; `AbsencesService.situation`.
+- Vérifié dans le navigateur (parent, 375 px) : connexion → « Mes enfants » ; « Aminata est présente aujourd'hui »,
+  « Fatou est absente aujourd'hui » + « Justifier » → « Malade » → envoyé, l'absence quitte « à justifier » ; barre basse,
+  pas de débordement. 287 tests unitaires.
+- Piège de test : la session vide du démarrage remet la daara courante à zéro → définir la daara après la création du
+  composant dans les tests de layout.
+
 ### 2026-10-15 — S5.3 Notifications dans l'application
 - Migration `notifications` (module `notifications`) : enum `type_notification`, table `notifications` (identifiants
   seulement : élève, absence, date, créneau ; ni texte ni nom d'enfant, ADR-011), lecture et « lu » par le destinataire

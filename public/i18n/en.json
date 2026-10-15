@@ -911,7 +911,15 @@
         "vide_message": "The daara has not linked your children to your account yet. Contact its administrator.",
         "sans_classe": "No class yet",
         "retour": "Back to my children",
-        "introuvable": "This child is not linked to your account."
+        "introuvable": "This child is not linked to your account.",
+        "a_justifier": "Absence(s) to justify: {{n}}",
+        "voir_detail": "See all absences",
+        "situation": {
+            "present": "{{prenom}} is present {{quand}}.",
+            "absence": "{{prenom}} is absent {{quand}}.",
+            "retard": "{{prenom}} arrived late {{quand}}.",
+            "attente": "Today’s roll call has not been taken yet."
+        }
     },
     "import": {
         "titre": "Import students",

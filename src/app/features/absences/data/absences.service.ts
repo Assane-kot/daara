@@ -113,6 +113,44 @@ export class AbsencesService {
         return data.map((a) => this.versAbsence(a));
     }
 
+    /**
+     * Accueil du parent (S5.4) : appels du jour des classes de ses enfants (« présent aujourd'hui ») et leurs absences
+     * depuis `debut`.
+     */
+    async situation(
+        enfantIds: readonly string[],
+        classeIds: readonly string[],
+        aujourdhui: string,
+        debut: string,
+    ): Promise<{ appels: { classeId: string; creneau: Creneau; termine: boolean }[]; absences: Absence[] }> {
+        if (enfantIds.length === 0) {
+            return { appels: [], absences: [] };
+        }
+        const [appels, absences] = await Promise.all([
+            classeIds.length
+                ? this.sb
+                      .from('appels')
+                      .select('classe_id, creneau, termine_at')
+                      .in('classe_id', [...classeIds])
+                      .eq('date_appel', aujourdhui)
+                : Promise.resolve({ data: [], error: null }),
+            this.sb
+                .from('absences')
+                .select(COLONNES)
+                .in('apprenant_id', [...enfantIds])
+                .gte('date_absence', debut)
+                .order('date_absence', { ascending: false })
+                .order('creneau'),
+        ]);
+        if (appels.error || absences.error) {
+            throw erreurAbsences(appels.error ?? absences.error);
+        }
+        return {
+            appels: appels.data.map((a) => ({ classeId: a.classe_id, creneau: a.creneau, termine: !!a.termine_at })),
+            absences: absences.data.map((a) => this.versAbsence(a)),
+        };
+    }
+
     async justifier(absenceId: string, motif: string): Promise<void> {
         const { error } = await this.sb.rpc('justifier_absence', { p_absence: absenceId, p_motif: motif });
         if (error) {

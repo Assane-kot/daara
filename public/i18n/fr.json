@@ -911,7 +911,15 @@
         "vide_message": "La daara n’a pas encore relié vos enfants à votre compte. Contactez son administrateur.",
         "sans_classe": "Pas encore de classe",
         "retour": "Retour à mes enfants",
-        "introuvable": "Cet enfant n’est pas relié à votre compte."
+        "introuvable": "Cet enfant n’est pas relié à votre compte.",
+        "a_justifier": "Absence(s) à justifier : {{n}}",
+        "voir_detail": "Voir toutes ses absences",
+        "situation": {
+            "present": "{{prenom}} est présent{{e}} {{quand}}.",
+            "absence": "{{prenom}} est absent{{e}} {{quand}}.",
+            "retard": "{{prenom}} est arrivé{{e}} en retard {{quand}}.",
+            "attente": "L’appel d’aujourd’hui n’est pas encore fait."
+        }
     },
     "import": {
         "titre": "Importer des élèves",
