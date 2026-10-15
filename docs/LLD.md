@@ -61,12 +61,14 @@ src/app/
   ├── appel, appel/:classeId       admin, enseignant ; moduleGuard('absences') : appel du jour (sprint 5)
   ├── absences                     admin, enseignant titulaire ; moduleGuard('absences') : suivi, justifications, stats
   ├── notifications                tous ; moduleGuard('notifications') (sprint 5 ; barre basse des parents)
-  ├── evaluations/...              admin, enseignant
+  ├── notes/...                    admin, enseignant ; moduleGuard('notes') : évaluations par classe / matière / période,
+  │                                evaluations/:id (saisie), moyennes (sprint 6)
   ├── bulletins/...                admin (gestion), parent/apprenant (consultation)
   ├── enfants                      parent : « Mes enfants » (sprint 4) = accueil du parent (sprint 5 : présent / absent
   │                                aujourd'hui, absences, « Justifier ») ; :apprenantId/... (sprints 5+)
   ├── coran/...                    admin, enseignant, apprenant
-  └── parametres                   admin : onglets Général (nom, logo, langue, barème) et Modules (ADR-008)
+  └── parametres                   admin : onglets Général (nom, logo, langue, barème), Modules (ADR-008), Absences et Notes
+                                   (sprint 6, ADR-012 ; onglet visible si le module est actif)
 /plateforme/...                    super-admin
 ```
 
@@ -243,8 +245,19 @@ sur un canal privé par utilisateur (S5.3).
 #### Évaluations et bulletins (sprints 6-7)
 | Table | Colonnes principales | Contraintes |
 |---|---|---|
-| `evaluations` | daara_id, classe_matiere_id, periode_id, libelle, type (devoir/composition), date_eval, bareme, coefficient | période non clôturée |
-| `notes` | daara_id, evaluation_id, apprenant_id, valeur, absent, appreciation | unique (evaluation_id, apprenant_id) ; 0 ≤ valeur ≤ barème |
+Sprint 6 détaillé le 2026-10-15 (spec `notes.md`, ADR-012 paramétrage par daara). Module `notes` (prérequis
+`structure`) ; `reglages_absences` : module `absences`. Tables d'élèves (notes) : journal sans valeurs (ADR-010).
+Enums : `regle_absence_eval` (`ignorer`, `zero`, `zero_si_non_justifiee`), `mode_moyenne` (`ponderee`, `simple`),
+`arrondi_note` (`centieme`, `dixieme`, `quart`, `demi`), `visibilite_notes` (`publication`, `saisie`),
+`decideur_justification` (`admin_titulaire`, `admin`) ; `type_notification` + `notes_publiees`.
+
+| Table | Colonnes principales | Contraintes |
+|---|---|---|
+| `reglages_notes` | daara_id (pk), absence_evaluation (`ignorer`), moyenne_generale (`ponderee`), arrondi (`centieme`), seuil_reussite numeric null (null = moitié du barème), titulaire_saisit bool (false), visibilite (`publication`), moyennes_visibles bool (true), appreciations bool (true), updated_at, updated_by | une ligne par daara, créée avec la daara (trigger) et pour les daaras existantes ; seuil entre 0 et le barème ; lecture : membres actuels + module ; écriture : admin aal2 + module ; journalisée |
+| `types_evaluation` | nom (libelle_valide, 40), coefficient numeric (0,25 à 20, par quart), ordre smallint, archive bool | unique (daara_id, nom sans casse) ; Devoir (1) et Composition (2) créés avec la daara ; supprimable s'il n'est pas utilisé (sinon archiver) |
+| `evaluations` | classe_matiere_id (fk restrict), classe_id (copiée), periode_id (fk restrict), type_id (fk restrict), libelle (libelle_valide, 60), date_eval, bareme numeric (1 à 100, défaut : barème de la daara), coefficient (défaut : celui du type), publiee_at null, created_by | trigger `evaluations_coherentes` (droits en tête) : écrivain = admin aal2 ou enseignant de la matière dans la classe (`classe_matieres.enseignant_id`), ou titulaire si `titulaire_saisit` ; classe de l'année active ; période de l'année de la classe, **non clôturée** ; date dans la période ; `publiee_at` posé seulement par `publier_evaluation` ; suppression refusée si publiée avec des notes ; index (daara_id), (classe_id, periode_id) |
+| `notes` | evaluation_id (fk cascade), apprenant_id (fk cascade), valeur numeric null, absent bool, appreciation text null (≤ 200, texte_sur), updated_at, updated_by | unique (evaluation_id, apprenant_id) ; `absent` xor `valeur` ; 0 ≤ valeur ≤ barème de l'évaluation, par quart de point ; trigger `notes_coherentes` : mêmes droits que l'évaluation, élève inscrit dans la classe, période non clôturée, appréciation nulle si le réglage la désactive ; journal sans valeurs |
+| `reglages_absences` (S6.1b) | daara_id (pk), delai_correction smallint (7 ; 0 à 30), decideur (`admin_titulaire`), justification_parent bool (true), updated_at, updated_by | remplace les valeurs fixées au sprint 5 (`verifier_appel`, `decider_justification`, `justifier_absence`) ; `daaras.appel_demi_journee` inchangé |
 | `bulletins` | daara_id, apprenant_id, periode_id, moyenne, rang, effectif, appreciation, statut (brouillon/publie), pdf_path, publie_at | unique (apprenant_id, periode_id) |
 | `bulletin_lignes` | bulletin_id, matiere_id, moyenne, coefficient, rang, appreciation, enseignant_nom | figées à la publication |
 
@@ -282,8 +295,9 @@ L = lecture, E = écriture (insert/update), S = suppression, — = aucun accès.
 | appels (sprint 5, module `absences`) | L E S | L E (ses classes, année active, 7 jours) | L (classes de ses enfants) | — |
 | absences (sprint 5, module `absences`) | L E S ; décide la justification | L E S (ses classes, année active, 7 jours) ; décide s'il est titulaire | L (les siens) ; motif (RPC) | — (sprint 9) |
 | notifications (sprint 5, module `notifications`) | L (les siennes) ; marquer lue | idem | idem | idem |
-| evaluations | L E S | L E (ses classe_matieres) | L publiées | L publiées |
-| notes | L E S | L E (ses évaluations, période ouverte) | L (les siens) | L (soi) |
+| reglages_notes, types_evaluation, reglages_absences (sprint 6) | L E | L | L | L |
+| evaluations (sprint 6, module `notes`) | L E S, publie | L (classes enseignées, année active) ; E S, publie (ses matières ; titulaire selon réglage) | L publiées (ou toutes, réglage) des classes de ses enfants | — |
+| notes (sprint 6, module `notes`) | L E S | L (classes enseignées, année active) ; E S (ses évaluations, période ouverte) | L (les siens ; publiées ou toutes, réglage) | — (sprint 9) |
 | bulletins | L E S | L (ses classes) | L publiés (les siens) | L publiés (soi) |
 | cahier_entrees | L E | L E (ses apprenants) | L (les siens) | L (soi) |
 | recitations | L | L E (correction) | L (les siens) | L E (envoi, soi) |
@@ -412,6 +426,9 @@ nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `au
 | `justifier_absence(p_absence, p_motif)` (S5.2) | le parent envoie ou modifie le motif (≤ 300, texte sûr, nettoyé) → `envoyee` ; S5.3 : notifie admins et titulaire ; écrit sous l'indicateur de transaction `daara.rpc_absence` (trigger de saisie sauté, type immuable) | `is_parent_of` ; refus après décision (`deja_decidee`) |
 | `decider_justification(p_absence, p_justifiee bool)` (S5.2) | `justifiee` / `non_justifiee`, `decide_par`, `decide_at` ; notifie les parents actuels | admin aal2 ou **titulaire** de la classe (`classes.titulaire_id`) ; module |
 | `statistiques_absences(p_daara, p_debut, p_fin, p_classe null)` → jsonb (S5.2) | par classe de l'année active ayant des appels : élèves inscrits, appels terminés, absences, retards, non justifiées, taux = absences / (élèves × appels) ; 10 élèves les plus absents (identifiants seulement : noms lus par l'écran avec ses droits) | security invoker (RLS) ; admin ou enseignant (ses classes) |
+| `moyennes(p_classe, p_periode, p_apprenant null)` → jsonb (S6.4) | par élève : moyenne de chaque matière et moyenne générale selon `reglages_notes` (ADR-012 : barème ramené, coefficients, absent, pondérée / simple, arrondi) ; matière sans note ignorée | security invoker : calculée sur ce que l'appelant lit (le parent : notes visibles de son enfant ; moyennes masquées si `moyennes_visibles` est faux) |
+| `arrondir_note(p_valeur, p_mode)` (S6.4) | arrondi au centième, dixième, quart, demi-point | fonction pure, `authenticated` |
+| `publier_evaluation(p_evaluation)` (S6.5) | `publiee_at`, notification `notes_publiees` aux parents actuels des élèves de la classe ; rappel sans effet | mêmes droits que l'écriture de l'évaluation |
 | `sans_accents(texte)` (S3.4) | minuscules sans accents (`unaccent` à dictionnaire explicite, immuable) ; colonnes générées `matieres.recherche` (nom + code) et `classes.recherche` (nom + niveau), filtrées par `ilike` côté client | fonction pure, exécutable par `authenticated` (colonnes générées) |
 | `importer_apprenants(p_daara, p_lignes jsonb, p_classe uuid null, p_simuler bool false)` → jsonb `{ crees, lignes, erreurs[{ligne, champ, code}] }` (S4.4) | import CSV (analysé dans le navigateur : séparateur `;` `,` ou tabulation, UTF-8 ou Windows-1252, en-têtes fr / en, dates JJ/MM/AAAA) : revalide toutes les lignes (nom, prénom `libelle_valide`, date ISO 1950 → aujourd'hui, sexe F / M, classe de l'année active retrouvée par son nom sans accents ni casse, sinon `p_classe`), doublons (même nom, prénom et date, sans accents) dans le fichier ou la daara ; **tout ou rien**, 500 lignes au plus ; erreurs par ligne et par champ sans rien écrire ; `p_simuler` : vérification seule (aperçu) | security invoker (RLS, triggers et droits par colonne comme une saisie) ; admin aal2 (`42501`) ; journal sans valeurs |
 | `avant_creation_utilisateur(event)` (S2.5, ADR-009) | hook Auth `before_user_created` : refuse toute inscription publique par téléphone (les comptes téléphone naissent par `accept-invitation`, API d'administration, non soumise au hook) | exécutable par `supabase_auth_admin` uniquement |
@@ -563,12 +580,12 @@ sequenceDiagram
   Note over DB: hors application (Web Push, WhatsApp) : sprint 8, sans nom d'enfant
 ```
 
-### 7.3 Calcul des moyennes (sprint 6-7)
-- Note ramenée sur 20 : `valeur / bareme_eval × 20`.
-- Moyenne matière (période) : moyenne pondérée des notes par `coefficient` de l'évaluation.
-  Absence à une évaluation : exclue ou comptée 0 selon le paramètre de la daara.
-- Moyenne générale : moyenne des moyennes matières pondérée par `classe_matieres.coefficient`.
-- Affichage converti dans le barème de la daara (10 ou 20).
+### 7.3 Calcul des moyennes (sprint 6-7, ADR-012)
+- Note ramenée au barème de la daara : `valeur / bareme_eval × bareme_daara`.
+- Moyenne matière (période) : moyenne pondérée des notes par `coefficient` de l'évaluation. Élève absent : selon
+  `reglages_notes.absence_evaluation` (ne compte pas / 0 / 0 si l'absence du jour n'est pas justifiée).
+- Moyenne générale : pondérée par `classe_matieres.coefficient` (ou simple, réglage) ; matière sans note ignorée.
+- Arrondi selon `reglages_notes.arrondi`, appliqué aux moyennes affichées.
 - Rang : `rank() over (partition by classe, periode order by moyenne desc)`.
 - Implémentation : fonction SQL `calculer_bulletins(periode_id, classe_id)` ; à la publication, les valeurs
   sont figées dans `bulletins` / `bulletin_lignes`.

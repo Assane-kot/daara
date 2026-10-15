@@ -15,7 +15,8 @@
 - Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
 - Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 à S5.4 faits (conception, mise à jour automatique, appel, justification et suivi, notifications, accueil parent).
   S5.5 (e2e) et S5.6 (préparation du pilote) **reportées** (voir « À faire avant le pilote ») ; audit de fin de sprint
-  corrigé, bilan ci-dessous. Suivant : plan du sprint 6 (évaluations et notes). **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+  corrigé, bilan ci-dessous.
+- Sprint 6 — Évaluations et notes : planification validée, S6.0 fait (conception). Suivante : S6.1 Paramètres → Notes. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - **À faire avant le lancement du pilote** (décision du développeur, 2026-10-15, pour avancer sur les fonctionnalités) :
   - S5.5 : tests e2e Playwright du parcours enseignant → parent en temps réel → justification → décision, et job CI
@@ -117,6 +118,19 @@
 3. Sprint 2 : planification faite (2026-10-04). Commencer par S2.0 (spike téléphone sans SMS → ADR-009 confirmé ou
    alternative présentée au développeur), puis S2.1 à S2.7 dans l'ordre, un commit par story.
 
+### Décisions de planification du sprint 6 (validées le 2026-10-15)
+- **Paramétrage par daara** (demande du développeur : « chaque école a ses réalités ») → ADR-012 : toute règle qui varie
+  d'une école à l'autre est un réglage avec une valeur par défaut, rangé par module dans Paramètres, expliqué par un
+  exemple, pré-rempli par le profil d'onboarding, stocké en table typée et appliqué par la base ; un réglage de calcul
+  modifié recalcule (avertissement), les bulletins publiés figent.
+- Réglages des notes : barème, types d'évaluation (Devoir 1, Composition 2, modifiables), absent (ne compte pas / 0 / 0 si
+  non justifiée), moyenne générale (pondérée / simple), arrondi, seuil de réussite, saisie par le titulaire, visibilité
+  parents (après publication / dès la saisie), moyennes visibles, appréciations.
+- Réglages des absences (S6.1b, rattrapage du sprint 5) : délai de correction (7 j), qui décide (admin + titulaire / admin),
+  justification par les parents.
+- Découpage S6.0 à S6.5 (+ S6.1b) ; moyennes calculées à la demande (fonction SQL, tests chiffrés) ; rang et bulletins au
+  sprint 7.
+
 ### Décisions de planification du sprint 5 (validées le 2026-10-13)
 - Découpage S5.0 à S5.6 (conception, appel, justification et suivi, notifications et temps réel, accueil parent, e2e
   Playwright, préparation du pilote) ; audit unique en fin de sprint.
@@ -201,6 +215,12 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-15 — S6.0 Conception du sprint 6
+- Plan validé (décisions ci-dessus). ADR-012 (paramétrage par daara + calcul des moyennes), spec `notes.md`, LLD : §2
+  routes (`notes/...`, onglets Absences et Notes des Paramètres), §3.5 (`reglages_notes`, `types_evaluation`,
+  `evaluations`, `notes`, `reglages_absences`, enums), §4 matrice, RPC `moyennes`, `arrondir_note`,
+  `publier_evaluation`, §7.3 calcul.
+
 ### 2026-10-15 — Audit de fin de sprint 5 et bilan du sprint 5 (Absences et espace parent)
 **Audit** (un seul agent `auditeur-securite`, mode économe) : 0 critique, **1 important**, 4 mineurs. Vérifié sans
 problème : canaux Realtime privés (aucun envoi client, `membre_actuel` / `auth.uid()`, messages sans donnée),

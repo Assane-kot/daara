@@ -107,10 +107,15 @@ Audit de fin de sprint fait et corrigé (2026-10-15).
 Livrable : déploiement chez les daaras pilotes (après S5.5 et S5.6, reportées avant le pilote).
 
 ## Sprint 6 — Évaluations et notes
-- [ ] Évaluations par classe/matière/période
-- [ ] Saisie des notes en grille (clavier, sauvegarde auto), verrouillage période clôturée
-- [ ] Calcul des moyennes (fonction SQL + tests pgTAP sur cas chiffrés)
-- [ ] Consultation des notes côté parent
+Planification validée le 2026-10-15 (LLD §3.5, §4, §7.3 ; spec `notes.md` ; ADR-012 paramétrage par daara). Module
+`notes`. Un commit par story ; audit unique en fin de sprint.
+- [x] S6.0 Conception : ADR-012 (paramétrage par daara, calcul des moyennes), spec, LLD
+- [ ] S6.1 Paramètres → Notes : `reglages_notes`, types d'évaluation, valeurs par défaut (daaras existantes comprises), profils d'onboarding
+- [ ] S6.1b Paramètres → Absences : délai de correction, qui décide, justification par les parents
+- [ ] S6.2 Évaluations par classe, matière et période
+- [ ] S6.3 Saisie des notes (un écran par évaluation, clavier, enregistrement automatique, période clôturée)
+- [ ] S6.4 Moyennes calculées par la base selon les réglages (tests chiffrés), tableau des moyennes
+- [ ] S6.5 Publication, notification et consultation par les parents
 Livrable : notes saisies, moyennes justes et testées.
 
 ## Sprint 7 — Bulletins
