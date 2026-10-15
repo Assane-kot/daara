@@ -30,7 +30,8 @@
         "eleves": "Students",
         "enfants": "My children",
         "appel": "Roll call",
-        "absences": "Absences"
+        "absences": "Absences",
+        "notifications": "Notifications"
     },
     "titres": {
         "tableau_de_bord": "Dashboard",
@@ -60,7 +61,8 @@
         "enfants": "My children",
         "import": "Import students",
         "appel": "Roll call",
-        "absences": "Absences"
+        "absences": "Absences",
+        "notifications": "Notifications"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -1073,7 +1075,8 @@
             "annee_inactive": "This class does not belong to the current school year.",
             "eleve_hors_classe": "This student is no longer enrolled in this class. The list has been refreshed.",
             "creneau_invalide": "The roll call setting (day or morning / afternoon) has just changed. Go back to the class list."
-        }
+        },
+        "parents_prevenus": "Their parents will be notified in the app."
     },
     "absences": {
         "titre": "Absences",
@@ -1152,6 +1155,35 @@
             "inattendue": "The action failed. Try again.",
             "motif_invalide": "Write a reason (300 characters at most).",
             "deja_decidee": "The daara has already decided on this absence: the reason can no longer be changed."
+        }
+    },
+    "notifications": {
+        "titre": "Notifications",
+        "cloche": "Notifications ({{n}} unread)",
+        "tout_lu": "Mark all as read",
+        "voir_tout": "See all notifications",
+        "voir_plus": "See more",
+        "vide": "No notification.",
+        "vide_titre": "No notification",
+        "non_lue": "unread",
+        "vide_message": "You will be notified here of absences, lateness and justifications.",
+        "erreur": "Notifications could not be loaded.",
+        "votre_enfant": "Your child",
+        "un_eleve": "a student",
+        "quand": {
+            "journee": "today",
+            "matin": "this morning",
+            "apres_midi": "this afternoon",
+            "le": "on {{date}}"
+        },
+        "messages": {
+            "absence": "{{prenom}} was absent {{quand}}.",
+            "retard": "{{prenom}} arrived late {{quand}}.",
+            "absence_annulee": "{{prenom}}’s absence {{quand}} was cancelled: {{prenom}} was present.",
+            "justification_envoyee": "Reason received for {{prenom}}’s absence {{quand}}: to be confirmed.",
+            "justification_decidee": "The daara has processed the justification of {{prenom}}’s absence {{quand}}.",
+            "justifiee": "{{prenom}}’s absence {{quand}} is justified.",
+            "non_justifiee": "{{prenom}}’s absence {{quand}} is not justified."
         }
     }
 }

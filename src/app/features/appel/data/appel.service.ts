@@ -50,10 +50,7 @@ export function erreurAppel(erreur: { code?: string; message?: string } | null):
     return new ErreurAppel(erreur?.code === '42501' ? 'appel.erreurs.droits' : 'appel.erreurs.inattendue');
 }
 
-/** Date du jour au Sénégal (`Africa/Dakar`), au format AAAA-MM-JJ. */
-export function aujourdhui(maintenant = new Date()): string {
-    return maintenant.toLocaleDateString('en-CA', { timeZone: 'Africa/Dakar' });
-}
+export { aujourdhui } from '../../../core/dates';
 
 /** Créneau proposé : la journée, ou le matin avant 13 h et l'après-midi ensuite. */
 export function creneauParDefaut(demiJournee: boolean, maintenant = new Date()): Creneau {

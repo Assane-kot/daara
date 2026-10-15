@@ -1,6 +1,6 @@
 import { ModuleDaara, RoleMembre } from '../../core/daara/daara.model';
 
-export type IconeMenu = 'tableau' | 'appel' | 'absences' | 'eleves' | 'membres' | 'structure' | 'parametres' | 'compte';
+export type IconeMenu = 'tableau' | 'notifications' | 'appel' | 'absences' | 'eleves' | 'membres' | 'structure' | 'parametres' | 'compte';
 
 /**
  * Entrée de menu déclarée en données (LLD §2) : affichée seulement si le rôle et le module le permettent.
@@ -26,6 +26,7 @@ export const MENU: readonly EntreeMenu[] = [
     { cle: 'menu.absences', icone: 'absences', route: 'absences', roles: ['admin', 'enseignant'], module: 'absences' },
     { cle: 'menu.enfants', icone: 'eleves', route: 'enfants', roles: ['parent'], barreBasse: true },
     { cle: 'menu.eleves', icone: 'eleves', route: 'apprenants', roles: ['admin', 'enseignant'] },
+    { cle: 'menu.notifications', icone: 'notifications', route: 'notifications', roles: ['parent', 'apprenant'], module: 'notifications', barreBasse: true },
     { cle: 'menu.membres', icone: 'membres', route: 'membres', roles: ['admin'] },
     { cle: 'menu.structure', icone: 'structure', route: 'structure', roles: ['admin', 'enseignant'], module: 'structure' },
     { cle: 'menu.parametres', icone: 'parametres', route: 'parametres', roles: ['admin'] },

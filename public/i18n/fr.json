@@ -30,7 +30,8 @@
         "eleves": "Élèves",
         "enfants": "Mes enfants",
         "appel": "Appel",
-        "absences": "Absences"
+        "absences": "Absences",
+        "notifications": "Notifications"
     },
     "titres": {
         "tableau_de_bord": "Tableau de bord",
@@ -60,7 +61,8 @@
         "enfants": "Mes enfants",
         "import": "Importer des élèves",
         "appel": "Appel",
-        "absences": "Absences"
+        "absences": "Absences",
+        "notifications": "Notifications"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -1073,7 +1075,8 @@
             "annee_inactive": "Cette classe n’appartient pas à l’année scolaire en cours.",
             "eleve_hors_classe": "Cet élève n’est plus inscrit dans cette classe. La liste a été actualisée.",
             "creneau_invalide": "Le réglage de l’appel (journée ou matin / après-midi) vient de changer. Revenez à la liste des classes."
-        }
+        },
+        "parents_prevenus": "Leurs parents seront prévenus dans l’application."
     },
     "absences": {
         "titre": "Absences",
@@ -1152,6 +1155,35 @@
             "inattendue": "L’action a échoué. Réessayez.",
             "motif_invalide": "Écrivez un motif (300 caractères au plus).",
             "deja_decidee": "La daara a déjà décidé pour cette absence : le motif ne peut plus être modifié."
+        }
+    },
+    "notifications": {
+        "titre": "Notifications",
+        "cloche": "Notifications ({{n}} non lue(s))",
+        "tout_lu": "Tout marquer comme lu",
+        "voir_tout": "Voir toutes les notifications",
+        "voir_plus": "Voir plus",
+        "vide": "Aucune notification.",
+        "vide_titre": "Aucune notification",
+        "non_lue": "non lue",
+        "vide_message": "Vous serez prévenu ici des absences, des retards et des justifications.",
+        "erreur": "Les notifications n’ont pas pu être chargées.",
+        "votre_enfant": "Votre enfant",
+        "un_eleve": "un élève",
+        "quand": {
+            "journee": "aujourd’hui",
+            "matin": "ce matin",
+            "apres_midi": "cet après-midi",
+            "le": "le {{date}}"
+        },
+        "messages": {
+            "absence": "{{prenom}} était absent{{e}} {{quand}}.",
+            "retard": "{{prenom}} est arrivé{{e}} en retard {{quand}}.",
+            "absence_annulee": "L’absence de {{prenom}} {{quand}} a été annulée : {{prenom}} était présent{{e}}.",
+            "justification_envoyee": "Motif reçu pour l’absence de {{prenom}} {{quand}} : à valider.",
+            "justification_decidee": "La daara a traité la justification de l’absence de {{prenom}} {{quand}}.",
+            "justifiee": "L’absence de {{prenom}} {{quand}} est justifiée.",
+            "non_justifiee": "L’absence de {{prenom}} {{quand}} n’est pas justifiée."
         }
     }
 }

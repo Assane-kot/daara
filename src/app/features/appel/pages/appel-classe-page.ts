@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { CurrentDaaraService } from '../../../core/daara/current-daara.service';
 import { SignauxDaaraService } from '../../../core/daara/signaux-daara.service';
 import { LanguageService } from '../../../core/i18n/language.service';
 import { ConfirmDialogService } from '../../../shared/ui/confirm-dialog/confirm-dialog.service';
@@ -125,6 +126,7 @@ export class AppelClassePage {
     private readonly confirmation = inject(ConfirmDialogService);
     private readonly translate = inject(TranslateService);
     private readonly router = inject(Router);
+    private readonly courante = inject(CurrentDaaraService);
     private readonly langue = inject(LanguageService).langue;
     private readonly route = inject(ActivatedRoute);
     private readonly classeId = this.route.snapshot.paramMap.get('classeId') ?? '';
@@ -226,10 +228,11 @@ export class AppelClassePage {
         const c = this.compte();
         const confirme = await this.confirmation.confirmer({
             titre: this.translate.instant('appel.confirmer_titre', { classe: this.classeNom() }),
-            message: this.translate.instant(c.absence + c.retard === 0 ? 'appel.confirmer_tous_presents' : 'appel.confirmer_message', {
-                absents: c.absence,
-                retards: c.retard,
-            }),
+            message:
+                this.translate.instant(c.absence + c.retard === 0 ? 'appel.confirmer_tous_presents' : 'appel.confirmer_message', {
+                    absents: c.absence,
+                    retards: c.retard,
+                }) + (c.absence + c.retard > 0 && this.courante.moduleActif('notifications') ? ' ' + this.translate.instant('appel.parents_prevenus') : ''),
             libelleConfirmer: this.translate.instant('appel.terminer'),
         });
         if (!confirme) {

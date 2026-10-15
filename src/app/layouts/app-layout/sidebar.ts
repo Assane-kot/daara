@@ -7,6 +7,7 @@ import { IconCaretsDown } from '../../shared/icon/icon-carets-down';
 import { IconMenuDashboard } from '../../shared/icon/icon-menu-dashboard';
 import { IconSettings } from '../../shared/icon/icon-settings';
 import { IconBook } from '../../shared/icon/icon-book';
+import { IconBell } from '../../shared/icon/icon-bell';
 import { IconCalendar } from '../../shared/icon/icon-calendar';
 import { IconListCheck } from '../../shared/icon/icon-list-check';
 import { IconUser } from '../../shared/icon/icon-user';
@@ -27,6 +28,7 @@ import { MENU, menuVisible } from './menu';
         IconBook,
         IconListCheck,
         IconCalendar,
+        IconBell,
         IconUser,
     ],
     templateUrl: './sidebar.html',

@@ -13,7 +13,7 @@
   de la daara), S2.4 (gestion des membres), S2.5 (invitations, en 3 commits), S2.6 (réinitialisation assistée) et S2.7 (Mon compte) faits : **code du sprint 2
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
 - Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
-- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 à S5.2 faits (conception, mise à jour automatique, appel du jour, justification et suivi). Suivante : S5.3 notifications. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 à S5.3 faits (conception, mise à jour automatique, appel, justification et suivi, notifications). Suivante : S5.4 accueil parent. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
@@ -189,6 +189,22 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-15 — S5.3 Notifications dans l'application
+- Migration `notifications` (module `notifications`) : enum `type_notification`, table `notifications` (identifiants
+  seulement : élève, absence, date, créneau ; ni texte ni nom d'enfant, ADR-011), lecture et « lu » par le destinataire
+  seulement, aucune création client ; `notifier` (jamais à l'auteur, module actif), `parents_a_prevenir` (parents actifs
+  reliés), `equipe_a_prevenir` (admins + titulaire) ; triggers : fin de l'appel → parents des absents et retardataires ;
+  après la fin : ajout, changement de type, retrait (« absence annulée ») ; motif → équipe ; décision → parents ; signal
+  Realtime privé `utilisateur:<uuid>` (politique sur `realtime.messages`). 17 tests pgTAP (749).
+- Front : `NotificationsService` (non lues, 10 dernières, canal par utilisateur), cloche dans l'en-tête (pastille,
+  menu, « Tout marquer comme lu », « Voir toutes les notifications »), page `/d/:slug/notifications` (non lues en gras,
+  « Voir plus », un toucher ouvre l'enfant ou les absences et marque lue), entrée « Notifications » de la barre basse
+  des parents avec pastille ; barre basse : une icône par entrée ; messages composés à l'écran avec l'accord (« absente »
+  pour une fille : sexe obligatoire) et la décision réelle (« est justifiée » / « n'est pas justifiée ») ; « Terminer
+  l'appel » annonce « Leurs parents seront prévenus dans l'application ». Date du jour à Dakar déplacée dans `core/dates`.
+- Vérifié dans le navigateur : parent connecté, l'enseignant termine l'appel → la cloche passe à 1 sans recharger ;
+  « Fatou était absente aujourd'hui. » → toucher → page de l'enfant, cloche à 0. 284 tests unitaires.
+
 ### 2026-10-14 — S5.2 Justification des absences et suivi
 - Migration `justification_absences` : RPC `justifier_absence` (parent de l'enfant, motif nettoyé de 300 caractères au
   plus, refus après décision), `decider_justification` (admin aal2 ou **titulaire** de la classe ; décision corrigeable ;

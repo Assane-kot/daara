@@ -2,7 +2,10 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CurrentDaaraService } from '../../core/daara/current-daara.service';
+import { NotificationsService } from '../../core/notifications/notifications.service';
+import { IconBell } from '../../shared/icon/icon-bell';
 import { IconMenuDashboard } from '../../shared/icon/icon-menu-dashboard';
+import { IconUser } from '../../shared/icon/icon-user';
 import { MENU, barreBasseVisible } from './menu';
 
 /**
@@ -11,7 +14,7 @@ import { MENU, barreBasseVisible } from './menu';
  */
 @Component({
     selector: 'app-barre-basse',
-    imports: [RouterLink, RouterLinkActive, TranslatePipe, IconMenuDashboard],
+    imports: [RouterLink, RouterLinkActive, TranslatePipe, IconMenuDashboard, IconUser, IconBell],
     template: `
         <nav
             class="fixed inset-x-0 bottom-0 z-40 border-t border-white-light bg-white pb-[env(safe-area-inset-bottom)] sm:hidden dark:border-night-border dark:bg-night"
@@ -27,6 +30,21 @@ import { MENU, barreBasseVisible } from './menu';
                             class="flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs font-semibold text-muted dark:text-night-muted"
                         >
                             @switch (entree.icone) {
+                                @case ('eleves') {
+                                    <icon-user class="h-5 w-5" />
+                                }
+                                @case ('notifications') {
+                                    <span class="relative">
+                                        <icon-bell class="h-5 w-5" />
+                                        @if (notifications.nonLues() > 0) {
+                                            <span
+                                                class="absolute -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-danger px-0.5 text-[10px] leading-none font-bold text-white ltr:-right-2 rtl:-left-2"
+                                                aria-hidden="true"
+                                                >{{ notifications.nonLues() > 99 ? '99+' : notifications.nonLues() }}</span
+                                            >
+                                        }
+                                    </span>
+                                }
                                 @default {
                                     <icon-menu-dashboard class="h-5 w-5" />
                                 }
@@ -42,6 +60,7 @@ import { MENU, barreBasseVisible } from './menu';
 })
 export class BarreBasse {
     private readonly courante = inject(CurrentDaaraService);
+    protected readonly notifications = inject(NotificationsService);
     protected readonly entrees = computed(() => barreBasseVisible(MENU, this.courante.roles(), this.courante.modules()));
     protected readonly base = computed(() => ['/d', this.courante.slug() ?? '']);
 }

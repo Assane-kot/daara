@@ -49,6 +49,12 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/enfants/enfant-page').then((m) => m.EnfantPage),
             },
             {
+                path: 'notifications',
+                title: 'titres.notifications',
+                canActivate: [moduleGuard('notifications')],
+                loadComponent: () => import('./features/notifications/notifications-page').then((m) => m.NotificationsPage),
+            },
+            {
                 path: 'absences',
                 title: 'titres.absences',
                 canActivate: [moduleGuard('absences'), roleGuard(['admin', 'enseignant'])],

@@ -12,13 +12,14 @@ import { IconMenu } from '../../shared/icon/icon-menu';
 import { IconMoon } from '../../shared/icon/icon-moon';
 import { IconSun } from '../../shared/icon/icon-sun';
 import { IconUser } from '../../shared/icon/icon-user';
+import { Cloche } from './cloche';
 import { LayoutService } from '../layout.service';
 
 @Component({
     // Sélecteur sur l'élément <header> : le CSS Vristo `.navbar-sticky header` le rend collant.
     // eslint-disable-next-line @angular-eslint/component-selector
     selector: 'header[appHeader]',
-    imports: [RouterLink, TranslatePipe, CdkMenuTrigger, CdkMenu, CdkMenuItem, IconMenu, IconSun, IconMoon, IconLaptop, IconLogout, IconUser],
+    imports: [RouterLink, TranslatePipe, CdkMenuTrigger, CdkMenu, CdkMenuItem, IconMenu, IconSun, IconMoon, IconLaptop, IconLogout, IconUser, Cloche],
     templateUrl: './header.html',
     host: { class: 'z-40 shadow-xs' },
     changeDetection: ChangeDetectionStrategy.OnPush,

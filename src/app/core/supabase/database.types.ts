@@ -825,6 +825,67 @@ export type Database = {
                     },
                 ];
             };
+            notifications: {
+                Row: {
+                    absence_id: string | null;
+                    apprenant_id: string | null;
+                    created_at: string;
+                    creneau: Database['public']['Enums']['creneau_appel'] | null;
+                    daara_id: string;
+                    date_absence: string | null;
+                    id: string;
+                    lu_at: string | null;
+                    type: Database['public']['Enums']['type_notification'];
+                    user_id: string;
+                };
+                Insert: {
+                    absence_id?: string | null;
+                    apprenant_id?: string | null;
+                    created_at?: string;
+                    creneau?: Database['public']['Enums']['creneau_appel'] | null;
+                    daara_id: string;
+                    date_absence?: string | null;
+                    id?: string;
+                    lu_at?: string | null;
+                    type: Database['public']['Enums']['type_notification'];
+                    user_id: string;
+                };
+                Update: {
+                    absence_id?: string | null;
+                    apprenant_id?: string | null;
+                    created_at?: string;
+                    creneau?: Database['public']['Enums']['creneau_appel'] | null;
+                    daara_id?: string;
+                    date_absence?: string | null;
+                    id?: string;
+                    lu_at?: string | null;
+                    type?: Database['public']['Enums']['type_notification'];
+                    user_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'notifications_absence_id_fkey';
+                        columns: ['absence_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'absences';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'notifications_apprenant_id_fkey';
+                        columns: ['apprenant_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'apprenants';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'notifications_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             parent_links: {
                 Row: {
                     apprenant_id: string;
@@ -1049,6 +1110,7 @@ export type Database = {
             };
             enseigne_apprenant: { Args: { p_apprenant: string }; Returns: boolean };
             envoi_sms_factice: { Args: { event: Json }; Returns: Json };
+            equipe_a_prevenir: { Args: { p_classe: string }; Returns: string[] };
             est_admin_quelque_part: { Args: { p_user: string }; Returns: boolean };
             est_enseignant_de: { Args: { p_daara: string; p_user: string }; Returns: boolean };
             etat_invitation: { Args: { p_invitation: Database['public']['Tables']['invitations']['Row'] }; Returns: string };
@@ -1099,7 +1161,20 @@ export type Database = {
             module_actif: { Args: { p_daara: string; p_module: Database['public']['Enums']['module_daara'] }; Returns: boolean };
             modules_valides: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: boolean };
             normaliser_code_acces: { Args: { p_code: string }; Returns: string };
+            notifier: {
+                Args: {
+                    p_absence: string;
+                    p_apprenant: string;
+                    p_creneau: Database['public']['Enums']['creneau_appel'];
+                    p_daara: string;
+                    p_date: string;
+                    p_destinataires: string[];
+                    p_type: Database['public']['Enums']['type_notification'];
+                };
+                Returns: undefined;
+            };
             parent_actuel: { Args: { p_daara: string }; Returns: boolean };
+            parents_a_prevenir: { Args: { p_apprenant: string }; Returns: string[] };
             photo_apprenant_administree: { Args: { p_nom: string }; Returns: boolean };
             photo_apprenant_lisible: { Args: { p_nom: string }; Returns: boolean };
             prerequis_module: { Args: { p_module: Database['public']['Enums']['module_daara'] }; Returns: Database['public']['Enums']['module_daara'][] };
@@ -1149,6 +1224,7 @@ export type Database = {
             statut_apprenant: 'inscrit' | 'parti';
             type_absence: 'absence' | 'retard';
             type_matiere: 'scolaire' | 'coran' | 'religieux';
+            type_notification: 'absence' | 'retard' | 'absence_annulee' | 'justification_envoyee' | 'justification_decidee';
         };
         CompositeTypes: {
             [_ in never]: never;
@@ -1266,6 +1342,7 @@ export const Constants = {
             statut_apprenant: ['inscrit', 'parti'],
             type_absence: ['absence', 'retard'],
             type_matiere: ['scolaire', 'coran', 'religieux'],
+            type_notification: ['absence', 'retard', 'absence_annulee', 'justification_envoyee', 'justification_decidee'],
         },
     },
 } as const;
