@@ -35,3 +35,5 @@ paths:
   jamais `is_member` (un ancien parent, sans enfant inscrit, ne la voit pas : ADR-010 §9). `is_member` reste pour la daara
   elle-même, ses modules et ce qui est personnel.
 - Calculs (moyennes, rangs) : vues `security_invoker = true` ou fonctions SQL, jamais dupliqués côté front.
+- Politique ou RPC d'un enseignant sur une donnée d'élève (absences, notes, bulletins…) : `enseigne_classe_active(classe)`
+  ou `enseigne_apprenant(apprenant)` (bornés à l'année active, ADR-010 §8), jamais `teaches_class` seul (audit S5).

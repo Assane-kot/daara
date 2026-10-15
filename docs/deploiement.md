@@ -246,6 +246,15 @@ Objectif : connexion téléphone + mot de passe, **aucune** inscription publique
    - code d'accès (S2.6) : Membres → « Réinitialiser l'accès » → `/auth/code-acces` → mot de passe changé, ancienne
      session fermée, e-mail de notification reçu si le compte a une adresse.
 
+### 2.10 Realtime (S5.0b, S5.3, ADR-011) — dans chaque projet
+1. Realtime → Settings : **décocher « Allow public access »** (seuls les canaux privés, autorisés par les politiques de
+   `realtime.messages`, sont alors utilisables ; sinon tout détenteur de la clé publishable pourrait diffuser sur un canal
+   public homonyme `daara:<uuid>`).
+2. Vérifier après `db push` : connecté comme membre d'une daara, l'écran se met à jour quand un autre profil modifie une
+   donnée (ex. Membres) ; un parent reçoit la cloche à la fin d'un appel.
+3. Surveiller dans le tableau de bord (Reports → Realtime) les connexions simultanées et les messages du mois : seuils de
+   passage à l'offre Pro dans l'ADR-011 (150 connexions en pointe ou 1,5 million de messages / mois, deux mois de suite).
+
 ## 3. En-têtes de sécurité (`public/_headers`)
 
 | En-tête | Valeur | Raison |

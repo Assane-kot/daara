@@ -1109,6 +1109,7 @@ export type Database = {
                 }[];
             };
             enseigne_apprenant: { Args: { p_apprenant: string }; Returns: boolean };
+            enseigne_classe_active: { Args: { p_classe: string }; Returns: boolean };
             envoi_sms_factice: { Args: { event: Json }; Returns: Json };
             equipe_a_prevenir: { Args: { p_classe: string }; Returns: string[] };
             est_admin_quelque_part: { Args: { p_user: string }; Returns: boolean };

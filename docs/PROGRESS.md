@@ -14,8 +14,17 @@
   terminé** (bilan ci-dessous). Clôture effective après les configurations cloud du développeur (§2.8, §2.9).
 - Sprint 3 — Structure scolaire : **terminé** (S3.0 à S3.4, audit de fin de sprint corrigé, bilan ci-dessous).
 - Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 à S5.4 faits (conception, mise à jour automatique, appel, justification et suivi, notifications, accueil parent).
-  Suivante : S5.5 tests e2e Playwright. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+  S5.5 (e2e) et S5.6 (préparation du pilote) **reportées** (voir « À faire avant le pilote ») ; audit de fin de sprint
+  corrigé, bilan ci-dessous. Suivant : plan du sprint 6 (évaluations et notes). **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
+- **À faire avant le lancement du pilote** (décision du développeur, 2026-10-15, pour avancer sur les fonctionnalités) :
+  - S5.5 : tests e2e Playwright du parcours enseignant → parent en temps réel → justification → décision, et job CI
+    (`@playwright/test` en devDependency, Chromium ~100 Mo ; minutes GitHub Actions : gratuit si dépôt public, ~5-8 min
+    par exécution sur 2 000 min/mois si privé) ; compléter au sprint 12 ;
+  - S5.6 : daara de démonstration sur `daara-dev` (jamais en production, garde-fou comme `seed.sql`), guide utilisateur
+    court par rôle (admin, enseignant, parent) avec captures, check-list de mise en route d'un pilote ;
+  - risque accepté d'ici là : pas de filet automatique sur un parcours complet ; couverture actuelle = pgTAP + tests
+    unitaires + vérification dans le navigateur à chaque story.
 - Problèmes ouverts :
   - Licence Vristo : vérifier le type (Regular ou Extended). La Regular ne couvre pas un produit à accès
     payant → à régler avant R4 (Extended, accord de l'auteur, ou remplacement du CSS propre à Vristo).
@@ -59,6 +68,8 @@
       d'enfants) ; reste au sprint 12 : purge planifiée (1 an) et purge à la suppression d'une daara / d'un enfant ;
     - sprint 4 (exports CSV / PDF) : neutraliser `= + - @` en tête de cellule (injection de formules) ;
     - sprint 12 : performance des politiques (`(select has_role(daara_id …))` dépend de la ligne).
+  - À faire par le développeur sur `daara-dev` et `daara-prod` : Realtime → Settings → décocher « Allow public access »
+    (`docs/deploiement.md` §2.10, audit de fin de sprint 5).
   - À faire par le développeur avant la preview : déployer les Edge Functions et leurs secrets (`docs/deploiement.md`
     §2.9 : APP_URL, ORIGINES_AUTORISEES, BREVO_API_KEY, EMAIL_EXPEDITEUR, TURNSTILE_SECRET ; `use-access-code` ajoutée
     à la commande de déploiement), hooks et téléphone (§2.8) ;
@@ -190,6 +201,49 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-15 — Audit de fin de sprint 5 et bilan du sprint 5 (Absences et espace parent)
+**Audit** (un seul agent `auditeur-securite`, mode économe) : 0 critique, **1 important**, 4 mineurs. Vérifié sans
+problème : canaux Realtime privés (aucun envoi client, `membre_actuel` / `auth.uid()`, messages sans donnée),
+indicateurs de transaction non positionnables par un client, notifications sans texte et jamais à l'auteur, aucun
+`innerHTML`, statistiques sans fuite entre classes. Corrigés (migration `corrections_sprint5`, 8 tests pgTAP, 757) :
+- **important** : `teaches_class` ignore l'année → un ancien enseignant lisait encore les absences et motifs de sa classe
+  de l'an passé, décidait et supprimait un appel → `enseigne_classe_active` dans toutes les politiques d'appels et
+  d'absences et dans la décision du titulaire (`teaches_class`, utilisé par la structure, inchangé) ;
+- suppression d'un appel soumise à `verifier_appel` (7 jours, année active) ; type changé après une décision → décision
+  annulée (retour à « envoyée » / « sans justification ») ; notifications illisibles par un membre désactivé ;
+  `docs/deploiement.md` §2.10 : décocher « Allow public access » de Realtime (tâche du développeur).
+
+**Objectif** : l'enseignant fait l'appel, le parent est prévenu en temps réel et justifie. **Atteint en local**
+(navigateur + pgTAP). Livrable « déploiement chez les pilotes » : après S5.5 et S5.6, reportées avant le pilote.
+
+| Story | État |
+|---|---|
+| S5.0 Conception (LLD, specs, ADR-011) | Fait |
+| S5.0b Mise à jour automatique entre profils (ajoutée en cours de sprint) | Fait |
+| S5.1 Appel du jour | Fait |
+| S5.2 Justification, décision, suivi, statistiques | Fait |
+| S5.3 Notifications dans l'application | Fait |
+| S5.4 Accueil parent mobile | Fait |
+| S5.5 Tests e2e Playwright | Reportée avant le pilote |
+| S5.6 Préparation du pilote | Reportée avant le pilote |
+Hors stories, sur retours du développeur : classe absente de la fiche élève (bug `[value]` / `@for`), ajout de plusieurs
+matières en une fois (règle « sélection multiple avec recherche »), anciens parents, enseignants limités à l'année.
+
+**Chiffres** : 757 tests pgTAP (684 après S5.0b ; 668 à la fin du sprint 4) ; 287 tests unitaires (264) ; chargement
+initial 151,8 kB (151,0) ; 1 ADR (011, révisé en cours de sprint) ; aucun paquet npm ajouté.
+
+**Ce qui a bien marché** : les retours du développeur en cours de sprint (temps réel, sélection multiple) ont donné des
+règles générales réutilisées ensuite ; tester le navigateur avec des touchers très rapides a révélé une course réelle ;
+les notifications et signaux sans aucune donnée simplifient la sécurité.
+
+**À améliorer** : la limite « année active » décidée au sprint 4 n'a pas été appliquée aux nouvelles politiques du
+sprint 5 (trouvé par l'audit) → règle : toute politique enseignant sur une donnée d'élève passe par un helper borné à
+l'année active ; les remises à zéro de la base effacent les données de test du développeur (prévenir à chaque fois).
+
+**Pièges à retenir** : `[value]` sur un `<select>` dont les options viennent d'un `@for` ; le garde-fou de transaction ne
+marche pas avec `psql -c` ; colonne `not null` remplie par trigger → types générés exigeants ; un effet qui lit le signal
+qu'il modifie boucle (`untracked`) ; nouvelle table → retirer les privilèges par défaut avant les droits par colonne.
+
 ### 2026-10-15 — S5.4 Accueil parent mobile
 - Front seul : « Mes enfants » devient l'accueil du parent (le tableau de bord le redirige, l'entrée « Tableau de bord » est
   retirée de son menu ; barre basse : Mes enfants, Notifications). Carte par enfant : situation du jour calculée par

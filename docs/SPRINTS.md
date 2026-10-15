@@ -99,9 +99,12 @@ Planification validée le 2026-10-13 (LLD §3.5, §4, §7.2 ; specs `absences.md
 - [x] S5.2 Justification (parent) et décision (admin, titulaire), historique, écran Absences, statistiques simples
 - [x] S5.3 Notifications dans l'application : `notifications`, cloche, centre, temps réel
 - [x] S5.4 Accueil parent mobile : présent / absent aujourd'hui, absences récentes, « Justifier »
-- [ ] S5.5 Tests e2e Playwright (appel → parent en temps réel → justification → décision), job CI
-- [ ] S5.6 Préparation pilote : daara de démonstration (`daara-dev`), guide utilisateur par rôle, check-list pilote
-Livrable : déploiement chez les daaras pilotes.
+- [ ] S5.5 Tests e2e Playwright (appel → parent en temps réel → justification → décision), job CI — **reportée** (décision du
+  2026-10-15) : à faire **juste avant le lancement du pilote**, puis à compléter au sprint 12 (durcissement)
+- [ ] S5.6 Préparation pilote : daara de démonstration (`daara-dev`), guide utilisateur par rôle, check-list pilote —
+  **reportée** (2026-10-15) : à faire **quand la date du pilote est fixée** (écrans stabilisés après les sprints 6-7)
+Audit de fin de sprint fait et corrigé (2026-10-15).
+Livrable : déploiement chez les daaras pilotes (après S5.5 et S5.6, reportées avant le pilote).
 
 ## Sprint 6 — Évaluations et notes
 - [ ] Évaluations par classe/matière/période
@@ -146,6 +149,7 @@ Livrable : planning nafar généré et suivi.
 Livrable : une daara souscrit et paie en ligne.
 
 ## Sprint 12 — Durcissement et lancement (fin R4)
+- [ ] Tests e2e Playwright des parcours critiques (repris de S5.5 ; le premier lot est à faire avant le pilote)
 - [ ] Revue de sécurité complète (agents + test d'intrusion externe si possible)
 - [ ] Performance (index, requêtes lentes, bundle Angular)
 - [ ] Bilan des limites de l'offre gratuite → passage à Supabase Pro si seuils ADR-003 atteints

@@ -19,6 +19,11 @@ story, à annoncer dans son plan et à vérifier dans le navigateur.
   silence.
 - **Ne rien perdre** : ne pas effacer un formulaire en erreur ; prévenir avant de quitter une saisie non enregistrée
   quand elle est longue.
+- **Sélection multiple avec recherche** (exigence du développeur, 2026-10-13) : dès qu'on ajoute des éléments pris dans une
+  liste (matières d'une classe, élèves d'une classe, enfants d'un parent…), une seule modale avec recherche sans accents,
+  cases à cocher, « Tout sélectionner » (sur les éléments affichés) et un bouton « Ajouter n … » ; les réglages propres à
+  chaque élément (coefficient, enseignant…) se font sur sa ligne une fois coché, avec une valeur par défaut. Jamais
+  d'aller-retour « un par un ». Modèles : `InscrireDialog`, `AjoutMatieresDialog`.
 - **Pas de choix inutile** : jamais d'option « Non précisé » / « Autre » quand la réponse est connue et attendue ;
   proposer seulement les vraies réponses (ex. sexe : Garçon ou Fille) et rendre le champ obligatoire (décision du
   développeur, 2026-10-10).
