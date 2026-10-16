@@ -19,8 +19,10 @@ export interface Absence {
     /** Vide si l'élève n'est plus lisible (enseignant : élève d'une année passée). */
     readonly eleve: string;
     readonly classe: string;
-    /** L'utilisateur peut décider (admin, ou titulaire de la classe). */
+    /** L'utilisateur peut décider (admin, ou titulaire de la classe si le réglage l'autorise). */
     readonly peutDecider: boolean;
+    /** Le parent peut envoyer (ou corriger) un motif : réglage de la daara et absence pas encore décidée. */
+    readonly peutJustifier: boolean;
 }
 
 export interface FiltresAbsences {
@@ -46,6 +48,12 @@ export interface Statistiques {
     readonly eleves: readonly { readonly apprenantId: string; readonly nom: string; readonly absences: number; readonly retards: number }[];
 }
 
+export interface ReglagesAbsencesLus {
+    readonly delaiCorrection: number;
+    readonly decideur: Database['public']['Enums']['decideur_justification'];
+    readonly justificationParent: boolean;
+}
+
 export class ErreurAbsences extends Error {
     constructor(readonly cle: string) {
         super(cle);
@@ -54,7 +62,7 @@ export class ErreurAbsences extends Error {
 
 export function erreurAbsences(erreur: { code?: string; message?: string } | null): ErreurAbsences {
     const message = erreur?.message ?? '';
-    if (['motif_invalide', 'deja_decidee'].includes(message)) {
+    if (['motif_invalide', 'deja_decidee', 'justification_desactivee'].includes(message)) {
         return new ErreurAbsences('absences.erreurs.' + message);
     }
     return new ErreurAbsences(erreur?.code === '42501' ? 'absences.erreurs.droits' : 'absences.erreurs.inattendue');
@@ -88,6 +96,7 @@ export class AbsencesService {
             q = q.eq('etat', f.etat);
         }
         const desc = r.tri?.cle !== 'date' || r.tri.desc;
+        const reglages = await this.reglages();
         const { data, error, count } = await q
             .order('date_absence', { ascending: !desc })
             .order('creneau')
@@ -95,11 +104,12 @@ export class AbsencesService {
         if (error) {
             throw erreurAbsences(error);
         }
-        return { lignes: data.map((a) => this.versAbsence(a)), total: count ?? 0 };
+        return { lignes: data.map((a) => this.versAbsence(a, reglages)), total: count ?? 0 };
     }
 
     /** Toutes les absences d'un élève (fiche élève, espace parent), les plus récentes d'abord. */
     async historique(apprenantId: string): Promise<Absence[]> {
+        const r = await this.reglages();
         const { data, error } = await this.sb
             .from('absences')
             .select(COLONNES)
@@ -110,7 +120,7 @@ export class AbsencesService {
         if (error) {
             throw erreurAbsences(error);
         }
-        return data.map((a) => this.versAbsence(a));
+        return data.map((a) => this.versAbsence(a, r));
     }
 
     /**
@@ -126,6 +136,7 @@ export class AbsencesService {
         if (enfantIds.length === 0) {
             return { appels: [], absences: [] };
         }
+        const r = await this.reglages();
         const [appels, absences] = await Promise.all([
             classeIds.length
                 ? this.sb
@@ -147,7 +158,7 @@ export class AbsencesService {
         }
         return {
             appels: appels.data.map((a) => ({ classeId: a.classe_id, creneau: a.creneau, termine: !!a.termine_at })),
-            absences: absences.data.map((a) => this.versAbsence(a)),
+            absences: absences.data.map((a) => this.versAbsence(a, r)),
         };
     }
 
@@ -188,17 +199,34 @@ export class AbsencesService {
         };
     }
 
-    private versAbsence(a: {
-        id: string;
-        date_absence: string;
-        creneau: Creneau;
-        type: TypeAbsence;
-        etat: EtatJustification;
-        motif: string | null;
-        apprenant_id: string;
-        apprenants: { prenom: string; nom: string } | null;
-        classes: { nom: string; titulaire_id: string | null } | null;
-    }): Absence {
+    /** Réglages des absences de la daara (S6.1b) ; valeurs par défaut si illisibles. */
+    async reglages(): Promise<ReglagesAbsencesLus> {
+        const { data } = await this.sb
+            .from('reglages_absences')
+            .select('delai_correction, decideur, justification_parent')
+            .eq('daara_id', this.daaraId())
+            .maybeSingle();
+        return {
+            delaiCorrection: data?.delai_correction ?? 7,
+            decideur: data?.decideur ?? 'admin_titulaire',
+            justificationParent: data?.justification_parent ?? true,
+        };
+    }
+
+    private versAbsence(
+        a: {
+            id: string;
+            date_absence: string;
+            creneau: Creneau;
+            type: TypeAbsence;
+            etat: EtatJustification;
+            motif: string | null;
+            apprenant_id: string;
+            apprenants: { prenom: string; nom: string } | null;
+            classes: { nom: string; titulaire_id: string | null } | null;
+        },
+        reglages: ReglagesAbsencesLus,
+    ): Absence {
         const admin = this.courante.roles().includes('admin');
         const moi = this.auth.user()?.id;
         return {
@@ -211,7 +239,9 @@ export class AbsencesService {
             apprenantId: a.apprenant_id,
             eleve: a.apprenants ? `${a.apprenants.prenom} ${a.apprenants.nom}` : '',
             classe: a.classes?.nom ?? '',
-            peutDecider: admin || (!!moi && a.classes?.titulaire_id === moi && this.courante.roles().includes('enseignant')),
+            peutDecider:
+                admin || (reglages.decideur === 'admin_titulaire' && !!moi && a.classes?.titulaire_id === moi && this.courante.roles().includes('enseignant')),
+            peutJustifier: reglages.justificationParent && (a.etat === 'aucune' || a.etat === 'envoyee'),
         };
     }
 

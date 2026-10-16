@@ -10,6 +10,7 @@ export const ONGLETS_PARAMETRES: readonly { route: string; cle: string; module?:
     { route: 'general', cle: 'parametres.onglets.general' },
     { route: 'modules', cle: 'parametres.onglets.modules' },
     // Réglages par module (ADR-012) : onglet visible si le module est actif.
+    { route: 'absences', cle: 'parametres.onglets.absences', module: 'absences' },
     { route: 'notes', cle: 'parametres.onglets.notes', module: 'notes' },
 ];
 

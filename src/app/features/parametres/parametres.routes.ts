@@ -16,6 +16,12 @@ export const PARAMETRES_ROUTES: Routes = [
                 loadComponent: () => import('./pages/general/general-page').then((m) => m.GeneralPage),
             },
             {
+                path: 'absences',
+                title: 'titres.parametres_absences',
+                canActivate: [moduleGuard('absences')],
+                loadComponent: () => import('./pages/absences/absences-reglages-page').then((m) => m.AbsencesReglagesPage),
+            },
+            {
                 path: 'notes',
                 title: 'titres.parametres_notes',
                 canActivate: [moduleGuard('notes')],

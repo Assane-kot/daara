@@ -72,7 +72,7 @@ export function dateAbsence(iso: string, langue: string): string {
                                     <p class="m-0 mt-1 text-sm text-muted dark:text-night-muted">« {{ a.motif }} »</p>
                                 }
                             </div>
-                            @if (mode() === 'parent' && (a.etat === 'aucune' || a.etat === 'envoyee')) {
+                            @if (mode() === 'parent' && a.peutJustifier) {
                                 <button type="button" class="btn btn-sm btn-primary min-h-11" [disabled]="enCours()" (click)="justifier(a)">
                                     {{ (a.etat === 'aucune' ? 'absences.justifier.bouton' : 'absences.justifier.modifier') | translate }}
                                 </button>

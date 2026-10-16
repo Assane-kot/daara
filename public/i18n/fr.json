@@ -63,7 +63,8 @@
         "appel": "Appel",
         "absences": "Absences",
         "notifications": "Notifications",
-        "parametres_notes": "Paramètres · Notes"
+        "parametres_notes": "Paramètres · Notes",
+        "parametres_absences": "Paramètres · Absences"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -334,7 +335,8 @@
         "onglets": {
             "general": "Général",
             "modules": "Modules",
-            "notes": "Notes"
+            "notes": "Notes",
+            "absences": "Absences"
         },
         "modules": {
             "intro": "Activez les modules que votre daara utilise : les autres disparaissent pour tous les membres. Désactiver un module ne supprime aucune donnée.",
@@ -378,10 +380,7 @@
                 "inattendue": "L’enregistrement a échoué. Réessayez.",
                 "logo_illisible": "Ce fichier n’est pas une image lisible.",
                 "logo_suppression": "Le logo n’a pas pu être supprimé. Réessayez."
-            },
-            "appel": "Appel",
-            "appel_jour": "Une fois par jour",
-            "appel_demi": "Matin et après-midi"
+            }
         }
     },
     "membres": {
@@ -1164,7 +1163,8 @@
             "droits": "Vous ne pouvez pas faire cette action.",
             "inattendue": "L’action a échoué. Réessayez.",
             "motif_invalide": "Écrivez un motif (300 caractères au plus).",
-            "deja_decidee": "La daara a déjà décidé pour cette absence : le motif ne peut plus être modifié."
+            "deja_decidee": "La daara a déjà décidé pour cette absence : le motif ne peut plus être modifié.",
+            "justification_desactivee": "La daara ne reçoit pas les justifications dans l’application : contactez-la directement."
         }
     },
     "notifications": {
@@ -1274,6 +1274,38 @@
             "nom_pris": "Ce nom de type existe déjà : choisissez-en un autre.",
             "type_utilise": "Ce type a déjà servi : archivez-le plutôt.",
             "donnee_invalide": "Valeur refusée : coefficient de 0,25 à 20 (par quart de point), seuil dans le barème, nom de 40 caractères au plus.",
+            "inattendue": "L’enregistrement a échoué. Réessayez."
+        }
+    },
+    "reglages_absences": {
+        "enregistrer": "Enregistrer les réglages",
+        "enregistres": "Réglages enregistrés.",
+        "appel": {
+            "titre": "Appel",
+            "aide": "Ex. : une daara qui a cours matin et après-midi fait deux appels par jour.",
+            "false": "Une fois par jour",
+            "true": "Matin et après-midi"
+        },
+        "delai": {
+            "titre": "Délai de correction pour un enseignant",
+            "aide": "Combien de jours en arrière un enseignant peut faire ou corriger un appel. 0 = seulement le jour même. L’administrateur peut toujours corriger.",
+            "jours": "jour(s)"
+        },
+        "decideur": {
+            "titre": "Qui décide qu’une absence est justifiée",
+            "aide": "Ex. : le maître de la classe connaît souvent la famille.",
+            "admin_titulaire": "L’administrateur et le titulaire de la classe",
+            "admin": "L’administrateur seulement"
+        },
+        "justificationParent": {
+            "titre": "Les parents justifient dans l’application",
+            "aide": "Sinon, la justification se fait sur papier ou de vive voix, et l’administrateur la note.",
+            "true": "Oui",
+            "false": "Non"
+        },
+        "erreurs": {
+            "droits": "Seul un administrateur ayant confirmé son identité peut changer les réglages.",
+            "donnee_invalide": "Délai de 0 à 30 jours.",
             "inattendue": "L’enregistrement a échoué. Réessayez."
         }
     }

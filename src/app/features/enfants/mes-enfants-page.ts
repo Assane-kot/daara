@@ -188,7 +188,7 @@ export class MesEnfantsPage implements OnInit {
                         ...e,
                         photoUrl: await this.apprenants.urlPhoto(e.photoPath),
                         situation: this.absencesActives() ? situationDuJour(e, situation.appels, duJour) : null,
-                        aJustifier: situation.absences.filter((a) => a.apprenantId === e.id && a.etat === 'aucune'),
+                        aJustifier: situation.absences.filter((a) => a.apprenantId === e.id && a.etat === 'aucune' && a.peutJustifier),
                     })),
                 ),
             );

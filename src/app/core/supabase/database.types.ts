@@ -1033,6 +1033,41 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            reglages_absences: {
+                Row: {
+                    daara_id: string;
+                    decideur: Database['public']['Enums']['decideur_justification'];
+                    delai_correction: number;
+                    justification_parent: boolean;
+                    updated_at: string;
+                    updated_by: string | null;
+                };
+                Insert: {
+                    daara_id: string;
+                    decideur?: Database['public']['Enums']['decideur_justification'];
+                    delai_correction?: number;
+                    justification_parent?: boolean;
+                    updated_at?: string;
+                    updated_by?: string | null;
+                };
+                Update: {
+                    daara_id?: string;
+                    decideur?: Database['public']['Enums']['decideur_justification'];
+                    delai_correction?: number;
+                    justification_parent?: boolean;
+                    updated_at?: string;
+                    updated_by?: string | null;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'reglages_absences_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: true;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             reglages_notes: {
                 Row: {
                     absence_evaluation: Database['public']['Enums']['regle_absence_eval'];
@@ -1310,6 +1345,7 @@ export type Database = {
         Enums: {
             arrondi_note: 'centieme' | 'dixieme' | 'quart' | 'demi';
             creneau_appel: 'journee' | 'matin' | 'apres_midi';
+            decideur_justification: 'admin_titulaire' | 'admin';
             etat_justification: 'aucune' | 'envoyee' | 'justifiee' | 'non_justifiee';
             lien_parent: 'pere' | 'mere' | 'tuteur';
             mode_moyenne: 'ponderee' | 'simple';
@@ -1432,6 +1468,7 @@ export const Constants = {
         Enums: {
             arrondi_note: ['centieme', 'dixieme', 'quart', 'demi'],
             creneau_appel: ['journee', 'matin', 'apres_midi'],
+            decideur_justification: ['admin_titulaire', 'admin'],
             etat_justification: ['aucune', 'envoyee', 'justifiee', 'non_justifiee'],
             lien_parent: ['pere', 'mere', 'tuteur'],
             mode_moyenne: ['ponderee', 'simple'],

@@ -7,6 +7,7 @@ import { Badge } from '../../../shared/ui/badge/badge';
 import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { PageHeader } from '../../../shared/ui/page-header/page-header';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
+import { AbsencesService } from '../../absences/data/absences.service';
 import { AppelService, ClasseAppel, Creneau, ErreurAppel, aujourdhui, creneauParDefaut } from '../data/appel.service';
 
 /** Décale une date AAAA-MM-JJ de `jours` jours. */
@@ -117,13 +118,15 @@ export function decalerDate(iso: string, jours: number): string {
 export class AppelClassesPage {
     private readonly service = inject(AppelService);
     private readonly courante = inject(CurrentDaaraService);
+    private readonly absences = inject(AbsencesService);
 
     protected readonly aujourdhui = aujourdhui();
     protected readonly creneaux: readonly Creneau[] = ['matin', 'apres_midi'];
     protected readonly admin = computed(() => this.courante.roles().includes('admin'));
     protected readonly demiJournee = computed(() => this.courante.daara()?.appelDemiJournee ?? false);
     /** L'enseignant remonte 7 jours au plus (la base le revérifie) ; l'admin, toute l'année active. */
-    protected readonly dateMin = computed(() => (this.admin() ? null : decalerDate(this.aujourdhui, -7)));
+    private readonly delai = signal(7);
+    protected readonly dateMin = computed(() => (this.admin() ? null : decalerDate(this.aujourdhui, -this.delai())));
     protected readonly date = signal(this.aujourdhui);
     protected readonly creneau = signal<Creneau>(creneauParDefaut(this.courante.daara()?.appelDemiJournee ?? false));
     protected readonly classes = signal<ClasseAppel[]>([]);
@@ -134,8 +137,12 @@ export class AppelClassesPage {
 
     constructor() {
         // Mise à jour automatique : appels faits par les collègues, classes modifiées (S5.0b).
-        inject(SignauxDaaraService).surveiller(['appels', 'absences', 'classes', 'classe_matieres'], () => this.charger(true));
+        inject(SignauxDaaraService).surveiller(['appels', 'absences', 'classes', 'classe_matieres', 'reglages_absences'], () => this.charger(true));
         void this.charger();
+        void this.absences.reglages().then(
+            (r) => this.delai.set(r.delaiCorrection),
+            () => undefined,
+        );
     }
 
     protected choisirDate(date: string): void {

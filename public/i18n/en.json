@@ -63,7 +63,8 @@
         "appel": "Roll call",
         "absences": "Absences",
         "notifications": "Notifications",
-        "parametres_notes": "Settings · Grades"
+        "parametres_notes": "Settings · Grades",
+        "parametres_absences": "Settings · Absences"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -334,7 +335,8 @@
         "onglets": {
             "general": "General",
             "modules": "Modules",
-            "notes": "Grades"
+            "notes": "Grades",
+            "absences": "Absences"
         },
         "modules": {
             "intro": "Enable the modules your daara uses: the others disappear for all members. Disabling a module deletes no data.",
@@ -378,10 +380,7 @@
                 "inattendue": "Saving failed. Please try again.",
                 "logo_illisible": "This file is not a readable image.",
                 "logo_suppression": "The logo could not be deleted. Please try again."
-            },
-            "appel": "Roll call",
-            "appel_jour": "Once a day",
-            "appel_demi": "Morning and afternoon"
+            }
         }
     },
     "membres": {
@@ -1164,7 +1163,8 @@
             "droits": "You cannot do this action.",
             "inattendue": "The action failed. Try again.",
             "motif_invalide": "Write a reason (300 characters at most).",
-            "deja_decidee": "The daara has already decided on this absence: the reason can no longer be changed."
+            "deja_decidee": "The daara has already decided on this absence: the reason can no longer be changed.",
+            "justification_desactivee": "The daara does not take justifications in the app: contact it directly."
         }
     },
     "notifications": {
@@ -1274,6 +1274,38 @@
             "nom_pris": "This type name already exists: choose another one.",
             "type_utilise": "This type has already been used: archive it instead.",
             "donnee_invalide": "Value refused: coefficient from 0.25 to 20 (by quarter point), pass mark within the scale, name of 40 characters at most.",
+            "inattendue": "Saving failed. Try again."
+        }
+    },
+    "reglages_absences": {
+        "enregistrer": "Save the settings",
+        "enregistres": "Settings saved.",
+        "appel": {
+            "titre": "Roll call",
+            "aide": "E.g. a daara with morning and afternoon classes takes two roll calls a day.",
+            "false": "Once a day",
+            "true": "Morning and afternoon"
+        },
+        "delai": {
+            "titre": "Correction window for a teacher",
+            "aide": "How many days back a teacher can take or correct a roll call. 0 = same day only. The administrator can always correct.",
+            "jours": "day(s)"
+        },
+        "decideur": {
+            "titre": "Who decides an absence is justified",
+            "aide": "E.g. the class teacher often knows the family.",
+            "admin_titulaire": "The administrator and the class teacher",
+            "admin": "The administrator only"
+        },
+        "justificationParent": {
+            "titre": "Parents justify in the app",
+            "aide": "Otherwise, justification is given on paper or in person, and the administrator records it.",
+            "true": "Yes",
+            "false": "No"
+        },
+        "erreurs": {
+            "droits": "Only an administrator who confirmed their identity can change the settings.",
+            "donnee_invalide": "Window from 0 to 30 days.",
             "inattendue": "Saving failed. Try again."
         }
     }

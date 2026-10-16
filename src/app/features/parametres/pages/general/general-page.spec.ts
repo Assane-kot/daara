@@ -11,7 +11,7 @@ describe('GeneralPage', () => {
     let courante: CurrentDaaraService;
     const service = { charger: vi.fn(), enregistrer: vi.fn(), deposerLogo: vi.fn(), retirerLogo: vi.fn() };
     const confirmation = { confirmer: vi.fn() };
-    const infos = { nom: 'Daara Touba', ville: 'Touba', telephone: '', langueDefaut: 'fr', bareme: 20, appelDemiJournee: false };
+    const infos = { nom: 'Daara Touba', ville: 'Touba', telephone: '', langueDefaut: 'fr', bareme: 20 };
 
     function champ(nom: string): HTMLInputElement {
         return element.querySelector(`[formcontrolname="${nom}"]`) as HTMLInputElement;

@@ -17,6 +17,7 @@ const absence = (modif: Partial<Absence>): Absence => ({
     eleve: 'Awa Ndiaye',
     classe: 'CE1 A',
     peutDecider: false,
+    peutJustifier: true,
     ...modif,
 });
 
@@ -52,7 +53,7 @@ describe('HistoriqueAbsences', () => {
     beforeEach(() => vi.resetAllMocks());
 
     it('parent : « Justifier » ouvre la saisie du motif ; plus de bouton après décision', async () => {
-        service.historique.mockResolvedValue([absence({}), absence({ id: 'abs-2', etat: 'justifiee', motif: 'Malade' })]);
+        service.historique.mockResolvedValue([absence({}), absence({ id: 'abs-2', etat: 'justifiee', motif: 'Malade', peutJustifier: false })]);
         dialogue.ouvrir.mockResolvedValue(true);
         const fixture = creer('parent');
         await stable(fixture);

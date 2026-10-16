@@ -115,22 +115,6 @@
                             }
                         </div>
                     </fieldset>
-
-                    @if (courante.moduleActif('absences')) {
-                        <fieldset class="m-0 border-0 p-0 sm:col-span-2">
-                            <legend class="mb-1.5 font-semibold">{{ 'parametres.general.appel' | translate }}</legend>
-                            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                                @for (demi of [false, true]; track demi) {
-                                    <label
-                                        class="mb-0! flex min-h-11 cursor-pointer items-center justify-center rounded-md border border-white-light px-3 text-center font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:text-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary dark:border-night-border"
-                                    >
-                                        <input class="sr-only" type="radio" formControlName="appelDemiJournee" [value]="demi" />
-                                        {{ (demi ? 'parametres.general.appel_demi' : 'parametres.general.appel_jour') | translate }}
-                                    </label>
-                                }
-                            </div>
-                        </fieldset>
-                    }
                 </div>
 
                 @if (erreur(); as erreur) {

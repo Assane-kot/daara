@@ -16,7 +16,7 @@
 - Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 à S5.4 faits (conception, mise à jour automatique, appel, justification et suivi, notifications, accueil parent).
   S5.5 (e2e) et S5.6 (préparation du pilote) **reportées** (voir « À faire avant le pilote ») ; audit de fin de sprint
   corrigé, bilan ci-dessous.
-- Sprint 6 — Évaluations et notes : planification validée, S6.0 et S6.1 faits (conception, réglages des notes). Suivante : S6.1b Paramètres → Absences. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 6 — Évaluations et notes : planification validée, S6.0, S6.1 et S6.1b faits (conception, réglages des notes et des absences). Suivante : S6.2 évaluations. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - **À faire avant le lancement du pilote** (décision du développeur, 2026-10-15, pour avancer sur les fonctionnalités) :
   - S5.5 : tests e2e Playwright du parcours enseignant → parent en temps réel → justification → décision, et job CI
@@ -215,6 +215,18 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-16 — S6.1b Paramètres → Absences
+- Migration `reglages_absences` (module `absences`, ADR-012) : délai de correction de l'enseignant (7 j, 0 à 30), qui
+  décide d'une justification (admin + titulaire / admin seul), justification par les parents (oui / non) ; valeurs par
+  défaut pour chaque daara (création et existantes, via `reglages_par_defaut`) ; `verifier_appel`, `justifier_absence`
+  (`justification_desactivee`) et `decider_justification` lisent désormais ces réglages. 10 tests pgTAP (782).
+- Front : onglet Paramètres → Absences (appel une fois / matin et après-midi déplacé depuis Général, délai, décideur,
+  justification par les parents ; une phrase d'exemple par réglage) ; écran d'appel : date la plus ancienne selon le
+  délai ; « Justifier » masqué chez le parent si désactivé ; décision proposée au titulaire seulement si le réglage
+  l'autorise.
+- Vérifié dans le navigateur (admin) : matin et après-midi, délai 3 jours, admin seul → enregistrés (base vérifiée).
+  291 tests unitaires.
+
 ### 2026-10-16 — S6.1 Paramètres → Notes
 - Migration `reglages_notes` (module `notes`, ADR-012) : enums, `reglages_notes` (une ligne par daara : absent, moyenne
   générale, arrondi, seuil, saisie par le titulaire, visibilité parents, moyennes visibles, appréciations) et
