@@ -21,7 +21,9 @@ export type TableSignal =
     | 'parent_links'
     | 'invitation_enfants'
     | 'appels'
-    | 'absences';
+    | 'absences'
+    | 'reglages_notes'
+    | 'types_evaluation';
 
 /** Délai de regroupement : un import de 20 élèves ou plusieurs écritures rapprochées = un seul rechargement. */
 const REGROUPEMENT_MS = 400;

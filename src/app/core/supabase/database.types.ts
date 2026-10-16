@@ -1033,6 +1033,97 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            reglages_notes: {
+                Row: {
+                    absence_evaluation: Database['public']['Enums']['regle_absence_eval'];
+                    appreciations: boolean;
+                    arrondi: Database['public']['Enums']['arrondi_note'];
+                    daara_id: string;
+                    moyenne_generale: Database['public']['Enums']['mode_moyenne'];
+                    moyennes_visibles: boolean;
+                    seuil_reussite: number | null;
+                    titulaire_saisit: boolean;
+                    updated_at: string;
+                    updated_by: string | null;
+                    visibilite: Database['public']['Enums']['visibilite_notes'];
+                };
+                Insert: {
+                    absence_evaluation?: Database['public']['Enums']['regle_absence_eval'];
+                    appreciations?: boolean;
+                    arrondi?: Database['public']['Enums']['arrondi_note'];
+                    daara_id: string;
+                    moyenne_generale?: Database['public']['Enums']['mode_moyenne'];
+                    moyennes_visibles?: boolean;
+                    seuil_reussite?: number | null;
+                    titulaire_saisit?: boolean;
+                    updated_at?: string;
+                    updated_by?: string | null;
+                    visibilite?: Database['public']['Enums']['visibilite_notes'];
+                };
+                Update: {
+                    absence_evaluation?: Database['public']['Enums']['regle_absence_eval'];
+                    appreciations?: boolean;
+                    arrondi?: Database['public']['Enums']['arrondi_note'];
+                    daara_id?: string;
+                    moyenne_generale?: Database['public']['Enums']['mode_moyenne'];
+                    moyennes_visibles?: boolean;
+                    seuil_reussite?: number | null;
+                    titulaire_saisit?: boolean;
+                    updated_at?: string;
+                    updated_by?: string | null;
+                    visibilite?: Database['public']['Enums']['visibilite_notes'];
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'reglages_notes_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: true;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
+            types_evaluation: {
+                Row: {
+                    archive: boolean;
+                    coefficient: number;
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    id: string;
+                    nom: string;
+                    ordre: number;
+                };
+                Insert: {
+                    archive?: boolean;
+                    coefficient?: number;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id: string;
+                    id?: string;
+                    nom: string;
+                    ordre?: number;
+                };
+                Update: {
+                    archive?: boolean;
+                    coefficient?: number;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id?: string;
+                    id?: string;
+                    nom?: string;
+                    ordre?: number;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'types_evaluation_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
         };
         Views: {
             [_ in never]: never;
@@ -1205,6 +1296,7 @@ export type Database = {
                     user_id: string;
                 }[];
             };
+            reglages_par_defaut: { Args: { p_daara: string }; Returns: undefined };
             retirer_facteurs: { Args: { p_motif: string; p_user: string }; Returns: number };
             revoquer_invitation: { Args: { p_invitation: string }; Returns: undefined };
             sans_accents: { Args: { p_texte: string }; Returns: string };
@@ -1216,16 +1308,20 @@ export type Database = {
             verifier_appel: { Args: { p_classe: string; p_daara: string; p_date: string }; Returns: string };
         };
         Enums: {
+            arrondi_note: 'centieme' | 'dixieme' | 'quart' | 'demi';
             creneau_appel: 'journee' | 'matin' | 'apres_midi';
             etat_justification: 'aucune' | 'envoyee' | 'justifiee' | 'non_justifiee';
             lien_parent: 'pere' | 'mere' | 'tuteur';
+            mode_moyenne: 'ponderee' | 'simple';
             module_daara: 'structure' | 'absences' | 'notes' | 'bulletins' | 'coran_cahier' | 'coran_recitations' | 'coran_nafar' | 'notifications';
+            regle_absence_eval: 'ignorer' | 'zero' | 'zero_si_non_justifiee';
             role_membre: 'admin' | 'enseignant' | 'parent' | 'apprenant';
             sexe_apprenant: 'F' | 'M';
             statut_apprenant: 'inscrit' | 'parti';
             type_absence: 'absence' | 'retard';
             type_matiere: 'scolaire' | 'coran' | 'religieux';
             type_notification: 'absence' | 'retard' | 'absence_annulee' | 'justification_envoyee' | 'justification_decidee';
+            visibilite_notes: 'publication' | 'saisie';
         };
         CompositeTypes: {
             [_ in never]: never;
@@ -1334,16 +1430,20 @@ export const Constants = {
     },
     public: {
         Enums: {
+            arrondi_note: ['centieme', 'dixieme', 'quart', 'demi'],
             creneau_appel: ['journee', 'matin', 'apres_midi'],
             etat_justification: ['aucune', 'envoyee', 'justifiee', 'non_justifiee'],
             lien_parent: ['pere', 'mere', 'tuteur'],
+            mode_moyenne: ['ponderee', 'simple'],
             module_daara: ['structure', 'absences', 'notes', 'bulletins', 'coran_cahier', 'coran_recitations', 'coran_nafar', 'notifications'],
+            regle_absence_eval: ['ignorer', 'zero', 'zero_si_non_justifiee'],
             role_membre: ['admin', 'enseignant', 'parent', 'apprenant'],
             sexe_apprenant: ['F', 'M'],
             statut_apprenant: ['inscrit', 'parti'],
             type_absence: ['absence', 'retard'],
             type_matiere: ['scolaire', 'coran', 'religieux'],
             type_notification: ['absence', 'retard', 'absence_annulee', 'justification_envoyee', 'justification_decidee'],
+            visibilite_notes: ['publication', 'saisie'],
         },
     },
 } as const;

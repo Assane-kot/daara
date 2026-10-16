@@ -16,7 +16,7 @@
 - Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 à S5.4 faits (conception, mise à jour automatique, appel, justification et suivi, notifications, accueil parent).
   S5.5 (e2e) et S5.6 (préparation du pilote) **reportées** (voir « À faire avant le pilote ») ; audit de fin de sprint
   corrigé, bilan ci-dessous.
-- Sprint 6 — Évaluations et notes : planification validée, S6.0 fait (conception). Suivante : S6.1 Paramètres → Notes. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 6 — Évaluations et notes : planification validée, S6.0 et S6.1 faits (conception, réglages des notes). Suivante : S6.1b Paramètres → Absences. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - **À faire avant le lancement du pilote** (décision du développeur, 2026-10-15, pour avancer sur les fonctionnalités) :
   - S5.5 : tests e2e Playwright du parcours enseignant → parent en temps réel → justification → décision, et job CI
@@ -215,6 +215,21 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-16 — S6.1 Paramètres → Notes
+- Migration `reglages_notes` (module `notes`, ADR-012) : enums, `reglages_notes` (une ligne par daara : absent, moyenne
+  générale, arrondi, seuil, saisie par le titulaire, visibilité parents, moyennes visibles, appréciations) et
+  `types_evaluation` (nom unique sans casse, coefficient 0,25 à 20 par quart) ; valeurs par défaut posées par un trigger à
+  la création de chaque daara (contrôle des droits sauté seulement depuis ce trigger : le créateur n'est pas encore
+  admin) et pour les daaras existantes ; lecture membres actuels + module, écriture admin aal2 + module ; journal et
+  signaux. 15 tests pgTAP (772 ; test de journal de `creer_daara` complété).
+- Front : onglet Paramètres → Notes (visible si le module est actif ; onglets filtrés par module) : types d'évaluation
+  (renommer, coefficient, archiver, supprimer si inutilisé, ajouter), réglages en tuiles avec une phrase d'exemple chacun,
+  seuil (vide = moitié du barème), barème rappelé avec lien vers Général ; avertissement avant un changement de calcul.
+- Profils d'onboarding : mêmes valeurs par défaut pour les deux (le profil « Daara coranique » n'active pas le module
+  `notes`) ; à revoir si une école signale d'autres habitudes.
+- Vérifié dans le navigateur (admin) : valeurs par défaut affichées, « Interrogation » (0,5) ajoutée, arrondi « quart de
+  point » enregistré après l'avertissement (base : `quart`, 3 types). 290 tests unitaires.
+
 ### 2026-10-15 — S6.0 Conception du sprint 6
 - Plan validé (décisions ci-dessus). ADR-012 (paramétrage par daara + calcul des moyennes), spec `notes.md`, LLD : §2
   routes (`notes/...`, onglets Absences et Notes des Paramètres), §3.5 (`reglages_notes`, `types_evaluation`,

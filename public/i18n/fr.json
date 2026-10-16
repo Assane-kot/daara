@@ -62,7 +62,8 @@
         "import": "Importer des élèves",
         "appel": "Appel",
         "absences": "Absences",
-        "notifications": "Notifications"
+        "notifications": "Notifications",
+        "parametres_notes": "Paramètres · Notes"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -332,7 +333,8 @@
         "titre": "Paramètres",
         "onglets": {
             "general": "Général",
-            "modules": "Modules"
+            "modules": "Modules",
+            "notes": "Notes"
         },
         "modules": {
             "intro": "Activez les modules que votre daara utilise : les autres disparaissent pour tous les membres. Désactiver un module ne supprime aucune donnée.",
@@ -1192,6 +1194,87 @@
             "justification_decidee": "La daara a traité la justification de l’absence de {{prenom}} {{quand}}.",
             "justifiee": "L’absence de {{prenom}} {{quand}} est justifiée.",
             "non_justifiee": "L’absence de {{prenom}} {{quand}} n’est pas justifiée."
+        }
+    },
+    "reglages": {
+        "bareme": "Les notes sont ramenées sur {{bareme}} pour les moyennes.",
+        "bareme_lien": "Changer le barème (onglet Général)",
+        "enregistrer": "Enregistrer les réglages",
+        "enregistres": "Réglages enregistrés.",
+        "confirmer_titre": "Changer le calcul des moyennes ?",
+        "confirmer_message": "Les moyennes déjà affichées, y compris aux parents, seront recalculées avec ces nouveaux réglages. Les bulletins déjà publiés ne changent pas.",
+        "types": {
+            "titre": "Types d’évaluation",
+            "aide": "Le coefficient dit combien une évaluation compte : une Composition (coefficient 2) compte deux fois plus qu’un Devoir (coefficient 1).",
+            "nom": "Nom",
+            "coefficient": "Coefficient",
+            "nouveau": "Nouveau type",
+            "exemple": "Ex. : Interrogation",
+            "ajouter": "Ajouter",
+            "archiver": "Archiver",
+            "reactiver": "Réactiver",
+            "supprimer": "Supprimer",
+            "ajoute": "Type d’évaluation ajouté.",
+            "modifie": "Type d’évaluation enregistré.",
+            "supprime": "Type d’évaluation supprimé.",
+            "confirmer_suppression": "Supprimer le type « {{nom}} » ?",
+            "confirmer_suppression_message": "S’il a déjà servi, la suppression sera refusée : archivez-le plutôt (il ne sera plus proposé)."
+        },
+        "absenceEvaluation": {
+            "titre": "Élève absent à une évaluation",
+            "aide": "Ex. : Awa était absente au devoir de maths.",
+            "ignorer": "Ne compte pas dans la moyenne",
+            "zero": "Compte 0",
+            "zero_si_non_justifiee": "Compte 0 si l’absence n’est pas justifiée"
+        },
+        "moyenneGenerale": {
+            "titre": "Moyenne générale",
+            "aide": "Ex. : avec le coefficient 3, le Coran compte trois fois plus que le dessin (coefficient 1).",
+            "ponderee": "Avec les coefficients des matières",
+            "simple": "Toutes les matières comptent pareil"
+        },
+        "arrondi": {
+            "titre": "Arrondi des moyennes",
+            "aide": "Ex. : une moyenne de 12,37.",
+            "centieme": "12,37 (centième)",
+            "dixieme": "12,4 (dixième)",
+            "quart": "12,25 (quart de point)",
+            "demi": "12,5 (demi-point)"
+        },
+        "titulaireSaisit": {
+            "titre": "Qui saisit les notes",
+            "aide": "Au primaire, le maître de la classe enseigne souvent toutes les matières.",
+            "false": "L’enseignant de chaque matière",
+            "true": "Aussi le titulaire, pour toutes les matières de sa classe"
+        },
+        "visibilite": {
+            "titre": "Les parents voient les notes",
+            "aide": "Publier évite de montrer une saisie pas encore terminée.",
+            "publication": "Quand l’enseignant les publie",
+            "saisie": "Dès qu’elles sont saisies"
+        },
+        "moyennesVisibles": {
+            "titre": "Les parents voient les moyennes",
+            "aide": "Moyennes provisoires de la période, avant le bulletin.",
+            "true": "Oui",
+            "false": "Non, seulement sur le bulletin"
+        },
+        "appreciations": {
+            "titre": "Appréciation sur chaque note",
+            "aide": "Ex. : « Bon travail, attention aux calculs ».",
+            "true": "Oui",
+            "false": "Non"
+        },
+        "seuil": {
+            "titre": "Seuil de réussite",
+            "aide": "Les moyennes en dessous s’affichent en rouge. Laissez vide pour la moitié du barème ({{moitie}})."
+        },
+        "erreurs": {
+            "droits": "Seul un administrateur ayant confirmé son identité peut changer les réglages.",
+            "nom_pris": "Ce nom de type existe déjà : choisissez-en un autre.",
+            "type_utilise": "Ce type a déjà servi : archivez-le plutôt.",
+            "donnee_invalide": "Valeur refusée : coefficient de 0,25 à 20 (par quart de point), seuil dans le barème, nom de 40 caractères au plus.",
+            "inattendue": "L’enregistrement a échoué. Réessayez."
         }
     }
 }

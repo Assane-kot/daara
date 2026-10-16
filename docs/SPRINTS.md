@@ -110,7 +110,7 @@ Livrable : déploiement chez les daaras pilotes (après S5.5 et S5.6, reportées
 Planification validée le 2026-10-15 (LLD §3.5, §4, §7.3 ; spec `notes.md` ; ADR-012 paramétrage par daara). Module
 `notes`. Un commit par story ; audit unique en fin de sprint.
 - [x] S6.0 Conception : ADR-012 (paramétrage par daara, calcul des moyennes), spec, LLD
-- [ ] S6.1 Paramètres → Notes : `reglages_notes`, types d'évaluation, valeurs par défaut (daaras existantes comprises), profils d'onboarding
+- [x] S6.1 Paramètres → Notes : `reglages_notes`, types d'évaluation, valeurs par défaut (daaras existantes comprises), profils d'onboarding
 - [ ] S6.1b Paramètres → Absences : délai de correction, qui décide, justification par les parents
 - [ ] S6.2 Évaluations par classe, matière et période
 - [ ] S6.3 Saisie des notes (un écran par évaluation, clavier, enregistrement automatique, période clôturée)

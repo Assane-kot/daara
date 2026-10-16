@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { roleGuard } from '../../core/daara/daara.guards';
+import { moduleGuard, roleGuard } from '../../core/daara/daara.guards';
 import { ParametresPage } from './parametres-page';
 
 /** `/d/:slug/parametres` (LLD §2) : admin uniquement ; la base revérifie chaque écriture (aal2). */
@@ -14,6 +14,12 @@ export const PARAMETRES_ROUTES: Routes = [
                 path: 'general',
                 title: 'titres.parametres_general',
                 loadComponent: () => import('./pages/general/general-page').then((m) => m.GeneralPage),
+            },
+            {
+                path: 'notes',
+                title: 'titres.parametres_notes',
+                canActivate: [moduleGuard('notes')],
+                loadComponent: () => import('./pages/notes/notes-reglages-page').then((m) => m.NotesReglagesPage),
             },
             {
                 path: 'modules',

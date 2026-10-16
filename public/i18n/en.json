@@ -62,7 +62,8 @@
         "import": "Import students",
         "appel": "Roll call",
         "absences": "Absences",
-        "notifications": "Notifications"
+        "notifications": "Notifications",
+        "parametres_notes": "Settings · Grades"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -332,7 +333,8 @@
         "titre": "Settings",
         "onglets": {
             "general": "General",
-            "modules": "Modules"
+            "modules": "Modules",
+            "notes": "Grades"
         },
         "modules": {
             "intro": "Enable the modules your daara uses: the others disappear for all members. Disabling a module deletes no data.",
@@ -1192,6 +1194,87 @@
             "justification_decidee": "The daara has processed the justification of {{prenom}}’s absence {{quand}}.",
             "justifiee": "{{prenom}}’s absence {{quand}} is justified.",
             "non_justifiee": "{{prenom}}’s absence {{quand}} is not justified."
+        }
+    },
+    "reglages": {
+        "bareme": "Grades are converted out of {{bareme}} for averages.",
+        "bareme_lien": "Change the scale (General tab)",
+        "enregistrer": "Save the settings",
+        "enregistres": "Settings saved.",
+        "confirmer_titre": "Change how averages are computed?",
+        "confirmer_message": "Averages already displayed, including to parents, will be recomputed with these settings. Published report cards do not change.",
+        "types": {
+            "titre": "Assessment types",
+            "aide": "The coefficient says how much an assessment counts: an Exam (coefficient 2) counts twice as much as a Homework (coefficient 1).",
+            "nom": "Name",
+            "coefficient": "Coefficient",
+            "nouveau": "New type",
+            "exemple": "E.g. Quiz",
+            "ajouter": "Add",
+            "archiver": "Archive",
+            "reactiver": "Reactivate",
+            "supprimer": "Delete",
+            "ajoute": "Assessment type added.",
+            "modifie": "Assessment type saved.",
+            "supprime": "Assessment type deleted.",
+            "confirmer_suppression": "Delete the type “{{nom}}”?",
+            "confirmer_suppression_message": "If it has already been used, deletion will be refused: archive it instead (it will no longer be offered)."
+        },
+        "absenceEvaluation": {
+            "titre": "Student absent from an assessment",
+            "aide": "E.g. Awa was absent from the maths homework.",
+            "ignorer": "Does not count in the average",
+            "zero": "Counts as 0",
+            "zero_si_non_justifiee": "Counts as 0 if the absence is not justified"
+        },
+        "moyenneGenerale": {
+            "titre": "Overall average",
+            "aide": "E.g. with coefficient 3, Quran counts three times more than drawing (coefficient 1).",
+            "ponderee": "With the subject coefficients",
+            "simple": "All subjects count the same"
+        },
+        "arrondi": {
+            "titre": "Rounding of averages",
+            "aide": "E.g. an average of 12.37.",
+            "centieme": "12.37 (hundredth)",
+            "dixieme": "12.4 (tenth)",
+            "quart": "12.25 (quarter point)",
+            "demi": "12.5 (half point)"
+        },
+        "titulaireSaisit": {
+            "titre": "Who enters grades",
+            "aide": "In primary school, the class teacher often teaches every subject.",
+            "false": "The teacher of each subject",
+            "true": "Also the class teacher, for every subject of the class"
+        },
+        "visibilite": {
+            "titre": "Parents see grades",
+            "aide": "Publishing avoids showing unfinished grading.",
+            "publication": "When the teacher publishes them",
+            "saisie": "As soon as they are entered"
+        },
+        "moyennesVisibles": {
+            "titre": "Parents see averages",
+            "aide": "Provisional averages of the term, before the report card.",
+            "true": "Yes",
+            "false": "No, only on the report card"
+        },
+        "appreciations": {
+            "titre": "Comment on each grade",
+            "aide": "E.g. “Good work, careful with calculations”.",
+            "true": "Yes",
+            "false": "No"
+        },
+        "seuil": {
+            "titre": "Pass mark",
+            "aide": "Averages below are shown in red. Leave empty for half the scale ({{moitie}})."
+        },
+        "erreurs": {
+            "droits": "Only an administrator who confirmed their identity can change the settings.",
+            "nom_pris": "This type name already exists: choose another one.",
+            "type_utilise": "This type has already been used: archive it instead.",
+            "donnee_invalide": "Value refused: coefficient from 0.25 to 20 (by quarter point), pass mark within the scale, name of 40 characters at most.",
+            "inattendue": "Saving failed. Try again."
         }
     }
 }
