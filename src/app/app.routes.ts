@@ -62,9 +62,7 @@ export const routes: Routes = [
             },
             {
                 path: 'notes',
-                title: 'titres.notes',
-                canActivate: [moduleGuard('notes'), roleGuard(['admin', 'enseignant'])],
-                loadComponent: () => import('./features/notes/pages/notes-page').then((m) => m.NotesPage),
+                loadChildren: () => import('./features/notes/notes.routes').then((m) => m.NOTES_ROUTES),
             },
             {
                 path: 'apprenants',

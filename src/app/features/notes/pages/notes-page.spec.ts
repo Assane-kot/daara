@@ -38,6 +38,7 @@ describe('NotesPage', () => {
         bareme: 20,
         coefficient: 1,
         publiee: false,
+        saisies: 0,
     };
     const service = { contexte: vi.fn(), lister: vi.fn(), creer: vi.fn(), modifier: vi.fn(), supprimer: vi.fn() };
     const dialogue = { ouvrir: vi.fn() };

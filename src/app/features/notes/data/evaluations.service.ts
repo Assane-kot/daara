@@ -51,6 +51,8 @@ export interface Evaluation {
     readonly bareme: number;
     readonly coefficient: number;
     readonly publiee: boolean;
+    /** Élèves notés ou absents (S6.3). */
+    readonly saisies: number;
 }
 
 export interface SaisieEvaluation {
@@ -67,7 +69,15 @@ export class ErreurEvaluation extends Error {
     }
 }
 
-const MESSAGES = ['periode_cloturee', 'date_hors_periode', 'periode_invalide', 'type_archive', 'annee_inactive'];
+const MESSAGES = [
+    'periode_cloturee',
+    'date_hors_periode',
+    'periode_invalide',
+    'type_archive',
+    'annee_inactive',
+    'bareme_inferieur_notes',
+    'evaluation_publiee',
+];
 
 /** Refus de la base (trigger `evaluations_coherentes`, droits, contraintes). */
 export function erreurEvaluation(erreur: { code?: string; message?: string } | null): ErreurEvaluation {
@@ -166,7 +176,7 @@ export class EvaluationsService {
     async lister(classeMatiereId: string, periodeId: string): Promise<Evaluation[]> {
         const { data, error } = await this.sb
             .from('evaluations')
-            .select('id, libelle, date_eval, type_id, bareme, coefficient, publiee_at, types_evaluation(nom)')
+            .select('id, libelle, date_eval, type_id, bareme, coefficient, publiee_at, types_evaluation(nom), notes(id)')
             .eq('classe_matiere_id', classeMatiereId)
             .eq('periode_id', periodeId)
             .order('date_eval')
@@ -183,6 +193,7 @@ export class EvaluationsService {
             bareme: Number(e.bareme),
             coefficient: Number(e.coefficient),
             publiee: !!e.publiee_at,
+            saisies: e.notes.length,
         }));
     }
 

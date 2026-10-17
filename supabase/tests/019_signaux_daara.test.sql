@@ -43,7 +43,7 @@ insert into public.parent_links (daara_id, parent_user_id, apprenant_id, lien) v
     ('00000000-0000-0000-0000-00000000190a', '00000000-0000-0000-0000-0000000019c1', '00000000-0000-0000-0000-0000000019f1', 'mere');
 
 -- Triggers posés sur les 13 tables (3 chacune).
-select is((select count(*)::int from pg_trigger where tgname like '%\_signal\_%' and not tgisinternal), 59, 'triggers de signal : 19 tables × 3, plus 2 pour les notifications (canal par utilisateur)');
+select is((select count(*)::int from pg_trigger where tgname like '%\_signal\_%' and not tgisinternal), 62, 'triggers de signal : 20 tables × 3, plus 2 pour les notifications (canal par utilisateur)');
 
 -- Signal publié : une ligne par instruction et par daara, payload sans donnée (seulement la table).
 delete from realtime.messages where topic like 'daara:00000000-0000-0000-0000-0000000019%';

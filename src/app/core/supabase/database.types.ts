@@ -909,6 +909,90 @@ export type Database = {
                     },
                 ];
             };
+            notes: {
+                Row: {
+                    absent: boolean;
+                    appreciation: string | null;
+                    apprenant_id: string;
+                    classe_id: string;
+                    classe_matiere_id: string;
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    evaluation_id: string;
+                    id: string;
+                    updated_at: string;
+                    updated_by: string | null;
+                    valeur: number | null;
+                };
+                Insert: {
+                    absent?: boolean;
+                    appreciation?: string | null;
+                    apprenant_id: string;
+                    classe_id: string;
+                    classe_matiere_id: string;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id: string;
+                    evaluation_id: string;
+                    id?: string;
+                    updated_at?: string;
+                    updated_by?: string | null;
+                    valeur?: number | null;
+                };
+                Update: {
+                    absent?: boolean;
+                    appreciation?: string | null;
+                    apprenant_id?: string;
+                    classe_id?: string;
+                    classe_matiere_id?: string;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id?: string;
+                    evaluation_id?: string;
+                    id?: string;
+                    updated_at?: string;
+                    updated_by?: string | null;
+                    valeur?: number | null;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'notes_apprenant_id_fkey';
+                        columns: ['apprenant_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'apprenants';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'notes_classe_id_fkey';
+                        columns: ['classe_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'classes';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'notes_classe_matiere_id_fkey';
+                        columns: ['classe_matiere_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'classe_matieres';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'notes_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'notes_evaluation_id_fkey';
+                        columns: ['evaluation_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'evaluations';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             notifications: {
                 Row: {
                     absence_id: string | null;

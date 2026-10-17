@@ -161,8 +161,10 @@ import {
                                             {{ e.libelle }}
                                             @if (e.publiee) {
                                                 <app-badge variante="success">{{ 'notes.etats.publiee' | translate }}</app-badge>
-                                            } @else {
+                                            } @else if (e.saisies === 0) {
                                                 <app-badge variante="warning">{{ 'notes.etats.a_saisir' | translate }}</app-badge>
+                                            } @else {
+                                                <app-badge variante="info">{{ 'notes.etats.saisies' | translate: { n: e.saisies } }}</app-badge>
                                             }
                                         </p>
                                         <p class="m-0 text-sm text-muted dark:text-night-muted">
@@ -170,12 +172,15 @@ import {
                                             {{ 'notes.sur_coef' | translate: { bareme: nombre(e.bareme), coef: nombre(e.coefficient) } }}
                                         </p>
                                     </div>
-                                    @if (ecriture()) {
-                                        <div class="flex flex-wrap gap-2">
+                                    <div class="flex flex-wrap gap-2">
+                                        <a class="btn btn-sm btn-primary min-h-11" [routerLink]="['evaluations', e.id]">
+                                            {{ (ecriture() ? 'notes.saisir' : 'notes.voir_notes') | translate }}
+                                        </a>
+                                        @if (ecriture()) {
                                             <button type="button" class="btn btn-sm btn-outline-primary min-h-11" [disabled]="enCours()" (click)="modifier(e)">
                                                 {{ 'notes.modifier' | translate }}
                                             </button>
-                                            @if (!e.publiee) {
+                                            @if (!e.publiee || e.saisies === 0) {
                                                 <button
                                                     type="button"
                                                     class="btn btn-sm btn-outline-danger min-h-11"
@@ -185,8 +190,8 @@ import {
                                                     {{ 'notes.supprimer' | translate }}
                                                 </button>
                                             }
-                                        </div>
-                                    }
+                                        }
+                                    </div>
                                 </li>
                             }
                         </ul>
@@ -300,7 +305,7 @@ export class NotesPage implements OnInit {
     protected async supprimer(e: Evaluation): Promise<void> {
         const confirme = await this.confirmation.confirmer({
             titre: this.translate.instant('notes.confirmer_suppression', { libelle: e.libelle }),
-            message: this.translate.instant('notes.confirmer_suppression_message'),
+            message: this.translate.instant(e.saisies ? 'notes.confirmer_suppression_notes' : 'notes.confirmer_suppression_message', { n: e.saisies }),
             libelleConfirmer: this.translate.instant('notes.supprimer'),
             danger: true,
         });

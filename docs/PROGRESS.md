@@ -16,7 +16,7 @@
 - Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 à S5.4 faits (conception, mise à jour automatique, appel, justification et suivi, notifications, accueil parent).
   S5.5 (e2e) et S5.6 (préparation du pilote) **reportées** (voir « À faire avant le pilote ») ; audit de fin de sprint
   corrigé, bilan ci-dessous.
-- Sprint 6 — Évaluations et notes : planification validée, S6.0, S6.1, S6.1b et S6.2 faits (conception, réglages des notes et des absences, évaluations). Suivante : S6.3 saisie des notes. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 6 — Évaluations et notes : planification validée, S6.0 à S6.3 faits (conception, réglages des notes et des absences, évaluations, saisie des notes). Suivante : S6.4 moyennes. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - **À faire avant le lancement du pilote** (décision du développeur, 2026-10-15, pour avancer sur les fonctionnalités) :
   - S5.5 : tests e2e Playwright du parcours enseignant → parent en temps réel → justification → décision, et job CI
@@ -215,6 +215,24 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-17 — S6.3 Saisie des notes
+- Migration `notes` (module `notes`) : table (une ligne par élève noté : valeur de 0 au barème par quart de point, ou
+  absent ; appréciation de 200 caractères au plus ; classe et matière copiées de l'évaluation), `notes_coherentes` (droits
+  en tête par `peut_ecrire_evaluation`, matière contrôlée contre celle de l'évaluation, période non clôturée, élève inscrit
+  dans la classe, barème, appréciations selon le réglage, auteur et date), `notes_suppression` ; lecture : admin,
+  `enseigne_classe_active`, parent de l'élève si l'évaluation lui est lisible ; journal sans valeurs, signaux ;
+  évaluations : barème non abaissable sous une note saisie, publiée et notée non supprimable. 24 tests pgTAP (834).
+- Front : `/d/:slug/notes/evaluations/:id` : tous les élèves sur un écran (ordre alphabétique), champ numérique
+  (`inputmode="decimal"`, virgule acceptée), Entrée → élève suivant, enregistrement à la sortie du champ (« Enregistré » sur
+  la ligne, erreur expliquée sur la ligne sans rien envoyer), « Absent » en un toucher, appréciation repliée, résumé
+  (notes, absents, sans note) ; un enregistrement à la fois par élève ; saisie d'un collègue en même temps (23505) → mise à
+  jour ; lecture seule si période clôturée ou matière d'un collègue ; liste des évaluations : « Saisir les notes », « n
+  saisie(s) ». Mise à jour automatique.
+- Vérifié dans le navigateur (enseignant, clavier réel) : « 14,5 » Entrée « 9 » Entrée → enregistrés, « 25 » → « La note
+  dépasse le barème. » ; Awa corrigée à 17, Bineta absente, appréciation de Moussa ; base et journal (sans valeurs)
+  vérifiés ; 375 px sans débordement. 315 tests unitaires.
+- Piège : après une relance de `ng serve`, un onglet ouvert peut demander un ancien morceau (« Failed to fetch
+  dynamically imported module ») → la navigation retombe sur `/` avec une page blanche ; recharger la page.
 ### 2026-10-17 — S6.2 Évaluations par classe, matière et période
 - Migration `evaluations` (module `notes`) : table (matière de classe, classe copiée, période, type, intitulé, date,
   barème 1 à 100 et coefficient 0,25 à 20 par quart, `publiee_at` hors droits client) ; `peut_ecrire_evaluation` (admin

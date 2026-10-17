@@ -66,7 +66,8 @@
         "notifications": "Notifications",
         "parametres_notes": "Paramètres · Notes",
         "parametres_absences": "Paramètres · Absences",
-        "notes": "Notes"
+        "notes": "Notes",
+        "saisie_notes": "Saisie des notes"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -1338,7 +1339,8 @@
         "sur_coef": "sur {{bareme}} · coef. {{coef}}",
         "etats": {
             "a_saisir": "À saisir",
-            "publiee": "Publiée"
+            "publiee": "Publiée",
+            "saisies": "{{n}} saisie(s)"
         },
         "modifier": "Modifier",
         "supprimer": "Supprimer",
@@ -1371,7 +1373,42 @@
             "coefficient": "Le coefficient doit être compris entre 0,25 et 20.",
             "donnee_invalide": "Une information est invalide : vérifiez l’intitulé, le barème (par quart de point) et le coefficient.",
             "chargement": "Impossible de charger les évaluations. Vérifiez votre connexion.",
-            "inattendue": "Une erreur est survenue. Réessayez."
+            "inattendue": "Une erreur est survenue. Réessayez.",
+            "bareme_inferieur_notes": "Des notes dépassent ce barème : corrigez-les d’abord.",
+            "evaluation_publiee": "Cette évaluation est publiée et notée : elle ne peut plus être supprimée."
+        },
+        "saisir": "Saisir les notes",
+        "voir_notes": "Voir les notes",
+        "confirmer_suppression_notes": "L’évaluation et ses {{n}} note(s) seront supprimées définitivement.",
+        "saisie": {
+            "retour": "Retour aux évaluations",
+            "sur": "sur {{bareme}}",
+            "lecture_seule": "Vous pouvez consulter ces notes ; seul l’enseignant de la matière les saisit.",
+            "vide_titre": "Aucun élève dans cette classe",
+            "vide": "Inscrivez les élèves dans la classe pour saisir leurs notes.",
+            "inscrire": "Inscrire des élèves",
+            "resume": "{{notes}} note(s) · {{absents}} absent(s) · {{manquantes}} sans note",
+            "aide": "Tapez la note puis Entrée : elle est enregistrée et on passe à l’élève suivant.",
+            "abs": "Abs.",
+            "absent": "Absent",
+            "enregistrement": "Enregistrement…",
+            "enregistre": "Enregistré",
+            "ajouter_appreciation": "Ajouter une appréciation",
+            "modifier_appreciation": "Modifier l’appréciation",
+            "appreciation_de": "Appréciation de {{nom}}",
+            "erreurs": {
+                "format": "Tapez un nombre, par exemple 12 ou 12,5.",
+                "quart": "Utilisez des quarts de point au plus fin (12,25 ; 12,5 ; 12,75).",
+                "note_hors_bareme": "La note dépasse le barème.",
+                "periode_cloturee": "La période est clôturée : la note n’a pas été enregistrée.",
+                "eleve_hors_classe": "Cet élève n’est plus inscrit dans la classe.",
+                "appreciations_desactivees": "Les appréciations sont désactivées dans les réglages.",
+                "droits": "Vous ne pouvez pas saisir les notes de cette matière.",
+                "invalide": "Note refusée : vérifiez la valeur.",
+                "introuvable": "Cette évaluation n’existe plus.",
+                "chargement": "Impossible de charger les notes. Vérifiez votre connexion.",
+                "inattendue": "Non enregistré : réessayez."
+            }
         }
     }
 }

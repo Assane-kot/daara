@@ -66,7 +66,8 @@
         "notifications": "Notifications",
         "parametres_notes": "Settings · Grades",
         "parametres_absences": "Settings · Absences",
-        "notes": "Grades"
+        "notes": "Grades",
+        "saisie_notes": "Enter grades"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -1338,7 +1339,8 @@
         "sur_coef": "out of {{bareme}} · coef. {{coef}}",
         "etats": {
             "a_saisir": "To grade",
-            "publiee": "Published"
+            "publiee": "Published",
+            "saisies": "{{n}} entered"
         },
         "modifier": "Edit",
         "supprimer": "Delete",
@@ -1371,7 +1373,42 @@
             "coefficient": "The coefficient must be between 0.25 and 20.",
             "donnee_invalide": "Some information is invalid: check the title, the scale (in quarter points) and the coefficient.",
             "chargement": "Unable to load assessments. Check your connection.",
-            "inattendue": "An error occurred. Try again."
+            "inattendue": "An error occurred. Try again.",
+            "bareme_inferieur_notes": "Some grades exceed this scale: correct them first.",
+            "evaluation_publiee": "This assessment is published and graded: it can no longer be deleted."
+        },
+        "saisir": "Enter grades",
+        "voir_notes": "View grades",
+        "confirmer_suppression_notes": "The assessment and its {{n}} grade(s) will be permanently deleted.",
+        "saisie": {
+            "retour": "Back to assessments",
+            "sur": "out of {{bareme}}",
+            "lecture_seule": "You can view these grades; only the subject teacher enters them.",
+            "vide_titre": "No student in this class",
+            "vide": "Enrol students in the class to enter their grades.",
+            "inscrire": "Enrol students",
+            "resume": "{{notes}} grade(s) · {{absents}} absent · {{manquantes}} without grade",
+            "aide": "Type the grade then Enter: it is saved and you move to the next student.",
+            "abs": "Abs.",
+            "absent": "Absent",
+            "enregistrement": "Saving…",
+            "enregistre": "Saved",
+            "ajouter_appreciation": "Add a comment",
+            "modifier_appreciation": "Edit comment",
+            "appreciation_de": "Comment for {{nom}}",
+            "erreurs": {
+                "format": "Type a number, for example 12 or 12.5.",
+                "quart": "Use quarter points at the finest (12.25; 12.5; 12.75).",
+                "note_hors_bareme": "The grade exceeds the scale.",
+                "periode_cloturee": "The term is closed: the grade was not saved.",
+                "eleve_hors_classe": "This student is no longer enrolled in the class.",
+                "appreciations_desactivees": "Comments are turned off in the settings.",
+                "droits": "You cannot enter grades for this subject.",
+                "invalide": "Grade refused: check the value.",
+                "introuvable": "This assessment no longer exists.",
+                "chargement": "Unable to load grades. Check your connection.",
+                "inattendue": "Not saved: try again."
+            }
         }
     }
 }
