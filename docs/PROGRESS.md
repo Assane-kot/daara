@@ -16,7 +16,7 @@
 - Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 à S5.4 faits (conception, mise à jour automatique, appel, justification et suivi, notifications, accueil parent).
   S5.5 (e2e) et S5.6 (préparation du pilote) **reportées** (voir « À faire avant le pilote ») ; audit de fin de sprint
   corrigé, bilan ci-dessous.
-- Sprint 6 — Évaluations et notes : planification validée, S6.0, S6.1 et S6.1b faits (conception, réglages des notes et des absences). Suivante : S6.2 évaluations. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 6 — Évaluations et notes : planification validée, S6.0, S6.1, S6.1b et S6.2 faits (conception, réglages des notes et des absences, évaluations). Suivante : S6.3 saisie des notes. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - **À faire avant le lancement du pilote** (décision du développeur, 2026-10-15, pour avancer sur les fonctionnalités) :
   - S5.5 : tests e2e Playwright du parcours enseignant → parent en temps réel → justification → décision, et job CI
@@ -215,6 +215,26 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-17 — S6.2 Évaluations par classe, matière et période
+- Migration `evaluations` (module `notes`) : table (matière de classe, classe copiée, période, type, intitulé, date,
+  barème 1 à 100 et coefficient 0,25 à 20 par quart, `publiee_at` hors droits client) ; `peut_ecrire_evaluation` (admin
+  aal2, enseignant de la matière, titulaire si `titulaire_saisit` ; année active ; module) dans les politiques et en tête
+  de `evaluations_coherentes` (même daara, période de l'année de la classe non clôturée, date dans la période, type non
+  archivé ; barème de la daara et coefficient du type par défaut) et `evaluations_suppression` ; lecture : admin,
+  `enseigne_classe_active`, parents (publiées, ou toutes si « dès la saisie ») ; matière de classe, période et type
+  utilisés non supprimables (clé étrangère contrôlée en fin d'instruction : la suppression d'une daara passe) ; journal,
+  signaux. Publication réservée à `publier_evaluation` (S6.5, indicateur `daara.publication`). 28 tests pgTAP (810).
+- Front : menu « Notes » (icône Vristo `notes-edit`), `/d/:slug/notes` : classe, matière (les siennes ; toutes pour
+  l'admin ou le titulaire autorisé) et période (celle du jour par défaut) gardées dans l'adresse ; évaluations (« À
+  saisir » / « Publiée »), « Nouvelle évaluation » : type en un toucher, intitulé numéroté proposé (« Devoir 2 »), date du
+  jour ramenée dans la période, barème de la daara, coefficient du type ; modifier, supprimer (confirmé) ; période
+  clôturée en lecture seule ; états vides avec action (classes, périodes, matières). Mise à jour automatique.
+- Vérifié dans le navigateur (enseignant titulaire de CE1 A, Coran à lui, Français sans enseignant) : seul Coran proposé,
+  Trimestre 1 par défaut, « Composition » → « Composition 1 », coef. 2 → créée (base vérifiée) ; 375 px sans débordement.
+  305 tests unitaires.
+- Outillage : `node_modules` absent en début de session → `npm ci` ; page blanche sans erreur ensuite (cache Vite des
+  dépendances périmé) → **piège** : après une réinstallation, vider `.angular/cache` avant `ng serve`. Base locale
+  remise à zéro : jeu de vérification recréé à la main (année 2026-2027, 3 trimestres, CE1 A, Coran, Français).
 ### 2026-10-16 — S6.1b Paramètres → Absences
 - Migration `reglages_absences` (module `absences`, ADR-012) : délai de correction de l'enseignant (7 j, 0 à 30), qui
   décide d'une justification (admin + titulaire / admin seul), justification par les parents (oui / non) ; valeurs par

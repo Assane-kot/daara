@@ -31,7 +31,8 @@
         "enfants": "My children",
         "appel": "Roll call",
         "absences": "Absences",
-        "notifications": "Notifications"
+        "notifications": "Notifications",
+        "notes": "Grades"
     },
     "titres": {
         "tableau_de_bord": "Dashboard",
@@ -64,7 +65,8 @@
         "absences": "Absences",
         "notifications": "Notifications",
         "parametres_notes": "Settings · Grades",
-        "parametres_absences": "Settings · Absences"
+        "parametres_absences": "Settings · Absences",
+        "notes": "Grades"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -1307,6 +1309,69 @@
             "droits": "Only an administrator who confirmed their identity can change the settings.",
             "donnee_invalide": "Window from 0 to 30 days.",
             "inattendue": "Saving failed. Try again."
+        }
+    },
+    "notes": {
+        "titre": "Grades",
+        "classe": "Class",
+        "matiere": "Subject",
+        "periode": "Term",
+        "cloturee": "closed",
+        "evaluations_de": "{{matiere}} assessments · {{periode}}",
+        "nouvelle": "New assessment",
+        "creer_premiere": "Create the first assessment",
+        "vide_titre": "No assessment for this term",
+        "vide_message": "Create a test or an exam: you will then enter the students' grades.",
+        "vide_lecture": "The term is closed: no more assessments can be added.",
+        "vide_classes_titre": "No class for grades",
+        "vide_classes_admin": "First create this year's classes and their subjects.",
+        "vide_classes_enseignant": "You don't teach any subject this year yet. Ask the administrator to assign you to a subject.",
+        "vide_periodes_titre": "No term",
+        "vide_periodes_admin": "Add the terms or semesters of the current year.",
+        "vide_periodes_enseignant": "The administrator hasn't created this year's terms or semesters yet.",
+        "voir_classes": "Create classes",
+        "voir_periodes": "Add terms",
+        "vide_matieres_titre": "No subject in this class",
+        "vide_matieres": "Add subjects to the class to create assessments.",
+        "ajouter_matieres": "Add subjects",
+        "periode_cloturee": "This term is closed: assessments are read-only.",
+        "sur_coef": "out of {{bareme}} · coef. {{coef}}",
+        "etats": {
+            "a_saisir": "To grade",
+            "publiee": "Published"
+        },
+        "modifier": "Edit",
+        "supprimer": "Delete",
+        "confirmer_suppression": "Delete “{{libelle}}”?",
+        "confirmer_suppression_message": "The assessment will be permanently deleted.",
+        "creee": "Assessment created.",
+        "enregistree": "Assessment saved.",
+        "supprimee": "Assessment deleted.",
+        "evaluation": {
+            "nouvelle": "New assessment",
+            "modifier": "Edit assessment",
+            "type": "Type",
+            "libelle": "Title",
+            "date": "Date",
+            "aide_date": "A date within {{periode}}.",
+            "bareme": "Out of",
+            "aide_bareme": "For example 20 or 10.",
+            "coefficient": "Coefficient",
+            "creer": "Create assessment",
+            "enregistrer": "Save"
+        },
+        "erreurs": {
+            "droits": "You cannot change the assessments of this subject.",
+            "periode_cloturee": "This term is closed: reopen it in Structure → Years to change it.",
+            "date_hors_periode": "Choose a date within the term.",
+            "periode_invalide": "This term does not belong to the class's year.",
+            "type_archive": "This assessment type is archived: choose another one.",
+            "annee_inactive": "This class is not in the current year.",
+            "bareme": "The maximum grade must be between 1 and 100.",
+            "coefficient": "The coefficient must be between 0.25 and 20.",
+            "donnee_invalide": "Some information is invalid: check the title, the scale (in quarter points) and the coefficient.",
+            "chargement": "Unable to load assessments. Check your connection.",
+            "inattendue": "An error occurred. Try again."
         }
     }
 }

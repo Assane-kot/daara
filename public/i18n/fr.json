@@ -31,7 +31,8 @@
         "enfants": "Mes enfants",
         "appel": "Appel",
         "absences": "Absences",
-        "notifications": "Notifications"
+        "notifications": "Notifications",
+        "notes": "Notes"
     },
     "titres": {
         "tableau_de_bord": "Tableau de bord",
@@ -64,7 +65,8 @@
         "absences": "Absences",
         "notifications": "Notifications",
         "parametres_notes": "Paramètres · Notes",
-        "parametres_absences": "Paramètres · Absences"
+        "parametres_absences": "Paramètres · Absences",
+        "notes": "Notes"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -1307,6 +1309,69 @@
             "droits": "Seul un administrateur ayant confirmé son identité peut changer les réglages.",
             "donnee_invalide": "Délai de 0 à 30 jours.",
             "inattendue": "L’enregistrement a échoué. Réessayez."
+        }
+    },
+    "notes": {
+        "titre": "Notes",
+        "classe": "Classe",
+        "matiere": "Matière",
+        "periode": "Période",
+        "cloturee": "clôturée",
+        "evaluations_de": "Évaluations de {{matiere}} · {{periode}}",
+        "nouvelle": "Nouvelle évaluation",
+        "creer_premiere": "Créer la première évaluation",
+        "vide_titre": "Aucune évaluation pour cette période",
+        "vide_message": "Créez un devoir ou une composition : vous saisirez ensuite les notes des élèves.",
+        "vide_lecture": "La période est clôturée : plus aucune évaluation ne peut être ajoutée.",
+        "vide_classes_titre": "Aucune classe pour les notes",
+        "vide_classes_admin": "Créez d’abord les classes de l’année en cours et leurs matières.",
+        "vide_classes_enseignant": "Vous n’enseignez encore aucune matière cette année. Demandez à l’administrateur de vous affecter à une matière.",
+        "vide_periodes_titre": "Aucune période",
+        "vide_periodes_admin": "Ajoutez les trimestres ou les semestres de l’année en cours.",
+        "vide_periodes_enseignant": "L’administrateur n’a pas encore créé les trimestres ou les semestres de l’année.",
+        "voir_classes": "Créer les classes",
+        "voir_periodes": "Ajouter les périodes",
+        "vide_matieres_titre": "Aucune matière dans cette classe",
+        "vide_matieres": "Ajoutez des matières à la classe pour créer des évaluations.",
+        "ajouter_matieres": "Ajouter des matières",
+        "periode_cloturee": "Cette période est clôturée : les évaluations sont en lecture seule.",
+        "sur_coef": "sur {{bareme}} · coef. {{coef}}",
+        "etats": {
+            "a_saisir": "À saisir",
+            "publiee": "Publiée"
+        },
+        "modifier": "Modifier",
+        "supprimer": "Supprimer",
+        "confirmer_suppression": "Supprimer « {{libelle}} » ?",
+        "confirmer_suppression_message": "L’évaluation sera supprimée définitivement.",
+        "creee": "Évaluation créée.",
+        "enregistree": "Évaluation enregistrée.",
+        "supprimee": "Évaluation supprimée.",
+        "evaluation": {
+            "nouvelle": "Nouvelle évaluation",
+            "modifier": "Modifier l’évaluation",
+            "type": "Type",
+            "libelle": "Intitulé",
+            "date": "Date",
+            "aide_date": "Une date du {{periode}}.",
+            "bareme": "Noté sur",
+            "aide_bareme": "Par exemple 20 ou 10.",
+            "coefficient": "Coefficient",
+            "creer": "Créer l’évaluation",
+            "enregistrer": "Enregistrer"
+        },
+        "erreurs": {
+            "droits": "Vous ne pouvez pas modifier les évaluations de cette matière.",
+            "periode_cloturee": "Cette période est clôturée : rouvrez-la dans Structure → Années pour la modifier.",
+            "date_hors_periode": "Choisissez une date comprise dans la période.",
+            "periode_invalide": "Cette période n’appartient pas à l’année de la classe.",
+            "type_archive": "Ce type d’évaluation est archivé : choisissez-en un autre.",
+            "annee_inactive": "Cette classe n’est pas dans l’année en cours.",
+            "bareme": "La note maximale doit être comprise entre 1 et 100.",
+            "coefficient": "Le coefficient doit être compris entre 0,25 et 20.",
+            "donnee_invalide": "Une information est invalide : vérifiez l’intitulé, le barème (par quart de point) et le coefficient.",
+            "chargement": "Impossible de charger les évaluations. Vérifiez votre connexion.",
+            "inattendue": "Une erreur est survenue. Réessayez."
         }
     }
 }

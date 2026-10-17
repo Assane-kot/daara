@@ -10,6 +10,7 @@ import { IconBook } from '../../shared/icon/icon-book';
 import { IconBell } from '../../shared/icon/icon-bell';
 import { IconCalendar } from '../../shared/icon/icon-calendar';
 import { IconListCheck } from '../../shared/icon/icon-list-check';
+import { IconNotesEdit } from '../../shared/icon/icon-notes-edit';
 import { IconUser } from '../../shared/icon/icon-user';
 import { IconUsers } from '../../shared/icon/icon-users';
 import { LayoutService } from '../layout.service';
@@ -27,6 +28,7 @@ import { MENU, menuVisible } from './menu';
         IconUsers,
         IconBook,
         IconListCheck,
+        IconNotesEdit,
         IconCalendar,
         IconBell,
         IconUser,

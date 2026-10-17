@@ -24,7 +24,8 @@ export type TableSignal =
     | 'absences'
     | 'reglages_notes'
     | 'types_evaluation'
-    | 'reglages_absences';
+    | 'reglages_absences'
+    | 'evaluations';
 
 /** Délai de regroupement : un import de 20 élèves ou plusieurs écritures rapprochées = un seul rechargement. */
 const REGROUPEMENT_MS = 400;

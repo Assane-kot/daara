@@ -556,6 +556,90 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            evaluations: {
+                Row: {
+                    bareme: number;
+                    classe_id: string;
+                    classe_matiere_id: string;
+                    coefficient: number;
+                    created_at: string;
+                    created_by: string | null;
+                    daara_id: string;
+                    date_eval: string;
+                    id: string;
+                    libelle: string;
+                    periode_id: string;
+                    publiee_at: string | null;
+                    type_id: string;
+                };
+                Insert: {
+                    bareme: number;
+                    classe_id: string;
+                    classe_matiere_id: string;
+                    coefficient: number;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id: string;
+                    date_eval?: string;
+                    id?: string;
+                    libelle: string;
+                    periode_id: string;
+                    publiee_at?: string | null;
+                    type_id: string;
+                };
+                Update: {
+                    bareme?: number;
+                    classe_id?: string;
+                    classe_matiere_id?: string;
+                    coefficient?: number;
+                    created_at?: string;
+                    created_by?: string | null;
+                    daara_id?: string;
+                    date_eval?: string;
+                    id?: string;
+                    libelle?: string;
+                    periode_id?: string;
+                    publiee_at?: string | null;
+                    type_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'evaluations_classe_id_fkey';
+                        columns: ['classe_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'classes';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'evaluations_classe_matiere_id_fkey';
+                        columns: ['classe_matiere_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'classe_matieres';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'evaluations_daara_id_fkey';
+                        columns: ['daara_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'daaras';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'evaluations_periode_id_fkey';
+                        columns: ['periode_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'periodes';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'evaluations_type_id_fkey';
+                        columns: ['type_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'types_evaluation';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             inscriptions: {
                 Row: {
                     annee_id: string;
@@ -1302,6 +1386,7 @@ export type Database = {
             };
             parent_actuel: { Args: { p_daara: string }; Returns: boolean };
             parents_a_prevenir: { Args: { p_apprenant: string }; Returns: string[] };
+            peut_ecrire_evaluation: { Args: { p_classe_matiere: string; p_daara: string }; Returns: boolean };
             photo_apprenant_administree: { Args: { p_nom: string }; Returns: boolean };
             photo_apprenant_lisible: { Args: { p_nom: string }; Returns: boolean };
             prerequis_module: { Args: { p_module: Database['public']['Enums']['module_daara'] }; Returns: Database['public']['Enums']['module_daara'][] };

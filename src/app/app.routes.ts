@@ -61,6 +61,12 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/absences/pages/absences-page').then((m) => m.AbsencesPage),
             },
             {
+                path: 'notes',
+                title: 'titres.notes',
+                canActivate: [moduleGuard('notes'), roleGuard(['admin', 'enseignant'])],
+                loadComponent: () => import('./features/notes/pages/notes-page').then((m) => m.NotesPage),
+            },
+            {
                 path: 'apprenants',
                 loadChildren: () => import('./features/apprenants/apprenants.routes').then((m) => m.APPRENANTS_ROUTES),
             },
