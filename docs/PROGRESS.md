@@ -16,7 +16,7 @@
 - Sprint 4 — Apprenants et parents : **terminé** (S4.0 à S4.6, audit de fin de sprint corrigé, bilan ci-dessous) . Sprint 5 — Absences et espace parent : planification validée, S5.0 à S5.4 faits (conception, mise à jour automatique, appel, justification et suivi, notifications, accueil parent).
   S5.5 (e2e) et S5.6 (préparation du pilote) **reportées** (voir « À faire avant le pilote ») ; audit de fin de sprint
   corrigé, bilan ci-dessous.
-- Sprint 6 — Évaluations et notes : planification validée, S6.0 à S6.3 faits (conception, réglages des notes et des absences, évaluations, saisie des notes). Suivante : S6.4 moyennes. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
+- Sprint 6 — Évaluations et notes : planification validée, S6.0 à S6.4 faits (conception, réglages, évaluations, saisie des notes, moyennes). Suivante : S6.5 publication et parents. **Audits en fin de sprint** (décision du 2026-10-09) : voir « À l'audit de fin de
   sprint 3 ».
 - **À faire avant le lancement du pilote** (décision du développeur, 2026-10-15, pour avancer sur les fonctionnalités) :
   - S5.5 : tests e2e Playwright du parcours enseignant → parent en temps réel → justification → décision, et job CI
@@ -215,6 +215,19 @@ Reportés : écran de connexion « cover » avec motif géométrique (sprint 1),
 mobile pour parents/apprenants (sprint 2), tableaux → cartes sous 640 px (sprint 3, `data-table`).
 
 ## Historique
+### 2026-10-17 — S6.4 Moyennes
+- Migration `moyennes` : `arrondir_note` (centième, dixième, quart, demi-point) et `moyennes(classe, période[, élève])`
+  (security invoker, jamais stockées) : note ramenée au barème de la daara, moyenne de matière pondérée par les
+  coefficients des évaluations, absent selon le réglage (ne compte pas / 0 / 0 sauf absence du jour justifiée), générale
+  pondérée par les coefficients des matières ou simple, matière sans note ignorée, arrondi du réglage, seuil (moitié du
+  barème par défaut) ; parent : `{ masquees: true }` si les moyennes sont masquées. Politique ajoutée : le parent lit les
+  matières de la classe de ses enfants (sans elle, ni matières ni générale pour lui). 22 tests pgTAP dont 16 cas chiffrés
+  (856).
+- Front : « Voir les moyennes » depuis Notes → `/d/:slug/notes/moyennes` : classe et période, tableau élèves × matières
+  (coefficient sous chaque matière) + moyenne générale, « — » sans note, rouge sous le seuil, légende ; cartes sous 640 px ;
+  recalcul automatique (notes, réglages, absences).
+- Vérifié dans le navigateur (enseignant titulaire) : Coran coef. 3 et Français coef. 2 → Awa 16,2 ; Cheikh 10 ; Bineta 8
+  (absente au Coran, ignoré) en rouge ; Moussa 14,5 ; 375 px en cartes sans débordement. 317 tests unitaires.
 ### 2026-10-17 — S6.3 Saisie des notes
 - Migration `notes` (module `notes`) : table (une ligne par élève noté : valeur de 0 au barème par quart de point, ou
   absent ; appréciation de 200 caractères au plus ; classe et matière copiées de l'évaluation), `notes_coherentes` (droits

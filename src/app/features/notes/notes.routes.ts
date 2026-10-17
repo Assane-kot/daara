@@ -10,6 +10,12 @@ export const NOTES_ROUTES: Routes = [
         loadComponent: () => import('./pages/notes-page').then((m) => m.NotesPage),
     },
     {
+        path: 'moyennes',
+        title: 'titres.moyennes',
+        canActivate: [moduleGuard('notes'), roleGuard(['admin', 'enseignant'])],
+        loadComponent: () => import('./pages/moyennes-page').then((m) => m.MoyennesPage),
+    },
+    {
         path: 'evaluations/:id',
         title: 'titres.saisie_notes',
         canActivate: [moduleGuard('notes'), roleGuard(['admin', 'enseignant'])],

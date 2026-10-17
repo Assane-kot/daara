@@ -1336,6 +1336,7 @@ export type Database = {
             accepter_invitation_nouveau_compte: { Args: { p_token: string; p_user: string }; Returns: string };
             accepter_invitation_pour: { Args: { p_nouveau_compte: boolean; p_token: string; p_uid: string }; Returns: string };
             activer_annee: { Args: { p_annee: string }; Returns: undefined };
+            arrondir_note: { Args: { p_mode: Database['public']['Enums']['arrondi_note']; p_valeur: number }; Returns: number };
             avant_creation_utilisateur: { Args: { event: Json }; Returns: Json };
             avec_prerequis: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: Database['public']['Enums']['module_daara'][] };
             basculer_module: {
@@ -1455,6 +1456,7 @@ export type Database = {
             membres_administres: { Args: Record<PropertyKey, never>; Returns: string[] };
             module_actif: { Args: { p_daara: string; p_module: Database['public']['Enums']['module_daara'] }; Returns: boolean };
             modules_valides: { Args: { p_modules: Database['public']['Enums']['module_daara'][] }; Returns: boolean };
+            moyennes: { Args: { p_apprenant?: string; p_classe: string; p_periode: string }; Returns: Json };
             normaliser_code_acces: { Args: { p_code: string }; Returns: string };
             notifier: {
                 Args: {

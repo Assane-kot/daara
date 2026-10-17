@@ -427,7 +427,7 @@ nom de classe, matière déjà dans la classe), `23514` (dates, coefficient, `au
 | `decider_justification(p_absence, p_justifiee bool)` (S5.2) | `justifiee` / `non_justifiee`, `decide_par`, `decide_at` ; notifie les parents actuels | admin aal2 ou **titulaire** de la classe (`classes.titulaire_id`) ; module |
 | `statistiques_absences(p_daara, p_debut, p_fin, p_classe null)` → jsonb (S5.2) | par classe de l'année active ayant des appels : élèves inscrits, appels terminés, absences, retards, non justifiées, taux = absences / (élèves × appels) ; 10 élèves les plus absents (identifiants seulement : noms lus par l'écran avec ses droits) | security invoker (RLS) ; admin ou enseignant (ses classes) |
 | `peut_ecrire_evaluation(p_daara, p_classe_matiere)` (S6.2) | vrai si l'utilisateur écrit les évaluations (et en S6.3 les notes) de cette matière de classe : module `notes`, classe de l'année active, admin aal2, enseignant de la matière (`classe_matieres.enseignant_id`) ou titulaire si `reglages_notes.titulaire_saisit` ; utilisée par les politiques et en tête des triggers | exécutable par `authenticated` (politiques) |
-| `moyennes(p_classe, p_periode, p_apprenant null)` → jsonb (S6.4) | par élève : moyenne de chaque matière et moyenne générale selon `reglages_notes` (ADR-012 : barème ramené, coefficients, absent, pondérée / simple, arrondi) ; matière sans note ignorée | security invoker : calculée sur ce que l'appelant lit (le parent : notes visibles de son enfant ; moyennes masquées si `moyennes_visibles` est faux) |
+| `moyennes(p_classe, p_periode, p_apprenant null)` → jsonb `{ bareme, seuil, matieres[{id, nom, coefficient}], eleves[{apprenant_id, nom, prenom, matieres{classe_matiere_id: moyenne}, generale}] }` ou `{ masquees: true }` (S6.4) | par élève : moyenne de chaque matière et moyenne générale selon `reglages_notes` (ADR-012 : barème ramené, coefficients, absent, pondérée / simple, arrondi) ; matière sans note ignorée | security invoker : calculée sur ce que l'appelant lit (le parent : notes visibles de son enfant ; moyennes masquées si `moyennes_visibles` est faux) |
 | `arrondir_note(p_valeur, p_mode)` (S6.4) | arrondi au centième, dixième, quart, demi-point | fonction pure, `authenticated` |
 | `publier_evaluation(p_evaluation)` (S6.5) | `publiee_at`, notification `notes_publiees` aux parents actuels des élèves de la classe ; rappel sans effet | mêmes droits que l'écriture de l'évaluation |
 | `sans_accents(texte)` (S3.4) | minuscules sans accents (`unaccent` à dictionnaire explicite, immuable) ; colonnes générées `matieres.recherche` (nom + code) et `classes.recherche` (nom + niveau), filtrées par `ilike` côté client | fonction pure, exécutable par `authenticated` (colonnes générées) |
@@ -586,7 +586,10 @@ sequenceDiagram
 - Moyenne matière (période) : moyenne pondérée des notes par `coefficient` de l'évaluation. Élève absent : selon
   `reglages_notes.absence_evaluation` (ne compte pas / 0 / 0 si l'absence du jour n'est pas justifiée).
 - Moyenne générale : pondérée par `classe_matieres.coefficient` (ou simple, réglage) ; matière sans note ignorée.
-- Arrondi selon `reglages_notes.arrondi`, appliqué aux moyennes affichées.
+- Arrondi selon `reglages_notes.arrondi`, appliqué aux moyennes renvoyées (la générale est calculée sur les moyennes de
+  matière non arrondies). Absent « 0 si non justifiée » : absence justifiée de l'élève le jour de l'évaluation.
+- S6.4 : fonction `moyennes` (security invoker) ; le parent lit les matières de la classe de ses enfants
+  (`classe_matieres_select_parent`).
 - Rang : `rank() over (partition by classe, periode order by moyenne desc)`.
 - Implémentation : fonction SQL `calculer_bulletins(periode_id, classe_id)` ; à la publication, les valeurs
   sont figées dans `bulletins` / `bulletin_lignes`.

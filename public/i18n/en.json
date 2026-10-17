@@ -67,7 +67,8 @@
         "parametres_notes": "Settings · Grades",
         "parametres_absences": "Settings · Absences",
         "notes": "Grades",
-        "saisie_notes": "Enter grades"
+        "saisie_notes": "Enter grades",
+        "moyennes": "Averages"
     },
     "dashboard": {
         "titre": "Dashboard",
@@ -1409,6 +1410,17 @@
                 "chargement": "Unable to load grades. Check your connection.",
                 "inattendue": "Not saved: try again."
             }
+        },
+        "voir_moyennes": "View averages",
+        "moyennes": {
+            "titre": "Averages",
+            "retour": "Back to assessments",
+            "eleve": "Student",
+            "generale": "Overall average",
+            "coef": "coef. {{coef}}",
+            "legende": "Averages out of {{bareme}}, computed with the school's settings. In red: below {{seuil}}. “—”: no grade counted.",
+            "vide_titre": "No averages yet",
+            "vide_classes": "A class of the current year and its terms are needed to compute averages."
         }
     }
 }

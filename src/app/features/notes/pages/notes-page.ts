@@ -33,7 +33,13 @@ import {
     selector: 'app-notes-page',
     imports: [RouterLink, TranslatePipe, Badge, EmptyState, PageHeader, Skeleton],
     template: `
-        <app-page-header [titre]="'notes.titre' | translate" />
+        <app-page-header [titre]="'notes.titre' | translate">
+            @if (classe() && periode()) {
+                <a actions class="btn btn-outline-primary" routerLink="moyennes" [queryParams]="{ classe: classe()?.id, periode: periode()?.id }">{{
+                    'notes.voir_moyennes' | translate
+                }}</a>
+            }
+        </app-page-header>
         @if (chargement()) {
             <div class="panel"><app-skeleton [lignes]="4" /></div>
         } @else if (erreurChargement(); as erreur) {

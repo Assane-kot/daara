@@ -67,7 +67,8 @@
         "parametres_notes": "Paramètres · Notes",
         "parametres_absences": "Paramètres · Absences",
         "notes": "Notes",
-        "saisie_notes": "Saisie des notes"
+        "saisie_notes": "Saisie des notes",
+        "moyennes": "Moyennes"
     },
     "dashboard": {
         "titre": "Tableau de bord",
@@ -1409,6 +1410,17 @@
                 "chargement": "Impossible de charger les notes. Vérifiez votre connexion.",
                 "inattendue": "Non enregistré : réessayez."
             }
+        },
+        "voir_moyennes": "Voir les moyennes",
+        "moyennes": {
+            "titre": "Moyennes",
+            "retour": "Retour aux évaluations",
+            "eleve": "Élève",
+            "generale": "Moyenne générale",
+            "coef": "coef. {{coef}}",
+            "legende": "Moyennes sur {{bareme}}, calculées selon les réglages de la daara. En rouge : sous {{seuil}}. « — » : aucune note comptée.",
+            "vide_titre": "Pas encore de moyennes",
+            "vide_classes": "Il faut une classe de l’année en cours et ses trimestres pour calculer les moyennes."
         }
     }
 }
